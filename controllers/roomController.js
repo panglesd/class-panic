@@ -12,19 +12,17 @@ exports.room_list = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    roomList : function (callback) {
-		room.roomList(function (r) {
-		    console.log('là', r);
-		    callback(null, r) });
+		room.roomList(callback);
 	    },
 	    roomOwnedList :  function (callback) {
 		room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
-		set.setOwnedList(req.session.user, function (r) { callback(null, r) });
+		set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {
-	    console.log(results);
+//	    console.log(results);
 	    res.render('rooms', results)
 	});
 };
@@ -68,16 +66,20 @@ exports.room_admin = function(req, res) {
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
+	    room : function (callback) {
+		room.roomGetFromID(req.params.id, callback)
+	    },
+	    set : function (callback) {
+		question.questionListFromRoomId(req.params.id, callback);
+	    },
 	    roomList : function (callback) {
-		room.roomList(function (r) {
-		    console.log('là', r);
-		    callback(null, r) });
+		room.roomList(callback);
 	    },
 	    roomOwnedList :  function (callback) {
 		room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
-		set.setOwnedList(req.session.user, function (r) { callback(null, r) });
+		set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {

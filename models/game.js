@@ -56,33 +56,10 @@ exports.getStatsFromRoom = function (room, callback) {
 /***********************************************************************/
 
 exports.nextQuestionFromRoom = function (room, callback) {
-    bdd.query("SELECT id_nextQuestion FROM `rooms` WHERE `name` = ?", [room], function (err1, rows) {
-	idQuestion = rows[0].id_nextQuestion;
-	console.log("on devrait maintenant avoir current id question", idQuestion);
-	bdd.query("SELECT * FROM `question` WHERE `id` = ?", [idQuestion], function (err2, question) {
-	    exports.setStatusForRoom(room, "pending", function () {
-		Room.roomGetByName(room, function(roomBdd) {
-		    exports.findNextQuestion(idQuestion, roomBdd.questionSet, roomBdd.owner, function (idNextQuestion) {
-
-			console.log("on va maintenant executer : ");
-			console.log("UPDATE `rooms` SET `id_currentQuestion` = ? ,`id_nextQuestion`= ? WHERE `name`= ?",
-				    [                                        idQuestion,    idNextQuestion,       room ]);
-
-			bdd.query("UPDATE `rooms` SET `id_currentQuestion` = ? ,`id_nextQuestion`= ? WHERE `name`= ?",
-				  [                                        idQuestion,    idNextQuestion,       room ],
-				  function (err12, rows12) {
-				      console.log("les erreurs et le resultat", err12, rows12);
-				      bdd.query("UPDATE `poll` SET `response`=-1 WHERE `room`= ? ",
-						[room],
-						function () {
-						    //clean Inactive User
-						    callback();
-						});
-				      
-				  });
-		    });
-		});
-	    });
+    bdd.query("UPDATE `rooms` SET `id_currentQuestion` = (SELECT nextQuestion FROM `questions` WHERE `id` = (SELECT id_currentQuestion FROM (SELECT * FROM `rooms`) AS trick WHERE `name` = ?)) WHERE `name` = ?", [room, room], function (err1, rows) {
+	if (err1) throw err1;
+	bdd.query("DELETE FROM `poll` WHERE `last_activity`+5*60<NOW() AND `room` = ?", [room], function () {
+	    bdd.query("UPDATE `poll` SET `response`=-1 WHERE `room`= ? ", [room], callback);
 	});
     });
 }
@@ -101,7 +78,7 @@ exports.setStatusForRoom = function (room, status, callback) {
 /*       Trouver la question suivante d'une room                       */
 /***********************************************************************/
 
-exports.findNextQuestion = function (idCurrentQuestion, setId, owner, callback) {
+/*exports.findNextQuestion = function (idCurrentQuestion, setId, owner, callback) {
     console.log("pour trouver le prochain id");
     console.log("SELECT * FROM `questions` WHERE `id` > ? AND `class` = ? AND `owner` = ? ORDER BY `id` LIMIT 1;",
 		[                              idCurrentQuestion,     setId,          owner ]);
@@ -122,3 +99,4 @@ exports.findNextQuestion = function (idCurrentQuestion, setId, owner, callback) 
 }
 
     
+*/

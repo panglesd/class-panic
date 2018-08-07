@@ -26,7 +26,7 @@
 		  <select name="setQuestion" onchange="setUpdate()" id="setChosen">
 		      <option> </option>
 		      <% setOwnedList.forEach(function(set) { %>
-			  <option <%= set.class==0 ? "selected" : "" %>> <%= set.class %></option>
+			  <option <%= set.id == room.questionSet ? "selected" : "" %>> <%= set.name %></option>
 			  <% }); %>
 		  </select>
 	      </div>
@@ -34,12 +34,22 @@
 	  <ul id="chooseQFromSet">
 	    <li id="chooseQuestionNext"> Choisir la question suivante :</li>
 	    
-	    <% //questions.forEach(function (question) { %>
-	    <li onclick="setNextQuestionId(this)" id="q<%= question.id %>">
-	      <%= "1" // question.enonce %>
+	    <% i = set.firstQ ;
+	       do { %>
+	    <li onclick="setNextQuestionId(this)" id="q<%= set.lQuestion[i].id %>" class="<%= i==room.id_currentQuestion ? "currentQuestion" : (i==set.lQuestion[room.id_currentQuestion].nextQuestion ? "nextQuestion" : "") %>">
+	      <%= set.lQuestion[i].enonce %>
+	      <%  i = set.lQuestion[i].nextQuestion %>
 	    </li>
-	    <% //}); %>
+	    <% } while (i != set.firstQ) %>
 	  </ul>
+	  <div class="controlPanel" id="stats">
+	    <ul>
+	      <li style="font-family: Impact, 'Arial Black', Arial, Verdana, sans-serif;"> Ce qu'en disent les élèves : </li>
+	      <li> <div style="display:flex; justify-content: space-between;color:green;"> Georges : <div style="color:green;">3</div></div></li>
+	      <li> <div style="display:flex; justify-content: space-between;color:red;"> Barmpalias : <font color="red">0</font></div></li>
+	      <li> <div style="display:flex; justify-content: space-between;color:white;"> Albert : <font color="">2</font></div></li>
+	    </ul>
+	  </div>
       </div>
       <div id="nbVoters"> </div>
       <script src="/socket.io/socket.io.js"></script>
@@ -101,23 +111,24 @@
 	
 	socket.on('newQuestion', function (reponse) {
 	    console.log(reponse);
-	    if(document.querySelector("#question").innerHTML!=reponse.enonce) {
-		document.querySelectorAll(".reponse").forEach(function (value) {
-		    value.classList.remove("selected");
-		    value.classList.add("notSelected");
-		});
-		document.querySelectorAll(".reponse").forEach(function (e) {
-		    e.style.boxShadow="";
-		    //	   e.style.backgroundColor="#F5F5DC";
-		    e.style.background = "linear-gradient(to right, rgba(0,0,0,0) 0%,#F5F5DC 0%)";
-		});
-		
-		document.querySelector("#question").innerHTML=reponse.enonce;
-		document.querySelector("#rep0").innerHTML=reponse.reponse1;
-		document.querySelector("#rep1").innerHTML=reponse.reponse2;
-		document.querySelector("#rep2").innerHTML=reponse.reponse3;
-		document.querySelector("#rep3").innerHTML=reponse.reponse4;
-	    }	      
+	    document.querySelectorAll(".reponse").forEach(function (value) {
+		value.classList.remove("selected");
+		value.classList.add("notSelected");
+	    });
+	    document.querySelectorAll(".reponse").forEach(function (e) {
+		e.style.boxShadow="";
+		//	   e.style.backgroundColor="#F5F5DC";
+		e.style.background = "linear-gradient(to right, rgba(0,0,0,0) 0%,#F5F5DC 0%)";
+	    });
+	    document.querySelector("li.currentQuestion").classList.remove("currentQuestion");
+	    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
+	    document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
+	    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
+	    document.querySelector("#question").innerHTML=reponse.enonce;
+	    document.querySelector("#rep0").innerHTML=reponse.reponse1;
+	    document.querySelector("#rep1").innerHTML=reponse.reponse2;
+	    document.querySelector("#rep2").innerHTML=reponse.reponse3;
+	    document.querySelector("#rep3").innerHTML=reponse.reponse4;
 	});
 	
 	     /*********************************************************************/
@@ -127,16 +138,15 @@
 	socket.on('correction', function (correction) {
 	    console.log(correction);
 	    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
-	    document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
-	    var total=Math.max(correction.rep0+correction.rep1+correction.rep2+correction.rep3,1);
-	    document.querySelector("#rep0").style.background =
-		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep0)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep0)/total*100.)+"%)";
-	    document.querySelector("#rep1").style.background =
-		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep1)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep1)/total*100.)+"%)";
-	    document.querySelector("#rep2").style.background =
-		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep2)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep2)/total*100.)+"%)";
-	    document.querySelector("#rep3").style.background =
-		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep3)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep3)/total*100.)+"%)";
+	    //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
+	    document.querySelector("#rep"+"1").style.boxShadow="0 0 8px 15px green";
+	    var total = 0;
+	    correction.forEach(function (v) { total += v.count });
+	    total=Math.max(total,1);
+	    correction.forEach(function (v) {
+		document.querySelector("#rep"+v.answer).style.background =
+		    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100.-5)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
+	    });
 	});
 	
 	     /*********************************************************************/

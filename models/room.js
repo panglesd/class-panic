@@ -1,12 +1,15 @@
 bdd = require("./bdd");
 var async = require('async');
 
-
+exports.roomGetFromID = function(id, callback) {
+    bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [id], function (err, resu) {callback(err, resu[0])});
+};
 
 exports.roomList = function (callback) {
     // TO BE TESTED
     bdd.query('SELECT * FROM rooms', function(err, rows) {
-	console.log(rows);
+	if(err) throw err;
+//	console.log(rows);
 	async.parallel(
 	    rows.map(
 		function (room) {
@@ -17,9 +20,9 @@ exports.roomList = function (callback) {
 			});
 		    };
 		}),
-	    function (er, res) {
-		console.log("check ",rows); 
-		callback(rows);
+	    function (err, res) {
+//		console.log("check ",rows); 
+		callback(err, rows);
 	    }
 	);
     });
@@ -27,7 +30,7 @@ exports.roomList = function (callback) {
 exports.roomOwnedList = function (user, callback) {
     // TO BE IMPLEMENTED
     bdd.query('SELECT * FROM rooms WHERE `owner` = ?', [user.pseudo], function(err, rows) {
-	console.log(rows);
+//	console.log(rows);
 	callback(rows);
     });
 //    callback([]);
@@ -35,7 +38,7 @@ exports.roomOwnedList = function (user, callback) {
 exports.roomCreate = function (user, roomName, callback) {
     // TO BE CHECKED
     bdd.query('INSERT INTO `rooms`(`name`, `owner`) VALUES (?, ?)', [roomName, user.pseudo], function(err, rows) {
-	console.log(rows);
+//	console.log(rows);
 	callback(rows);
     });
 }

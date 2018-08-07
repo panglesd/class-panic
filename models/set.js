@@ -3,15 +3,15 @@
 
 
 exports.setList = function (callback) {
-    bdd.query('SELECT class FROM questions GROUP BY class', function(err, rows) {
-	console.log(rows);
-	callback(rows);
+    bdd.query('SELECT * FROM setDeQuestion', function(err, rows) {
+//	console.log(rows);
+	callback(err, rows);
     });
 }
 exports.setOwnedList = function (user, callback) {
-    bdd.query('SELECT class FROM questions WHERE `owner` = ? GROUP BY class', [user.pseudo], function(err, rows) {
-	console.log("SET OWNED LIST !!!!!!", rows);
-	callback(rows);
+    bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ?', [user.id], function(err, rows) {
+//	console.log("SET OWNED LIST !!!!!!", rows);
+	callback(err, rows);
     });
 }
 exports.setCreate = function (user, set, callback) {

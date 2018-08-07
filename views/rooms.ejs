@@ -47,7 +47,7 @@
 		<select name="setQ" id="setChosen<%= room.id %>">
 		  <% setOwnedList.forEach(function(setQ) { %>
 		  <option <%= setQ.id==room.setId ? "selected" : "" %>>
-		    <%= setQ.class %>
+		    <%= setQ.name %>
 		  </option>
 		  <% }); %>
 		</select>

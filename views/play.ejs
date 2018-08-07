@@ -59,16 +59,15 @@
 	  socket.on('correction', function (correction) {
 	      console.log(correction);
 	      document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
-	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
-	      var total=Math.max(correction.rep0+correction.rep1+correction.rep2+correction.rep3,1);
-	      document.querySelector("#rep0").style.background =
-		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep0)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep0)/total*100.)+"%)";
-	      document.querySelector("#rep1").style.background =
-		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep1)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep1)/total*100.)+"%)";
-	      document.querySelector("#rep2").style.background =
-		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep2)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep2)/total*100.)+"%)";
-	      document.querySelector("#rep3").style.background =
-		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep3)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep3)/total*100.)+"%)";
+//	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
+	      document.querySelector("#rep"+"1").style.boxShadow="0 0 8px 15px green";
+	      var total = 0;
+	      correction.forEach(function (v) { total += v.count });
+	      total=Math.max(total,1);
+	      correction.forEach(function (v) {
+		  document.querySelector("#rep"+v.answer).style.background =
+		      "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100.-5)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
+	      });
 	  });
 
 	  /*********************************************************************/

@@ -67,7 +67,6 @@ module.exports = function (server) {
 //	    console.log("jai une reponse");
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		sendStats(socket.room)
-		// Prevenir l'admin : TO IMPLEMENT!!!!!!
 	    });
 	});
     });
@@ -114,13 +113,15 @@ module.exports = function (server) {
 //	    console.log("should emit to", socket.room, "the correction");
 	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
 		console.log(r,e);
-		io.to(socket.room).emit("correction", {
+		io.to(socket.room).emit("correction", e);
+/*		io.to(socket.room).emit("correction", {
 		    correct: 2,
 		    rep1: Math.floor(100*Math.random()),
 		    rep2: Math.floor(100*Math.random()),
 		    rep3: Math.floor(100*Math.random()),
 		    rep0: Math.floor(100*Math.random())
-		});
+		}); 
+*/
 		game.setStatusForRoom(socket.room, "revealed", function () {});
 	    });
 	    
@@ -159,31 +160,6 @@ module.exports = function (server) {
 	});
     });
 
-
-    /*    setInterval(
-	function () {
-	    io.to("Math").emit("newQuestion",
-			       {
-				   enonce: "Vous sentez bon ?",
-				   reponse1: "ouinon",
-				   reponse2: "nonoui",
-				   reponse3: "yesno",
-				   reponse4: "noyes"
-			       });
-	    },
-	    3000);
-    setInterval(
-	function () {
-	    io.to("Math").emit("correction",
-			       {
-				   correct: 2,
-				   rep1: Math.floor(100*Math.random()),
-				   rep2: Math.floor(100*Math.random()),
-				   rep3: Math.floor(100*Math.random()),
-				   rep0: Math.floor(100*Math.random())
-			       });
-	    },
-	    3000);*/
     return io;
 };
 

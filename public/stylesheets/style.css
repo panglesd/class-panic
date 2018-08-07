@@ -148,7 +148,10 @@ html {
     content: "#";
 }*/
 li.nextQuestion {
-    border-left: 15px solid white;
+    border-left: 15px solid rgba(255,255,255,0.5);
+}
+li.currentQuestion {
+    border-left: 15px solid rgba(255,255,255,1);
 }
 
 #controlPanel > * {
