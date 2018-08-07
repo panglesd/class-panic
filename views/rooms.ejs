@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" href="/stylesheets/style_main.css">
+    <script src="ajax.js"></script>
+  </head>
+  <body>
+    <div id="main_wrapper">
+      <h1>Quizz Panic</h1>
+      <nav>
+	<ul>
+	  <li><a href="/classPanic/room">Rejoindre une salle</a></li>
+	  <li><a href="/classPanic/user">Mon compte</a></li>
+	  <li><a id="leave" href="/classPanic/logout">Se d&eacute;connecter</a></li>
+      </nav>
+      <div class="wrapper" id="connect_wrapper">
+	<h2>Se connecter à une salle</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+	<ul class="room">
+	  <% roomList.forEach(function(room) { %>
+	  <a class="room" href="/classPanic/room/<%= room.id %>">
+	    <li class="room">
+	      <span class="froom"><%= room.name %></span>
+	      <ul>
+		<li>Nombre de participants : <%= room.number %></li>
+		<li>Administrateur: <%=room.owner %></li>
+	      </ul>
+	      <div>
+		Rejoindre
+	      </div>
+	    </li>
+	  </a>
+	  <% });%>
+	</ul>
+      </div>
+      <div id="admin_wrapper" class="wrapper">
+	<h2>Administrer une salle</h2>
+	Vous pouvez administrer l'une des salles suivantes :
+	<ul>
+	  <% roomOwnedList.forEach(function(room) { %>
+	  <li>
+	    <form method="post">
+	      Administrer <span class="froom"> <%= room.name %> </span> avec le set
+	      <div class="select" >
+		<select name="setQ" id="setChosen<%= room.id %>">
+		  <% setOwnedList.forEach(function(setQ) { %>
+		  <option <%= setQ.id==room.setId ? "selected" : "" %>>
+		    <%= setQ.class %>
+		  </option>
+		  <% }); %>
+		</select>
+	      </div>
+	      <input class="go" type="submit" value="Go !">
+	      <input class="go" type="button" value="Supprimer la salle">
+	    </form>
+	  </li>
+	  <% }); %>
+	</ul>
+	Vous pouvez aussi créer une salle :
+	<form method="post"><input name="roomToCreate" type="text"> <input type="submit" value="Créer" ></form>
+      </div>
+      <div id="setWrapper" class="wrapper">
+	<h2>G&eacute;rer son set de questions</h2>
+	<h3>Créer un nouveau set</h3>
+	<form method="post"><input name="setName" type="text"> <input type="submit" value="Créer" ></form>
+	
+	<br>
+	Gérer un set existant : 
+	
+	<form method="post">
+	  <div class="select" ><select name="setQuestion" onchange="setUpdate()" id="setChosen">
+	      <option> </option>
+	      <% setOwnedList.forEach(function (set) { %>
+	      <option <%= false ? "selected" : "" %>>
+		<%=  set.class %>
+	      </option>
+	      <% }); %>
+	    </select>
+	  </div>
+	  <div id="containerSet">
+	  </div>
+	</form>
+      </div>
+      <div id="footer"> <a id="leave" href="/classPanic/logout">Se deconnecter (<%= user.pseudo %>)</a></div>
+    </div>
+  </body>
+</html>

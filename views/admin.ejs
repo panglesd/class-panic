@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+<!--    <script src="script.js"></script>-->
+  </head>
+  <body>
+      <div id="answerContainer">
+	  <div id="question"></div>
+	  <div class="reponse" id="rep0"></div>
+	  <div class="reponse" id="rep1"></div>
+	  <div class="reponse" id="rep2"></div>
+	  <div class="reponse" id="rep3"></div>
+	  <div id="leave"><a href="main.php">Quitter la salle</a></div>
+      </div>
+      <div id="controlPanel">
+	  <div class="controlPanel" id="reveal">Réveler</div>
+	  <div class="controlPanel" id="nextQuestion">Passer à la question suivante</div>
+	  <!--	      <div class="controlPanel" id="choose">La prochaine question sera</div>-->
+	  <ul id="chooseSet">
+	      <li id="chooseQuestion"> Choisir le set de questions :</li>
+	      
+	      <div class="select">
+		  <select name="setQuestion" onchange="setUpdate()" id="setChosen">
+		      <option> </option>
+		      <% setOwnedList.forEach(function(set) { %>
+			  <option <%= set.class==0 ? "selected" : "" %>> <%= set.class %></option>
+			  <% }); %>
+		  </select>
+	      </div>
+	  </ul>
+	  <ul id="chooseQFromSet">
+	    <li id="chooseQuestionNext"> Choisir la question suivante :</li>
+	    
+	    <% //questions.forEach(function (question) { %>
+	    <li onclick="setNextQuestionId(this)" id="q<%= question.id %>">
+	      <%= "1" // question.enonce %>
+	    </li>
+	    <% //}); %>
+	  </ul>
+      </div>
+      <div id="nbVoters"> </div>
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+	var socket = io.connect('http://localhost:3000/');
+	var socketAdmin = io.connect('http://localhost:3000/admin');
+	
+	     /*********************************************************************/
+	     /*                 Actions à effectuer à toute connection            */
+	     /*********************************************************************/
+	
+	// On informe le serveur dans quel room on est
+	socket.on('connect', () => {
+    	    socket.emit("chooseRoom", "Math");
+	});
+	socketAdmin.on('connect', () => {
+	    socketAdmin.emit("chooseRoom", "Math");
+	});
+
+	/*******************************************************************************/
+	/*******************************************************************************/
+	/*                 Partie propre aux admins                                    */
+	/*******************************************************************************/
+
+    	     /*********************************************************************/
+	     /*                 lorsque l'on veut changer de question             */
+	     /*********************************************************************/
+
+	function changeQuestionPlease() {
+	    socketAdmin.emit("changeQuestionPlease");
+	}
+
+    	     /*********************************************************************/
+	     /*                 lorsque l'on veut reveler les resultats           */
+	     /*********************************************************************/
+
+	function revealResults() {
+	    socketAdmin.emit("revealResults");
+	}
+
+    	     /*********************************************************************/
+	     /*                 lorsque l'on reçoit les nouvelles statistiques    */
+	     /*********************************************************************/
+
+	socketAdmin.on('newStats', function (newStats) {
+	    console.log(newStats);
+	    // TO BE IMPLEMENTED
+	});
+
+	
+	/*******************************************************************************/
+	/*******************************************************************************/
+	/*                 Partie commune aux eleves et aux admins                     */
+	/*******************************************************************************/
+	
+    	     /*********************************************************************/
+	     /*                 lorsque l'on reçoit une nouvelle question         */
+	     /*********************************************************************/
+	
+	socket.on('newQuestion', function (reponse) {
+	    console.log(reponse);
+	    if(document.querySelector("#question").innerHTML!=reponse.enonce) {
+		document.querySelectorAll(".reponse").forEach(function (value) {
+		    value.classList.remove("selected");
+		    value.classList.add("notSelected");
+		});
+		document.querySelectorAll(".reponse").forEach(function (e) {
+		    e.style.boxShadow="";
+		    //	   e.style.backgroundColor="#F5F5DC";
+		    e.style.background = "linear-gradient(to right, rgba(0,0,0,0) 0%,#F5F5DC 0%)";
+		});
+		
+		document.querySelector("#question").innerHTML=reponse.enonce;
+		document.querySelector("#rep0").innerHTML=reponse.reponse1;
+		document.querySelector("#rep1").innerHTML=reponse.reponse2;
+		document.querySelector("#rep2").innerHTML=reponse.reponse3;
+		document.querySelector("#rep3").innerHTML=reponse.reponse4;
+	    }	      
+	});
+	
+	     /*********************************************************************/
+	     /*                 lorsque l'on reçoit la correction                 */
+	     /*********************************************************************/
+	
+	socket.on('correction', function (correction) {
+	    console.log(correction);
+	    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
+	    document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
+	    var total=Math.max(correction.rep0+correction.rep1+correction.rep2+correction.rep3,1);
+	    document.querySelector("#rep0").style.background =
+		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep0)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep0)/total*100.)+"%)";
+	    document.querySelector("#rep1").style.background =
+		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep1)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep1)/total*100.)+"%)";
+	    document.querySelector("#rep2").style.background =
+		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep2)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep2)/total*100.)+"%)";
+	    document.querySelector("#rep3").style.background =
+		"linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep3)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep3)/total*100.)+"%)";
+	});
+	
+	     /*********************************************************************/
+	     /*                 pour redemander d'envoyer la question             */
+	     /*********************************************************************/
+	
+	function sendQuestionPlease() {
+	    socket.emit("sendQuestionPlease");
+	}
+	
+	     /*********************************************************************/
+	     /*                 pour envoyer son choix de reponse                 */
+	     /*********************************************************************/
+	
+	function chooseAnswer(i) {
+	    socket.emit("chosenAnswer", i);
+	}
+	     /*********************************************************************/
+	     /*                 Mise en place des event listeners                 */
+	     /*********************************************************************/
+	
+	document.querySelector("#reveal").addEventListener("click", revealResults);
+	document.querySelector("#nextQuestion").addEventListener("click", changeQuestionPlease);
+	
+      </script>
+  </body>
+</html>

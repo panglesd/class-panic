@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<title>title</title>
+	<link rel="stylesheet" href="/stylesheets/style.css">
+    </head>
+    <body>
+	<!--      <h1>My own Quizz Panic</h1>-->
+	<div id="question"></div>
+	<div class="reponse notSelected" id="rep0"></div>
+	<div class="reponse notSelected" id="rep1"></div>
+	<div class="reponse notSelected" id="rep2"></div>
+	<div class="reponse notSelected" id="rep3"></div>
+	<div id="leave"><a href="/classPanic/room">Quitter la salle</a></div>
+	
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	  var socket = io.connect('http://localhost:3000/');
+	  /*********************************************************************/
+	  /*                 Actions à effectuer à toute connection            */
+	  /*********************************************************************/
+
+	  // On informe le serveur dans quel room on est
+	socket.on('connect', () => {
+    	    socket.emit("chooseRoom", "Math");
+	});
+
+
+	  /*********************************************************************/
+	  /*                 lorsque l'on reçoit une nouvelle question         */
+	  /*********************************************************************/
+
+	  socket.on('newQuestion', function (reponse) {
+	      console.log(reponse);
+	      if(document.querySelector("#question").innerHTML!=reponse.enonce) {
+		  document.querySelectorAll(".reponse").forEach(function (value) {
+		      value.classList.remove("selected");
+		      value.classList.add("notSelected");
+		  });
+		  document.querySelectorAll(".reponse").forEach(function (e) {
+		      e.style.boxShadow="";
+		      //	   e.style.backgroundColor="#F5F5DC";
+		      e.style.background = "linear-gradient(to right, rgba(0,0,0,0) 0%,#F5F5DC 0%)";
+		  });
+		  
+		  document.querySelector("#question").innerHTML=reponse.enonce;
+		  document.querySelector("#rep0").innerHTML=reponse.reponse1;
+		  document.querySelector("#rep1").innerHTML=reponse.reponse2;
+		  document.querySelector("#rep2").innerHTML=reponse.reponse3;
+		  document.querySelector("#rep3").innerHTML=reponse.reponse4;
+	      }	      
+	  });
+
+	  /*********************************************************************/
+	  /*                 lorsque l'on reçoit la correction                 */
+	  /*********************************************************************/
+
+	  socket.on('correction', function (correction) {
+	      console.log(correction);
+	      document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
+	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
+	      var total=Math.max(correction.rep0+correction.rep1+correction.rep2+correction.rep3,1);
+	      document.querySelector("#rep0").style.background =
+		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep0)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep0)/total*100.)+"%)";
+	      document.querySelector("#rep1").style.background =
+		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep1)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep1)/total*100.)+"%)";
+	      document.querySelector("#rep2").style.background =
+		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep2)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep2)/total*100.)+"%)";
+	      document.querySelector("#rep3").style.background =
+		  "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+correction.rep3)/total*100.-5)+"%,#F5F5DC "+((0.+correction.rep3)/total*100.)+"%)";
+	  });
+
+	  /*********************************************************************/
+	  /*                 pour redemander d'envoyer la question             */
+	  /*********************************************************************/
+
+	  function sendQuestionPlease() {
+	      socket.emit("sendQuestionPlease");
+	  }
+	  
+	  /*********************************************************************/
+	  /*                 pour envoyer son choix de reponse                 */
+	  /*********************************************************************/
+	  
+	  var reponses=document.querySelectorAll(".reponse");
+	  for(var vari=0;vari<reponses.length;vari++) {
+	      reponses[vari].addEventListener("click",chooseAnswer);
+	  };
+	  
+	  function chooseAnswer(a) {
+	      i=a.target.id.charAt(3);
+	      var reponses=document.querySelectorAll(".reponse");
+	      for(var vari=0;vari<reponses.length;vari++) {
+		  value=reponses[vari];
+		  value.classList.remove("selected");
+		  value.classList.add("notSelected");
+	      };
+	      a.target.classList.remove("notSelected");
+	      a.target.classList.add("selected");
+	      socket.emit("chosenAnswer", i);
+	  }
+
+	</script>
+    </body>
+</html>
