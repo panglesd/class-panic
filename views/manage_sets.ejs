@@ -4,8 +4,8 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
     <% setOwnedList.forEach(function(set) { %>
-	<a class="room" href="/classPanic/set/<%= set.id %>">
-	    <li class="room" onclick="alert('yo')">
+	<a class="room" href="/classPanic/manage/set/<%= set.id %>">
+	    <li class="room">
 		<span class="froom"><%= set.name %></span>
 		<!--	      <ul>		
 		     <li>Nombre de participants : <%=// room.number %></li>
@@ -17,7 +17,7 @@
 	    </li>
 	</a>
     <% });%>
-    <li class="room" onclick="alert('yo')">
+    <li class="room">
 	<span class="froom">Créer un nouveau set</span>
 	<div>
 	    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>

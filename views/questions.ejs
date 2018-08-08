@@ -5,7 +5,7 @@
 <ul class="room">
     <% questionList.forEach(function(q) { %>
 	<a class="room" href="/classPanic/set/<%= set.id %>/question/<%= q.id %>">
-	    <li class="room" onclick="alert('yo')">
+	    <li class="room">
 		<span class="froom"><%= q.enonce %></span>
 		<!--	      <ul>		
 		     <li>Nombre de participants : <%=// room.number %></li>
@@ -17,12 +17,14 @@
 	    </li>
 	</a>
     <% });%>
-    <li class="room" onclick="alert('yo')">
+    <li class="room">
 	<span class="froom">Créer une nouvelle question</span>
 	<div>
 	    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
 	</div>
     </li>
 </ul>
+
+<a style="display:block; margin:40px;" href="/classPanic/manage/set"> Retourner à la liste des sets </a>
 
 <%- include('admin_footer'); -%>

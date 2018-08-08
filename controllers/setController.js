@@ -3,7 +3,7 @@ var room = require('../models/room');
 var set = require('../models/set');
 var async = require('async');
 
-exports.set_list = function(req, res) {
+exports.set_manage_all = function(req, res) {
     //    res.send('NOT IMPLEMENTED: Room list');
     async.parallel(
 	{
@@ -23,12 +23,12 @@ exports.set_list = function(req, res) {
 	},
 	function (err, results) {
 	    console.log(results);
-	    res.render('set', results)
+	    res.render('manage_sets', results)
 	});
 };
 
 
-exports.setShow = function(req, res) {
+exports.set_manage = function(req, res) {
     //    res.send('NOT IMPLEMENTED: Room list');
     async.parallel(
 	{
@@ -37,10 +37,10 @@ exports.setShow = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    questionList : function (callback) {
-		question.questionListFromSetId(req.params.setId,function (e,b) {callback(e,b)});
+		question.questionListFromSetId(req.params.id,function (e,b) {callback(e,b)});
 	    },
 	    set : function (callback) {
-		set.setGet(req.session.user, req.params.setId, callback);
+		set.setGet(req.session.user, req.params.id, callback);
 	    }
 /*	    roomList : function (callback) {
 		room.roomList(callback);
@@ -50,7 +50,7 @@ exports.setShow = function(req, res) {
 	    },*/
 	},
 	function (err, results) {
-	    console.log(results.questionList);
+	    console.log(results);
 	    res.render('questions', results)
 	});
 };

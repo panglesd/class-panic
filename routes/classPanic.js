@@ -38,8 +38,24 @@ router.post('/manage/room/create', room_controller.room_create_post);
 router.get('/manage/room', room_controller.room_manage_all);
 
    /**********************************************************/
-   /*              Managing sets of queestions               */
+   /*              Managing sets of questions                */
    /**********************************************************/
+
+// POST request for deleting a set.
+//router.post('/manage/set/:id/delete', set_controller.set_delete_post);
+
+// POST request for modifying a set.
+//router.post('/manage/set/:id/update', set_controller.set_update_post);
+
+// GET request for managing a particular set.
+router.get('/manage/set/:id', set_controller.set_manage);
+
+// POST request for creating a set.
+//router.post('/manage/set/create', set_controller.set_create_post);
+
+// GET request for the main managing set page.
+router.get('/manage/set', set_controller.set_manage_all);
+
 
 // GET request for the main managing set page.
 //router.get('/manage/set', room_controller.room_create);
@@ -76,10 +92,10 @@ router.get('/admin/room', room_controller.room_admin_all);
 // GET request for showing set list.
 router.get('/manage/set/:setId/question/:questionId', question_controller.questionShow);
 // GET request for showing set list.
-router.get('/manage/set/:setId', set_controller.setShow);
+//router.get('/manage/set/:setId', set_controller.setShow);
 
 // GET request for showing set list.
-router.get('/manage/set', set_controller.set_list);
+//router.get('/manage/set', set_controller.set_list);
 
 
 // POST request for creating a room.
