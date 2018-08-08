@@ -43,7 +43,23 @@ table {
 	border-spacing: 0;
 }
 
-
+#chooseSet li:not(#chooseQuestion) {
+    /*    display:none;*/
+    animation:
+}
+#chooseQuestion {
+    cursor:pointer;
+}
+#chooseQuestion.hidden .arrow {
+    transform:rotate(90deg);
+}
+#chooseQuestion.shown .arrow {
+    transform:rotate(0deg);
+}
+/*#chooseSet:hover  li:not(#chooseQuestion) {
+    display: none;
+/*    height:0px;
+}*/
 
 .reponse {
     position:absolute;
@@ -148,7 +164,7 @@ html {
     content: "#";
 }*/
 li.nextQuestion {
-    border-left: 15px solid rgba(255,255,255,0.5);
+/*    border-left: 15px solid rgba(255,255,255,0.5);*/
 }
 li.currentQuestion {
     border-left: 15px solid rgba(255,255,255,1);

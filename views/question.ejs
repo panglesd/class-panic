@@ -1,0 +1,22 @@
+<%- include('admin_header'); -%>
+
+<h2> Modification de la question <%= question.id %></h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<form>
+    Énoncé :
+    <textarea style="width:100%"><%= question.enonce %></textarea>
+    Réponse 1 :
+    <textarea style="width:100%"><%= question.reponse1 %></textarea>
+    Réponse 2 :
+    <textarea style="width:100%"><%= question.reponse2 %></textarea>
+    Réponse 3 :
+    <textarea style="width:100%"><%= question.reponse3 %></textarea>
+    Réponse 4 :
+    <textarea style="width:100%"><%= question.reponse4 %></textarea>
+    La réponse correcte : <input type="number" value="<%= question.correct%>">
+    <button>Enregistrer cette réponse.</button>
+    <button>Supprimer cette réponse.</button>
+</form>
+Revenir au set "<%= set.name %>"
+
+<%- include('admin_footer'); -%>

@@ -26,6 +26,14 @@ function revealResults() {
 }
 
 /*********************************************************************/
+/*                 lorsque l'on veut aller à une question donnée     */
+/*********************************************************************/
+
+function revealResults(i) {
+    socketAdmin.emit("changeToQuestion", i);
+}
+
+/*********************************************************************/
 /*                 lorsque l'on reçoit les nouvelles statistiques    */
 /*********************************************************************/
 

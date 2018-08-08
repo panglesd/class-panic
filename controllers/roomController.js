@@ -1,24 +1,26 @@
-var user = require('../models/user');
-var room = require('../models/room');
-var set = require('../models/set');
+var User = require('../models/user');
+var Room = require('../models/room');
+var Set = require('../models/set');
+
 var async = require('async');
 
-// Display list of all Authors.
+
 exports.room_list = function(req, res) {
     //    res.send('NOT IMPLEMENTED: Room list');
     async.parallel(
 	{
+	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
 	    roomList : function (callback) {
-		room.roomList(callback);
+		Room.roomList(callback);
 	    },
 	    roomOwnedList :  function (callback) {
-		room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+		Room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
-		set.setOwnedList(req.session.user, callback);
+		Set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {
@@ -27,77 +29,109 @@ exports.room_list = function(req, res) {
 	});
 };
 
-// Display detail page for a specific Author.
+
+exports.room_admin_all = function(req, res) {
+    //    res.send('NOT IMPLEMENTED: Room list');
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: Administrer une salle")},
+	    user : function (callback) {
+		callback(null, req.session.user);
+	    },
+	    roomList : function (callback) {
+		Room.roomList(callback);
+	    },
+	    roomOwnedList :  function (callback) {
+		Room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+	    },
+	    setOwnedList :  function (callback) {
+		Set.setOwnedList(req.session.user, callback);
+	    }
+	},
+	function (err, results) {
+//	    console.log(results);
+	    res.render('admin_rooms', results)
+	});
+};
+exports.room_manage_all = function(req, res) {
+    //    res.send('NOT IMPLEMENTED: Room list');
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    user : function (callback) {
+		callback(null, req.session.user);
+	    },
+	    roomList : function (callback) {
+		Room.roomList(callback);
+	    },
+	    roomOwnedList :  function (callback) {
+		Room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+	    },
+	    setOwnedList :  function (callback) {
+		Set.setOwnedList(req.session.user, callback);
+	    }
+	},
+	function (err, results) {
+//	    console.log(results);
+	    res.render('manage_rooms', results)
+	});
+};
+
+
 exports.room_detail = function(req, res) {
     res.send('NOT IMPLEMENTED: Author detail: ' + req.params.id);
 };
 
-// Display Author create form on GET.
-exports.room_create = function(req, res) {
-    res.send('NOT IMPLEMENTED: Room create GET');
-};
 
-// Handle Author create on POST.
+
 exports.room_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author create POST');
+    Room.roomCreate(req.session.user, req.body, function () {
+    res.redirect('/classPanic/manage/room');
+    });
 };
 
-// Display Author delete form on GET.
+
 exports.room_delete = function(req, res) {
-    res.send('NOT IMPLEMENTED: Room delete GET');
+//    Room.roomDelete(req.session.user, req.params.id, function () {
+//	res.redirect("/manage/room");
+//    });
 };
 
-// Handle Author delete on POST.
+
 exports.room_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author delete POST');
+    Room.roomDelete(req.session.user, req.params.id, function () {
+	res.redirect("/classPanic/manage/room");
+    });
 };
 
-// Display Author update form on GET.
-exports.room_enter = function(req, res) {
-    async.parallel(
-	{
-	    room : function (callback) {
-		room.roomGetFromID(req.params.id, callback)
-	    }
-	},
-	function (err, results) {
-	    //	    console.log(results);
-	    res.render('play', results);
-	});
-};
 
-// Display Author update form on GET.
-exports.room_admin = function(req, res) {
-    //res.send('NOT IMPLEMENTED: Roome enter GET');
-    async.parallel(
-	{
-	    user : function (callback) {
-		callback(null, req.session.user);
-	    },
-	    room : function (callback) {
-		room.roomGetFromID(req.params.id, callback)
-	    },
-	    set : function (callback) {
-		question.questionListFromRoomId(req.params.id, callback);
-	    },
-	    roomList : function (callback) {
-		room.roomList(callback);
-	    },
-	    roomOwnedList :  function (callback) {
-		room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
-	    },
-	    setOwnedList :  function (callback) {
-		set.setOwnedList(req.session.user, callback);
-	    }
-	},
-	function (err, results) {
-	    console.log("this one", results);
-	    res.render('admin', results);
-//	    res.render('rooms', results)
-	});
-};
 
-// Handle Author update on POST.
 exports.room_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author update POST');
+    //    console.log(req.body);
+    Room.roomUpdate(req.session.user, req.params, req.body, function (id) {
+	res.redirect('/classPanic/manage/room/'+req.params.id);
+    });
+};
+
+exports.room_manage = function (req, res) {
+    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `owner` = ?", [req.params.id, req.session.user.pseudo], function (err, rows) {
+	thisRoom = rows[0];
+	async.parallel(
+	    {
+		title : function(callback) { callback(null, "ClassPanic: Administrer "+thisRoom.name)},
+		user : function (callback) {
+		    callback(null, req.session.user);
+		},
+		room :  function (callback) {
+		    callback(null, thisRoom);
+		},
+	    	setOwnedList :  function (callback) {
+		    Set.setOwnedList(req.session.user, callback);
+		}
+	    },
+	    function (err, results) {
+		console.log(results);
+		res.render('manage_room', results);
+	    });
+    });
 };

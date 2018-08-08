@@ -46,6 +46,15 @@ module.exports = function (server) {
 	    setTimeout(function () {console.log("socket is now in room", socket.rooms, "!");},1000);
 	    game.questionFromRoom(socket.room, function (question) {
 		socket.emit("newQuestion", question);
+		room.getStatus(socket.room, function (err, status) {
+		    console.log(status);
+		    if(status == "revealed") {
+		    	game.getAnonStatsFromRoom(socket.room, function (r,e) {
+			    console.log(r,e);
+			    io.to(socket.room).emit("correction", e);
+			});
+		    }
+		});
 	    });
 	});
 
@@ -116,8 +125,20 @@ module.exports = function (server) {
 		console.log(r,e);
 		io.to(socket.room).emit("correction", e);
 		game.setStatusForRoom(socket.room, "revealed", function () {});
-	    });
-	    
+	    });	    
+	});
+
+	/******************************************/
+	/*  On souhaite aller direct à une question*/
+	/******************************************/
+
+	socket.on('changeToQuestion', function () {
+//	    console.log("should emit to", socket.room, "the correction");
+	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
+		console.log(r,e);
+		io.to(socket.room).emit("correction", e);
+		game.setStatusForRoom(socket.room, "revealed", function () {});
+	    });	    
 	});
 	
 	/******************************************/

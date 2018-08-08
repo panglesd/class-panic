@@ -1,0 +1,28 @@
+<%- include('admin_header'); -%>
+
+<h2> Votre set "<%= set.name %>" contient les questions suivantes :</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class="room">
+    <% questionList.forEach(function(q) { %>
+	<a class="room" href="/classPanic/set/<%= set.id %>/question/<%= q.id %>">
+	    <li class="room" onclick="alert('yo')">
+		<span class="froom"><%= q.enonce %></span>
+		<!--	      <ul>		
+		     <li>Nombre de participants : <%=// room.number %></li>
+		     <li>Administrateur: <%=// room.owner %></li>
+		     </ul>-->
+		<div>
+		    <ul> <li> Modifier </li> </ul>
+		</div>
+	    </li>
+	</a>
+    <% });%>
+    <li class="room" onclick="alert('yo')">
+	<span class="froom">Créer une nouvelle question</span>
+	<div>
+	    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+	</div>
+    </li>
+</ul>
+
+<%- include('admin_footer'); -%>

@@ -1,0 +1,28 @@
+<%- include('admin_header'); -%>
+
+<h2> Vos sets</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class="room">
+    <% setOwnedList.forEach(function(set) { %>
+	<a class="room" href="/classPanic/set/<%= set.id %>">
+	    <li class="room" onclick="alert('yo')">
+		<span class="froom"><%= set.name %></span>
+		<!--	      <ul>		
+		     <li>Nombre de participants : <%=// room.number %></li>
+		     <li>Administrateur: <%=// room.owner %></li>
+		     </ul>-->
+		<div>
+		    <ul> <li> Modifier </li> </ul>
+		</div>
+	    </li>
+	</a>
+    <% });%>
+    <li class="room" onclick="alert('yo')">
+	<span class="froom">Créer un nouveau set</span>
+	<div>
+	    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+	</div>
+    </li>
+</ul>
+
+<%- include('admin_footer'); -%>

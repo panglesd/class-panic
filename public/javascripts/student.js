@@ -41,11 +41,14 @@ socket.on('correction', function (correction) {
     //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
     document.querySelector("#rep"+"1").style.boxShadow="0 0 8px 15px green";
     var total = 0;
-    correction.forEach(function (v) { total += v.count });
+    correction.anonStats.forEach(function (v) { total += v.count });
     total=Math.max(total,1);
-    correction.forEach(function (v) {
-	document.querySelector("#rep"+v.answer).style.background =
+    correction.anonStats.forEach(function (v) {
+	if(v.answer!=-1) {
+//	    console.log("#rep"+v.answer);
+	    document.querySelector("#rep"+v.answer).style.background =
 	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100.-5)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
+	}
     });
 });
 

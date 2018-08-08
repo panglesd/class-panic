@@ -1,4 +1,4 @@
-//bdd = require("bdd");
+bdd = require("./bdd");
 
 
 
@@ -13,6 +13,13 @@ exports.setOwnedList = function (user, callback) {
 //	console.log("SET OWNED LIST !!!!!!", rows);
 	callback(err, rows);
     });
+}
+exports.setGet = function (user, id, callback) {
+    bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ? AND `id` = ?', [user.id, id], function(err, rows) {
+//	console.log("SET OWNED LIST !!!!!!", rows);
+	callback(err, rows[0]);
+    });
+    // TO BE IMPLEMENTED
 }
 exports.setCreate = function (user, set, callback) {
     // TO BE IMPLEMENTED

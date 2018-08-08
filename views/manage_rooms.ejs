@@ -1,0 +1,38 @@
+<%- include('admin_header'); -%>
+
+<h2> Vos salles</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class="room">
+    <% roomOwnedList.forEach(function(room) { %>
+	<a class="room" href="/classPanic/manage/room/<%= room.id %>">
+	    <li class="room">
+		<span class="froom"><%= room.name %></span>
+		<!--	      <ul>		
+		     <li>Nombre de participants : <%= room.number %></li>
+		     <li>Administrateur: <%=room.owner %></li>
+		     </ul>-->
+		<div>
+		    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+		</div>
+	    </li>
+	</a>
+    <% });%>
+    <li class="room">
+	<span class="froom">Créer une nouvelle salle</span>
+	<form id="formNewRoom" action="/classPanic/manage/room/create" method="post">
+	    <input placeholder="Nom de la room" name="name">
+	    <select name="questionSet">
+		<% setOwnedList.forEach( function (set) { %>
+		    <option value="<%=set.id%>">
+			<%=set.name %>
+		    </option>
+		<% }); %>
+	    </select>
+	</form>
+	<div>
+	    <ul> <li> <span onclick="document.querySelector('#formNewRoom').submit()" style="cursor:pointer">Créer</span> </li> </ul>
+	</div>
+    </li>
+</ul>
+
+<%- include('admin_footer'); -%>

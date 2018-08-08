@@ -5,8 +5,8 @@ bdd = require("./bdd");
 exports.questionList = function (callback) {
     bdd.query("SELECT * FROM `questions`", callback);
 }
-exports.questionListFromSet = function (set, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ?", [set.name], callback);
+exports.questionListFromSetId = function (set, callback) {
+    bdd.query("SELECT * FROM `questions` WHERE `class` = ?", [set], callback);
 }
 exports.questionListFromSetFormatted = function (set, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `class` = ?", [set.id], function(err, qList) {
@@ -21,6 +21,9 @@ exports.questionListFromRoomId = function (id, callback) {
     bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id], function(err, qList) {
 	exports.questionListFromSetFormatted(qList[0], callback);
     });
+}
+exports.questionGet = function (questionId, callback) {
+    bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) { callback(err, rows[0])});
 }
 exports.questionCreate = function (user, question, callback) {
     // TO BE IMPLEMENTED

@@ -20,16 +20,16 @@
 	  <div class="controlPanel" id="nextQuestion">Passer à la question suivante</div>
 	  <!--	      <div class="controlPanel" id="choose">La prochaine question sera</div>-->
 	  <ul id="chooseSet">
-	      <li id="chooseQuestion"> Choisir le set de questions :</li>
-	      
-	      <div class="select">
+	    <li style="display:flex; justify-content: space-between;" id="chooseQuestion" onclick="showHideSet()"> Choisir le set de questions : <span class="arrow"> > </span></li>
+	    
+<!--	      <div class="select">
 		  <select name="setQuestion" onchange="setUpdate()" id="setChosen">
-		      <option> </option>
+		      <option> </option>-->
 		      <% setOwnedList.forEach(function(set) { %>
-			  <option <%= set.id == room.questionSet ? "selected" : "" %>> <%= set.name %></option>
-			  <% }); %>
-		  </select>
-	      </div>
+		      <li class="possibleSet" <%= set.id == room.questionSet ? "selected" : "" %>> <%= set.name %></li>
+		      <% }); %>
+		      <!--		  </select>
+					  </div>-->
 	  </ul>
 	  <ul id="chooseQFromSet">
 	    <li id="chooseQuestionNext"> Choisir la question suivante :</li>
@@ -64,7 +64,22 @@
 	
 	document.querySelector("#reveal").addEventListener("click", revealResults);
 	document.querySelector("#nextQuestion").addEventListener("click", changeQuestionPlease);
-	
+
+
+	/* De la mise en page */
+
+	showHideSet = function () {
+	    document.querySelectorAll('.possibleSet').forEach(function(elem) {elem.style.display=elem.style.display=='none' ? 'block' : 'none'});
+	    if(document.querySelector("#chooseQuestion").classList.contains("shown")) {
+		document.querySelector("#chooseQuestion").classList.remove("shown");
+		document.querySelector("#chooseQuestion").classList.add("hidden");
+	    }
+	    else {
+		document.querySelector("#chooseQuestion").classList.add("shown");
+		document.querySelector("#chooseQuestion").classList.remove("hidden");
+	    }
+	};
+	showHideSet();
       </script>
   </body>
 </html>

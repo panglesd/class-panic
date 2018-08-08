@@ -29,7 +29,9 @@ blockquote:before, blockquote:after, q:before, q:after {
 	border-spacing: 0;
 }*/
 
-
+.listSet .selected {
+    font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
+}
 
 
 html {
@@ -48,8 +50,10 @@ h1, h2 {
     margin:40px;
 }
 .froom {
+    display:inline-block;
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
     font-size: 3em;
+    margin-bottom: 10px;
 }
 li.room {
     display: block;
@@ -167,7 +171,7 @@ nav ul li {
 
 
 
-select {
+/*select {
     -webkit-appearance: none;
     -moz-appearance: none;
     -ms-appearance: none;
@@ -186,9 +190,9 @@ select:-moz-focusring {
  //   color: transparent;
     text-shadow: 0 0 0 #000;
 }
-
+*/
 /* Custom Select */
-.select {
+/*.select {
     position: relative;
 top:19px;
     display: inline-block;
@@ -212,9 +216,9 @@ select {
 }
 select::-ms-expand {
     display: none;
-}
+}*/
 /* Arrow */
-.select::after {
+/*.select::after {
     content: '\25BC';
     position: absolute;
     top: 0;
@@ -223,9 +227,9 @@ select::-ms-expand {
     padding: 0 1em;
     background: #34495e;
     pointer-events: none;
-}
+}*/
 /* Transition */
-.select:hover::after {
+/*.select:hover::after {
     color: #f39c12;
 }
 .select::after {
@@ -233,7 +237,7 @@ select::-ms-expand {
     -o-transition: .25s all ease;
     transition: .25s all ease;
 }
-
+*/
 input[type=text] {
 /*    width: 100%;*/
     padding: 12px 20px;
