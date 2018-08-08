@@ -26,13 +26,15 @@ exports.questionFromRoom = function (room, callback) {
 /***********************************************************************/
 
 exports.registerAnswer = function (user, room, newAnswer, callback) {
+//    console.log(user, "now vote for", newAnswer);
     bdd.query("SELECT status FROM `rooms` WHERE `name`= ?", [room], function (err, rooms) {
 	if(rooms[0].status=="pending") {
 	    bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `room`= ? AND `pseudo`= ?", [room, user.pseudo], function(err, answ) {
 		if(answ[0].count>0) 
 		    bdd.query("UPDATE `poll` SET `response`= ? WHERE `room`= ? AND `pseudo`= ?", [newAnswer, room, user.pseudo], callback);
-		else 
+		else {
 		    bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`room`) VALUES (?, ?, ?)", [user.pseudo, newAnswer, room], callback);
+		}
 	    });
 	}
 	else
@@ -45,10 +47,29 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 /***********************************************************************/
 
 exports.getAnonStatsFromRoom = function (room, callback) {
-    bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `room` = ? GROUP BY response", [room], callback);
+    async.parallel(
+	{
+	    anonStats : function (callback) {
+		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `room` = ? GROUP BY response", [room], callback);
+	    },
+	    correctAnswer : function (callback) {
+		bdd.query("SELECT correct FROM `question` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `name` = ?", [room], callback);
+	    }
+	},
+	callback);
+    
 }
 exports.getStatsFromRoom = function (room, callback) {
-    bdd.query("SELECT pseudo, response FROM `poll` WHERE `room` = ?", [room], callback);
+    async.parallel(
+	{
+	    namedStats : function (callback) {
+		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `poll`.`response` FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `room` = ?", [room], function(err, row) {callback(err, row)});
+	    },
+	    correctAnswer : function (callback) {
+		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `name` = ?)", [room], function (err, res) {callback(err, res[0].correct)});
+	    }
+	},
+	callback);
 }
 
 /***********************************************************************/

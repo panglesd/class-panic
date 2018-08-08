@@ -92,6 +92,7 @@ module.exports = function (server) {
 			game.questionFromRoom(socket.room, function (question) {
 			    socket.emit("newQuestion", question);
 			});
+			sendStats(socket.room);
 		    }
 		});
 	    }
@@ -114,14 +115,6 @@ module.exports = function (server) {
 	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
 		console.log(r,e);
 		io.to(socket.room).emit("correction", e);
-/*		io.to(socket.room).emit("correction", {
-		    correct: 2,
-		    rep1: Math.floor(100*Math.random()),
-		    rep2: Math.floor(100*Math.random()),
-		    rep3: Math.floor(100*Math.random()),
-		    rep0: Math.floor(100*Math.random())
-		}); 
-*/
 		game.setStatusForRoom(socket.room, "revealed", function () {});
 	    });
 	    
@@ -143,6 +136,8 @@ module.exports = function (server) {
 	    game.nextQuestionFromRoom(socket.room, function () {
 		game.questionFromRoom(socket.room, function (question) {
 		    io.to(socket.room).emit("newQuestion", question);
+		    io.of('/admin').to(socket.room).emit("newQuestion", question);
+		    game.setStatusForRoom(socket.room, "pending", function () {sendStats(socket.room);});
 		});
 	    })
 
@@ -155,7 +150,7 @@ module.exports = function (server) {
 
 	socket.on('chosenNextQuestion', function () {
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
-		// Prevenir l'admin : TO IMPLEMENT!!!!!!
+		// TO IMPLEMENT!!!!!!
 	    });
 	});
     });

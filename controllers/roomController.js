@@ -54,8 +54,16 @@ exports.room_delete_post = function(req, res) {
 
 // Display Author update form on GET.
 exports.room_enter = function(req, res) {
-    //res.send('NOT IMPLEMENTED: Roome enter GET');
-    res.render('play');
+    async.parallel(
+	{
+	    room : function (callback) {
+		room.roomGetFromID(req.params.id, callback)
+	    }
+	},
+	function (err, results) {
+	    //	    console.log(results);
+	    res.render('play', results);
+	});
 };
 
 // Display Author update form on GET.
