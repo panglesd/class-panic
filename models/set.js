@@ -33,7 +33,10 @@ exports.setDelete = function (user, set, callback) {
     });
 }
 exports.setUpdate = function (user, set, newSet, callback) {
-    // TO BE IMPLEMENTED
+    bdd.query("UPDATE `setDeQuestion` SET `name`= ? WHERE `id` = ? AND `owner` = ?", [newSet.name, set.id, user.id], function (err, row) {
+//	console.log(err);
+	callback(err, row);
+    });
 }
 
 

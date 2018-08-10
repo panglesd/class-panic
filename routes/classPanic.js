@@ -45,7 +45,7 @@ router.get('/manage/room', room_controller.room_manage_all);
 router.post('/manage/set/:id/delete', set_controller.set_delete_post);
 
 // POST request for modifying a set.
-// router.post('/manage/set/:id/update', set_controller.set_update_post);
+router.post('/manage/set/:id/update', set_controller.set_update_post);
 
 // GET request for managing a particular set.
 router.get('/manage/set/:id', set_controller.set_manage);

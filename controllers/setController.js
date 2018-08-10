@@ -69,3 +69,10 @@ exports.set_delete_post = function(req, res) {
 	res.redirect('/classPanic/manage/set');
     });
 };
+
+exports.set_update_post = function(req, res) {
+    Set.setUpdate(req.session.user, req.params, req.body, function (err, set) {
+//	console.log("what I got ",set);
+	res.redirect('/classPanic/manage/set');
+    });
+};
