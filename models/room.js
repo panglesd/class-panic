@@ -29,8 +29,8 @@ exports.roomList = function (callback) {
 }
 exports.roomOwnedList = function (user, callback) {
     // TO BE IMPLEMENTED
-    bdd.query('SELECT * FROM rooms WHERE `owner` = ?', [user.pseudo], function(err, rows) {
-//	console.log(rows);
+    bdd.query('SELECT `rooms`.id as id,`rooms`.`name` as name,`id_currentQuestion`, `questionSet`, `rooms`.`owner` as owner, `status`, `setDeQuestion`.name as nameSet FROM (rooms INNER JOIN setDeQuestion ON `rooms`.questionSet = `setDeQuestion`.`id`) WHERE `rooms`.`owner` = ?', [user.pseudo], function(err, rows) {
+	console.log(err, rows);
 	callback(rows);
     });
 //    callback([]);

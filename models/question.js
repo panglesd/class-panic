@@ -26,7 +26,7 @@ exports.questionGet = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) { callback(err, rows[0])});
 }
 exports.questionCreate = function (user, question, callback) {
-    // TO BE IMPLEMENTED
+//    bdd.query("INSERT INTO `questions`(`enonce`, `reponse1`, `reponse2`, `reponse3`, `reponse4`, `correct`, `class`, `owner`, `nextQuestion`, `reponses`) VALUES ([value-1],[value-2],[value-3],[value-4],[value-5],[value-6],[value-7],[value-8],[value-9],[value-10],[value-11])
 }
 exports.questionDelete = function (user, question, callback) {
     // TO BE IMPLEMENTED

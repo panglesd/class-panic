@@ -109,7 +109,7 @@ exports.room_delete_post = function(req, res) {
 exports.room_update_post = function(req, res) {
     //    console.log(req.body);
     Room.roomUpdate(req.session.user, req.params, req.body, function (id) {
-	res.redirect('/classPanic/manage/room/'+req.params.id);
+	res.redirect('/classPanic/manage/room/');
     });
 };
 

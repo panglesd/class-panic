@@ -7,18 +7,19 @@
 	<a class="room" href="/classPanic/manage/room/<%= room.id %>">
 	    <li class="room">
 		<span class="froom"><%= room.name %></span>
-		<!--	      <ul>		
-		     <li>Nombre de participants : <%= room.number %></li>
-		     <li>Administrateur: <%=room.owner %></li>
-		     </ul>-->
+		<ul>		
+		     <li>Associé au set : <%= room.nameSet %></li>
+		<!--	           <li>Administrateur: <%=room.owner %></li> -->
+		     </ul>
 		<div>
-		    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+		    <ul> <li> Modifier / Supprimer </li> </ul>
 		</div>
 	    </li>
 	</a>
     <% });%>
     <li class="room">
 	<span class="froom">Créer une nouvelle salle</span>
+	<div>
 	<form id="formNewRoom" action="/classPanic/manage/room/create" method="post">
 	    <input placeholder="Nom de la room" name="name">
 	    <select name="questionSet">
@@ -29,7 +30,6 @@
 		<% }); %>
 	    </select>
 	</form>
-	<div>
 	    <ul> <li> <span onclick="document.querySelector('#formNewRoom').submit()" style="cursor:pointer">Créer</span> </li> </ul>
 	</div>
     </li>

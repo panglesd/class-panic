@@ -4,25 +4,27 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
     <% setOwnedList.forEach(function(set) { %>
-	<a class="room" href="/classPanic/manage/set/<%= set.id %>">
-	    <li class="room">
+	<li class="room">
+	    <a class="room" href="/classPanic/manage/set/<%= set.id %>">
 		<span class="froom"><%= set.name %></span>
 		<!--	      <ul>		
 		     <li>Nombre de participants : <%=// room.number %></li>
 		     <li>Administrateur: <%=// room.owner %></li>
 		     </ul>-->
 		<div>
-		    <ul> <li> Modifier </li> </ul>
+		    <ul> <li> Voir / Modifier </li> </ul>
 		</div>
-	    </li>
-	</a>
+	    </a>
+	</li>
     <% });%>
     <li class="room">
 	<span class="froom">Créer un nouveau set</span>
 	<div>
-	    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+	<form id="formNewSet" action="/classPanic/manage/set/create" method="post">
+	    <input placeholder="Nom du set" name="name">
+	</form>
+	    <ul> <li> <span style="cursor:pointer" onclick="document.querySelector('#formNewSet').submit()">Créer</span> </li> </ul>
 	</div>
     </li>
 </ul>
-
 <%- include('admin_footer'); -%>

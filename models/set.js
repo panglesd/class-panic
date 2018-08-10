@@ -1,5 +1,5 @@
 bdd = require("./bdd");
-
+Question = require('./question');
 
 
 exports.setList = function (callback) {
@@ -22,7 +22,9 @@ exports.setGet = function (user, id, callback) {
     // TO BE IMPLEMENTED
 }
 exports.setCreate = function (user, set, callback) {
-    // TO BE IMPLEMENTED
+    bdd.query("INSERT INTO `setDeQuestion`(`name`, `owner`) VALUES (?, ?); SELECT * FROM `setDeQuestion` WHERE `id` = LAST_INSERT_ID();", [set.name , user.id], function(err, rows) {
+	callback(err, rows[1][0]);
+    });
 }
 exports.setDelete = function (user, set, callback) {
     // TO BE IMPLEMENTED
@@ -32,4 +34,4 @@ exports.setUpdate = function (user, set, newSet, callback) {
 }
 
 
-module.export = []
+//module.export = []

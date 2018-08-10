@@ -1,6 +1,6 @@
-var user = require('../models/user');
-var room = require('../models/room');
-var set = require('../models/set');
+var User = require('../models/user');
+var Room = require('../models/room');
+var Set = require('../models/set');
 var async = require('async');
 
 exports.set_manage_all = function(req, res) {
@@ -18,7 +18,7 @@ exports.set_manage_all = function(req, res) {
 		room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
 	    },*/
 	    setOwnedList :  function (callback) {
-		set.setOwnedList(req.session.user, callback);
+		Set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {
@@ -40,7 +40,7 @@ exports.set_manage = function(req, res) {
 		question.questionListFromSetId(req.params.id,function (e,b) {callback(e,b)});
 	    },
 	    set : function (callback) {
-		set.setGet(req.session.user, req.params.id, callback);
+		Set.setGet(req.session.user, req.params.id, callback);
 	    }
 /*	    roomList : function (callback) {
 		room.roomList(callback);
@@ -51,6 +51,14 @@ exports.set_manage = function(req, res) {
 	},
 	function (err, results) {
 	    console.log(results);
-	    res.render('questions', results)
+	    res.render('manage_set', results)
 	});
+};
+
+
+exports.set_create_post = function(req, res) {
+    Set.setCreate(req.session.user, req.body, function (err, set) {
+	console.log("what I got ",set);
+	res.redirect('/classPanic/manage/set/'+set.id);
+    });
 };

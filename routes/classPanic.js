@@ -42,19 +42,35 @@ router.get('/manage/room', room_controller.room_manage_all);
    /**********************************************************/
 
 // POST request for deleting a set.
-//router.post('/manage/set/:id/delete', set_controller.set_delete_post);
+// router.post('/manage/set/:id/delete', set_controller.set_delete_post);
 
 // POST request for modifying a set.
-//router.post('/manage/set/:id/update', set_controller.set_update_post);
+// router.post('/manage/set/:id/update', set_controller.set_update_post);
 
 // GET request for managing a particular set.
 router.get('/manage/set/:id', set_controller.set_manage);
 
 // POST request for creating a set.
-//router.post('/manage/set/create', set_controller.set_create_post);
+router.post('/manage/set/create', set_controller.set_create_post);
 
 // GET request for the main managing set page.
 router.get('/manage/set', set_controller.set_manage_all);
+
+   /**********************************************************/
+   /*              Managing one question                     */
+   /**********************************************************/
+
+// POST request for deleting a question.
+// router.post('/manage/set/:idSet/question/:id/delete', question_controller.question_delete_post);
+
+// POST request for modifying a question.
+// router.post('/manage/set/:idSet/question/:id/update', question_controller.question_update_post);
+
+// GET request for managing a question.
+// router.get('/manage/set/:idSet/question/:id', question_controller.question_manage);
+
+// POST request for creating a question.
+// router.post('/manage/set/:idSet/question/create', set_controller.set_create_post);
 
 
 // GET request for the main managing set page.
