@@ -58,7 +58,14 @@ exports.set_manage = function(req, res) {
 
 exports.set_create_post = function(req, res) {
     Set.setCreate(req.session.user, req.body, function (err, set) {
-	console.log("what I got ",set);
+//	console.log("what I got ",set);
 	res.redirect('/classPanic/manage/set/'+set.id);
+    });
+};
+
+exports.set_delete_post = function(req, res) {
+    Set.setDelete(req.session.user, req.params, function (err, set) {
+//	console.log("what I got ",set);
+	res.redirect('/classPanic/manage/set');
     });
 };
