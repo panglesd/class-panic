@@ -1,4 +1,5 @@
 bdd = require("./bdd");
+async = require("async");
 Question = require('./question');
 
 
@@ -37,6 +38,19 @@ exports.setUpdate = function (user, set, newSet, callback) {
 //	console.log(err);
 	callback(err, row);
     });
+}
+exports.reOrder = function (user, newOrder, callback) {
+    async.eachOf(
+	newOrder,
+	function(item, key, callback) {
+	    
+	    bdd.query("UPDATE `question2` SET `indexSet`= ? WHERE `id` = ? AND `owner` = ?", [key, item, user.id], function (err, row) {
+		//	console.log(err);
+		callback(err, row);
+	    });
+	},
+    callback);
+    
 }
 
 

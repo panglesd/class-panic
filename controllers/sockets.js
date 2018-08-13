@@ -175,6 +175,21 @@ module.exports = function (server) {
 	    });
 	});
     });
+    io.of('/manage').on('connection', function(socket) {
+
+	/******************************************/
+	/*  On a choisi la room a administrer     */
+	/******************************************/
+
+	socket.on('new order', function (newOrder) {
+	    if(socket.request.session) {
+		console.log(newOrder);
+		set.reOrder(socket.request.session.user, newOrder);
+	    }
+	    else {
+	    }
+	});
+    });
 
     return io;
 };

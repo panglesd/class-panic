@@ -1,0 +1,58 @@
+<%- include('admin_header'); -%>
+
+<h2> Modification de la question <%= question.id %></h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<form id="newQuestion" method="post" action="/classPanic/manage/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
+    Énoncé :
+    <textarea name="enonce" style="width:100%"><%= question.enonce %></textarea> 
+    <input type="button" onclick="addAnswer()" value="Ajouter une réponse">
+    <input type="button" onclick="removeOneElem()" value="Enlever une réponse"><br>
+    <% i = 1 ; question.reponses.forEach( function(reponsePossible) { %>
+	Réponse <%= i %> :
+	<textarea class="reponse" name="q<%= i %>" id="q<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
+	<% i++;
+	}); %>
+    <div  id="ajoutrep"></div>
+    La réponse correcte est : <input type="number" name="correct" value="<%= question.correct%>">
+    <input type="submit" value="Enregistrer cette question">
+</form>
+<% if (!newQuestion) { %>
+<div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
+    <form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="/classPanic/manage/set/<%= set.id %>/question/<%= question.id %>/delete">
+	<input type="submit" value="Supprimer cette question"">
+    </form>
+</div>
+<% } %>
+<a href="/classPanic/manage/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
+<script>
+ function addAnswer () {
+     a=document.querySelector("#newQuestion");
+     b = document.createElement("textarea");
+     c=document.querySelector("#ajoutrep");
+     d = document.querySelectorAll(".reponse");
+     e = document.createTextNode("Réponse "+(d.length+1)+" :");
+     b.style="width:100%";
+     b.classList.add("reponse");
+     b.id="q"+(d.length+1);
+     b.name="q"+(d.length+1);
+     a.insertBefore(e,c);
+     a.insertBefore(b,c);
+ }
+ function renumber() {
+     i=1;
+     q = document.querySelectorAll(".reponse");
+     q.forEach(function (elem) {  
+	 elem.previousSibling.data = "Réponse "+ i + " :";
+	 i++;
+     });
+ }
+ function removeOneElem() {
+     b=document.querySelector("#newQuestion");
+     a=document.querySelectorAll(".reponse");
+     if(a.length>1) {
+	 b.removeChild(a[a.length-1].previousSibling);
+	 b.removeChild(a[a.length-1]);
+     }
+ }
+</script>
+<%- include('admin_footer'); -%>

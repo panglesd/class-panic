@@ -13,31 +13,54 @@
 </form>
 
 
-<h2> Votre set "<%= set.name %>" contient les questions suivantes :</h2>
+<h2> Votre set "<%= set.name %>" contient les questions suivantes (glisser-déposer pour réordonner) :</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room sortable-list">
     <% questionList.forEach(function(q) { %>
-	<li class="question">
+	<li class="question" id="q<%= q.id %>">
 		<span class="froom"><%= q.enonce %></span>
 		<div>
-			<a class="room" href="/classPanic/set/<%= set.id %>/question/<%= q.id %>"> Modifier </a>
+			<a class="room" href="/classPanic/manage/set/<%= set.id %>/question/<%= q.id %>"> Modifier </a>
 		</div>
 	</li>
     <% });%>
     </ul>
     <ul>
-    <li class="room">
-	<span class="froom">Créer une nouvelle question</span>
-<!--	<div>
-	    <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
-	</div> -->
-    </li>
+	<a href="/classPanic/manage/set/<%= set.id %>/question/create">
+	    <li class="room">
+		<span class="froom">Créer une nouvelle question</span>
+		<!--	<div>
+		     <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+		     </div> -->
+	    </li>
+	</a>
 </ul>
 
 <a style="display:block; margin:40px;" href="/classPanic/manage/set"> Retourner à la liste des sets </a>
 <script src="/javascripts/Sortable.js">
  </script>
- <script> Sortable.create(document.querySelector('.sortable-list'));
+ <script src="/socket.io/socket.io.js"></script>
+ <script>
+  var socket = io.connect('http://localhost:3000/manage');
+
+  function getOrder() {
+      tmp = [];
+      i=0;
+      document.querySelectorAll("li.question").forEach(function (q) {
+	  tmp[i]=q.id.split("q")[1];
+	  i++;
+      });
+      return tmp;
+  }
+  Sortable.create(document.querySelector('.sortable-list'), {
+      onUpdate: function (event) {
+	  console.log(event);
+	  no = getOrder();
+	  console.log(no);
+	  socket.emit("new order", no);
+	  
+      }
+  });
 </script>
 
 <%- include('admin_footer'); -%>

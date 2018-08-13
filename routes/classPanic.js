@@ -60,17 +60,25 @@ router.get('/manage/set', set_controller.set_manage_all);
    /*              Managing one question                     */
    /**********************************************************/
 
+// POST request for creating a question.
+router.get('/manage/set/:idSet/question/create', question_controller.question_create_get);
+router.post('/manage/set/:idSet/question/create', question_controller.question_create_post);
+
 // POST request for deleting a question.
-// router.post('/manage/set/:idSet/question/:id/delete', question_controller.question_delete_post);
+ router.post('/manage/set/:idSet/question/:id/delete', question_controller.question_delete_post);
 
 // POST request for modifying a question.
-// router.post('/manage/set/:idSet/question/:id/update', question_controller.question_update_post);
+router.get('/manage/set/:idSet/question/:id/', question_controller.question_update_get);
+router.post('/manage/set/:idSet/question/:id/', question_controller.question_update_post);
+
+// POST request for modifying a question.
+router.post('/manage/set/:idSet/question/:id/update', question_controller.question_update_post);
+router.get('/manage/set/:idSet/question/:id/update', question_controller.question_update_get);
+//router.get('/manage/set/:setId/question/:questionId', question_controller.questionShow);
 
 // GET request for managing a question.
 // router.get('/manage/set/:idSet/question/:id', question_controller.question_manage);
 
-// POST request for creating a question.
-// router.post('/manage/set/:idSet/question/create', set_controller.set_create_post);
 
 
 // GET request for the main managing set page.
@@ -106,7 +114,7 @@ router.post('/room', room_controller.room_list);
 router.get('/admin/room', room_controller.room_admin_all);
 
 // GET request for showing set list.
-router.get('/manage/set/:setId/question/:questionId', question_controller.questionShow);
+//router.get('/manage/set/:setId/question/:questionId', question_controller.questionShow);
 // GET request for showing set list.
 //router.get('/manage/set/:setId', set_controller.setShow);
 
