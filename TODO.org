@@ -1,0 +1,43 @@
+* Choses à faire pour ClassPanic / QuestionDeCours / 20/20
+
+* Court terme
+
+** TODO Trouver un nom satisfaisant
+Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
+
+** TODO Vérifier la sécurité
+Dans les update, select, delete, insert on doit toujours vérifier l'user
+
+** TODO Regarder pour mettre une licence sur le code
+Open source of course
+
+** TODO Ajouter un TODO
+Auto réalisateur
+
+** TODO Déployer facilement sur choum
+
+** TODO Rediriger auto vers la page d'accueil en cas de session non valide
+
+** TODO Avoir une BDD avec des noms propres :)
+** TODO et un fichier pour la créer
+
+** TODO Débugger les création sets/room/question
+
+** TODO Refaire la page Jeu avec flex.
+** TODO Jeu avec un nb de réponses personnalisées
+
+** TODO Faire la page "mon compte"
+** TODO Gérer les statistiques
+Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
+
+** TODO On peut ouvrir et fermer des salles.
+
+** TODO Tester le tout
+
+* Long terme
+
+** TODO Faire une appli android et Iphone
+** TODO Créer des rêgles différentes, avec des timers par exemple, des champs de texte...
+
+
+
