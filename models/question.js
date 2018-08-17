@@ -3,33 +3,37 @@ bdd = require("./bdd");
 
 
 exports.questionList = function (callback) {
-    bdd.query("SELECT * FROM `questions`", callback);
-}
-exports.questionListFromSetId = function (set, callback) {
-    bdd.query("SELECT * FROM `question2` WHERE `class` = ? ORDER BY indexSet", [set], callback);
+    bdd.query("SELECT * FROM `question2`", callback);
 }
 
-exports.questionListFromSetFormatted = function (set, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ?", [set.id], function(err, qList) {
-	set = { firstQ : set.firstQuestion , lQuestion : [] };
-	qList.forEach(function (q) {
-	    set.lQuestion[q.id]=q;
-	});
-	callback(err, set);
-    });
+exports.listBySetID = function (setID, callback) {
+    bdd.query("SELECT * FROM `question2` WHERE `class` = ? ORDER BY indexSet", [setID], callback);
 }
-exports.questionListFromRoomId = function (id, callback) {
+
+exports.listByRoomID = function (id, callback) {
+    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
     bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id], function(err, qList) {
-	exports.questionListFromSetFormatted(qList[0], callback);
+//	console.log(qList);
+	exports.listBySetID(qList[0].id, callback);
     });
 }
-exports.questionGet = function (questionId, callback) {
+exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `question2` WHERE `id` = ?", [questionId], function (err, rows) {
+	q = rows[0];
+	q.reponses = JSON.parse(q.reponses);
+	q.reponses.forEach(function(rep) { delete rep.validity });
+//	console.log(q);
+	callback(err, q)
+    });
+}
+exports.getOwnedByID = function (user, questionId, callback) {
+//    console.log("SELECT * FROM `question2` WHERE `id` = ? AND `owned` = ?", [questionId, user.id]);
+    bdd.query("SELECT * FROM `question2` WHERE `id` = ? AND `owner` = ?", [questionId, user.id], function (err, rows) {
 	q = rows[0];
 	
 	q.reponses = JSON.parse(q.reponses);
-//	console.log(q);
-	callback(err, rows[0])
+	console.log(q);
+	callback(err, q)
     });
 }
 exports.questionCreate = function (user, question, set, callback) {

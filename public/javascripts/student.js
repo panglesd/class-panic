@@ -6,7 +6,7 @@ var socket = io.connect('http://localhost:3000/');
 
 // On informe le serveur dans quel room on est
 socket.on('connect', () => {
-    socket.emit("chooseRoom", room);
+    socket.emit("chooseRoom", roomID);
 });
 
 /*********************************************************************/
@@ -15,7 +15,7 @@ socket.on('connect', () => {
 
 socket.on('newQuestion', function (reponse) {
     console.log(reponse);
-    document.querySelectorAll(".reponse").forEach(function (value) {
+/*    document.querySelectorAll(".reponse").forEach(function (value) {
 	value.classList.remove("selected");
 	value.classList.add("notSelected");
     });
@@ -23,12 +23,24 @@ socket.on('newQuestion', function (reponse) {
 	e.style.boxShadow="";
 	//	   e.style.backgroundColor="#F5F5DC";
 	e.style.background = "linear-gradient(to right, rgba(0,0,0,0) 0%,#F5F5DC 0%)";
+    });*/
+    document.querySelector("#question").textContent=reponse.enonce;
+    wrapper = document.querySelector("#wrapperAnswer");
+    while (wrapper.firstChild) {
+	wrapper.removeChild(wrapper.firstChild);
+    }
+    reponse.reponses.forEach(function (rep, index) {
+	elem = document.createElement('div');
+	elem.classList.add("reponse");
+	elem.classList.add("reponse");
+	elem.id = "r"+index;
+	elem.textContent = rep.reponse;
+	wrapper.appendChild(elem);
     });
-    document.querySelector("#question").innerHTML=reponse.enonce;
-    document.querySelector("#rep0").innerHTML=reponse.reponse1;
+/*    document.querySelector("#rep0").innerHTML=reponse.reponse1;
     document.querySelector("#rep1").innerHTML=reponse.reponse2;
     document.querySelector("#rep2").innerHTML=reponse.reponse3;
-    document.querySelector("#rep3").innerHTML=reponse.reponse4;
+    document.querySelector("#rep3").innerHTML=reponse.reponse4;*/
 });
 
 /*********************************************************************/

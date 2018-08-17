@@ -1,6 +1,18 @@
 * Choses à faire pour ClassPanic / QuestionDeCours / 20/20
 
+* Meilleur formatage de code
+
+** TODO enlever toute mention de "question" dans les accès à la base de donnée dans models/game.js, remplacer par des accès au modèle question.js
+
 * Court terme
+
+** TODO gérer la création de compte
+
+** TODO gérer le cryptage de password
+
+** TODO Proprifier les controlleurs et routeur
+
+** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
 
 ** TODO Trouver un nom satisfaisant
 Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
@@ -11,7 +23,8 @@ Dans les update, select, delete, insert on doit toujours vérifier l'user
 ** TODO Regarder pour mettre une licence sur le code
 Open source of course
 
-** TODO Ajouter un TODO
+** DONE Ajouter un TODO
+   CLOSED: [2018-08-15 mer. 02:40]
 Auto réalisateur
 
 ** TODO Déployer facilement sur choum

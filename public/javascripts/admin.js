@@ -6,7 +6,7 @@ var socketAdmin = io.connect('http://localhost:3000/admin');
 
 // On informe le serveur dans quel room on est
 socketAdmin.on('connect', () => {
-    socketAdmin.emit("chooseRoom", room);
+    socketAdmin.emit("chooseRoom", roomID);
 });
 
 /*********************************************************************/
@@ -59,8 +59,9 @@ socketAdmin.on('newStats', function (newStats) {
 /*********************************************************************/
 
 socketAdmin.on('newQuestion', function (reponse) {
+    console.log("fromAdmin", reponse);
     document.querySelector("li.currentQuestion").classList.remove("currentQuestion");
-    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
+//    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
     document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
-    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
+//    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
 });

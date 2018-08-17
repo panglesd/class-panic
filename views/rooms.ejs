@@ -11,6 +11,7 @@
       <nav>
 	<ul>
 	  <li><a href="/classPanic/room">Rejoindre une salle</a></li>
+	  <%- user.admin ? '<li><a href="/classPanic/manage/room">Administrer</a></li>' : "" %>
 	  <li><a href="/classPanic/user">Mon compte</a></li>
 	  <li><a id="leave" href="/classPanic/logout">Se d&eacute;connecter</a></li>
       </nav>

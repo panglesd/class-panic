@@ -15,7 +15,14 @@ exports.setOwnedList = function (user, callback) {
 	callback(err, rows);
     });
 }
-exports.setGet = function (user, id, callback) {
+exports.setGet = function (id, callback) {
+    bdd.query('SELECT * FROM setDeQuestion WHERE `id` = ?', [id], function(err, rows) {
+//	console.log("SET OWNED LIST !!!!!!", rows);
+	callback(err, rows[0]);
+    });
+    // TO BE IMPLEMENTED
+}
+exports.setOwnedGet = function (user, id, callback) {
     bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ? AND `id` = ?', [user.id, id], function(err, rows) {
 //	console.log("SET OWNED LIST !!!!!!", rows);
 	callback(err, rows[0]);

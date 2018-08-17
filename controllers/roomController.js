@@ -14,17 +14,17 @@ exports.room_list = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    roomList : function (callback) {
-		Room.roomList(callback);
+		Room.list(callback);
 	    },
 	    roomOwnedList :  function (callback) {
-		Room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+		Room.ownedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
 		Set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
+	    console.log(results);
 	    res.render('rooms', results)
 	});
 };
@@ -39,10 +39,10 @@ exports.room_admin_all = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    roomList : function (callback) {
-		Room.roomList(callback);
+		Room.list(callback);
 	    },
 	    roomOwnedList :  function (callback) {
-		Room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+		Room.ownedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
 		Set.setOwnedList(req.session.user, callback);
@@ -62,10 +62,10 @@ exports.room_manage_all = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    roomList : function (callback) {
-		Room.roomList(callback);
+		Room.list(callback);
 	    },
 	    roomOwnedList :  function (callback) {
-		Room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+		Room.ownedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
 		Set.setOwnedList(req.session.user, callback);
@@ -85,7 +85,7 @@ exports.room_detail = function(req, res) {
 
 
 exports.room_create_post = function(req, res) {
-    Room.roomCreate(req.session.user, req.body, function () {
+    Room.create(req.session.user, req.body, function () {
     res.redirect('/classPanic/manage/room');
     });
 };
@@ -99,7 +99,7 @@ exports.room_delete = function(req, res) {
 
 
 exports.room_delete_post = function(req, res) {
-    Room.roomDelete(req.session.user, req.params.id, function () {
+    Room.delete(req.session.user, req.params.id, function () {
 	res.redirect("/classPanic/manage/room");
     });
 };
@@ -108,7 +108,7 @@ exports.room_delete_post = function(req, res) {
 
 exports.room_update_post = function(req, res) {
     //    console.log(req.body);
-    Room.roomUpdate(req.session.user, req.params, req.body, function (id) {
+    Room.update(req.session.user, req.params, req.body, function (id) {
 	res.redirect('/classPanic/manage/room/');
     });
 };

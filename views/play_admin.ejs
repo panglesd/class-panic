@@ -9,10 +9,12 @@
   <body>
       <div id="answerContainer">
 	  <div id="question"></div>
-	  <div class="reponse" id="rep0"></div>
-	  <div class="reponse" id="rep1"></div>
-	  <div class="reponse" id="rep2"></div>
-	  <div class="reponse" id="rep3"></div>
+	<div id="wrapperAnswer">
+	  <!--	  <div class="reponse notSelected" id="rep0"></div>
+		  <div class="reponse notSelected" id="rep1"></div>
+		  <div class="reponse notSelected" id="rep2"></div>
+	  <div class="reponse notSelected" id="rep3"></div>-->
+	</div> 
 	  <div id="leave"><a href="/classPanic/room">Quitter la salle</a></div>
       </div>
       <div id="controlPanel">
@@ -34,13 +36,13 @@
 	  <ul id="chooseQFromSet">
 	    <li id="chooseQuestionNext"> Choisir la question suivante :</li>
 	    
-	    <% i = set.firstQ ;
-	       do { %>
-	    <li onclick="setNextQuestionId(this)" id="q<%= set.lQuestion[i].id %>" class="<%= i==room.id_currentQuestion ? "currentQuestion" : (i==set.lQuestion[room.id_currentQuestion].nextQuestion ? "nextQuestion" : "") %>">
-	      <%= set.lQuestion[i].enonce %>
-	      <%  i = set.lQuestion[i].nextQuestion %>
+	    <% set.forEach(function(quest, index) { %>
+	    <li onclick="setNextQuestionId(this)" id="q<%= quest.id %>" class="<%= quest.id==room.id_currentQuestion ? "currentQuestion" :  "" %>">
+	      <%= quest.enonce %>
+	      <%  //i = set.lQuestion[i].nextQuestion %>
 	    </li>
-	    <% } while (i != set.firstQ) %>
+	    <% }); %>
+	    <%// } while (i != set.firstQ) %>
 	  </ul>
 	  <div class="controlPanel" id="stats">
 	    <ul>
@@ -53,9 +55,9 @@
       </div>
       <div id="nbVoters"> </div>
       <script src="/socket.io/socket.io.js"></script>
-      <script> room = "<%= room.name %>" </script>
+      <script> roomID = <%= room.id %>; console.log(roomID); </script>
       <script src="/javascripts/student.js"></script>
-      <script src="/javascripts/admin.js"></script>
+      <script src="/javascripts/admin.js"></script> 
       <script>
 
 	     /*********************************************************************/

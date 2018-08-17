@@ -4,7 +4,6 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
     <% roomOwnedList.forEach(function(room) { %>
-	<a class="room" href="/classPanic/manage/room/<%= room.id %>">
 	    <li class="room">
 		<span class="froom"><%= room.name %></span>
 		<ul>		
@@ -12,10 +11,13 @@
 		<!--	           <li>Administrateur: <%=room.owner %></li> -->
 		     </ul>
 		<div>
-		    <ul> <li> Modifier / Supprimer </li> </ul>
+		    <ul>
+ 			<a class="room" href="/classPanic/manage/room/<%= room.id %>"><li> Modifier </li></a>
+			<a class="room" href="/classPanic/room/<%= room.id %>"><li> Administrer </li></a>
+		    </ul>
 		</div>
 	    </li>
-	</a>
+
     <% });%>
     <li class="room">
 	<span class="froom">Créer une nouvelle salle</span>

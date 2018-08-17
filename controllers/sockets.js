@@ -23,7 +23,7 @@ module.exports = function (server) {
     }
 
     function sendStats(room) {
-	game.getStatsFromRoom(room, function (err, stats) {
+	game.getStatsFromRoom(room.id, function (err, stats) {
 	    io.of("/admin").to(room).emit("newStats", stats)
 	});
     }
@@ -39,21 +39,23 @@ module.exports = function (server) {
 	/******************************************/
 
 	socket.on('chooseRoom', function (newRoom) {
-	    socket.leave(socket.room);
-	    socket.room=newRoom;
-	    socket.join(newRoom);
-//	    console.log("socket has joined room", newRoom, "!");
-	    setTimeout(function () {console.log("socket is now in room", socket.rooms, "!");},1000);
-	    game.questionFromRoom(socket.room, function (question) {
-		socket.emit("newQuestion", question);
-		room.getStatus(socket.room, function (err, status) {
-		    console.log(status);
-		    if(status == "revealed") {
-		    	game.getAnonStatsFromRoom(socket.room, function (r,e) {
-			    console.log(r,e);
-			    io.to(socket.room).emit("correction", e);
-			});
-		    }
+	    if (socket.room)
+		socket.leave(socket.room.id);
+	    room.getByID(parseInt(newRoom), function (err, res) {
+		socket.room = res;
+		socket.join(newRoom);
+//		setTimeout(function () {console.log("socket is now in room", socket.room.name, "!");},1000);
+		game.questionFromRoomID(socket.room.id, function (err, question) {
+		    socket.emit("newQuestion", question);
+		    room.getStatus(socket.room, function (err, status) {
+			console.log(status);
+			if(status == "revealed") {
+		    	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
+				//			    console.log(r,e);
+				io.to(socket.room).emit("correction", e);
+			    });
+			}
+		    });
 		});
 	    });
 	});
@@ -91,28 +93,18 @@ module.exports = function (server) {
 	/******************************************/
 
 	socket.on('chooseRoom', function (newRoom) {
-	    if(socket.request.session) {
-		room.roomIsOwnedBy(newRoom, socket.request.session.user, function(owned) {
-		    if(owned) {
-			socket.leave(socket.room);
-			socket.room=newRoom;
-			socket.join(newRoom);
-//			console.log("admin socket has joined room", newRoom, "!");
-			game.questionFromRoom(socket.room, function (question) {
-			    socket.emit("newQuestion", question);
-			});
-			sendStats(socket.room);
-		    }
-		});
-	    }
-	    else {
-		socket.room=newRoom;
-		socket.join(newRoom);
+	    if (socket.room)
+		socket.leave(socket.room.id);
+	    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
+		socket.room = res;
+		socket.join(socket.room.id);
 //		console.log("admin socket has joined room", newRoom, "!");
-		game.questionFromRoom(socket.room, function (question) {
+		game.questionOwnedFromRoomID(socket.request.session.user, socket.room.id, function (err, question) {
+		    console.log("fromadmin", question);
 		    socket.emit("newQuestion", question);
 		});
-	    }
+		sendStats(socket.room);
+	    });
 	});
 
 	/******************************************/
@@ -122,7 +114,7 @@ module.exports = function (server) {
 	socket.on('revealResults', function () {
 //	    console.log("should emit to", socket.room, "the correction");
 	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
-		console.log(r,e);
+//		console.log(r,e);
 		io.to(socket.room).emit("correction", e);
 		game.setStatusForRoom(socket.room, "revealed", function () {});
 	    });	    
@@ -135,7 +127,7 @@ module.exports = function (server) {
 	socket.on('changeToQuestion', function () {
 //	    console.log("should emit to", socket.room, "the correction");
 	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
-		console.log(r,e);
+//		console.log(r,e);
 		io.to(socket.room).emit("correction", e);
 		game.setStatusForRoom(socket.room, "revealed", function () {});
 	    });	    
@@ -183,7 +175,7 @@ module.exports = function (server) {
 
 	socket.on('new order', function (newOrder) {
 	    if(socket.request.session) {
-		console.log(newOrder);
+//		console.log(newOrder);
 		set.reOrder(socket.request.session.user, newOrder);
 	    }
 	    else {

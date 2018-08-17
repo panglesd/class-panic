@@ -1,5 +1,5 @@
 var user = require('../models/user');
-var room = require('../models/room');
+var Room = require('../models/room');
 var set = require('../models/set');
 var async = require('async');
 
@@ -8,7 +8,7 @@ exports.room_enter = function(req, res) {
     async.parallel(
 	{
 	    room : function (callback) {
-		room.roomGetFromID(req.params.id, callback)
+		Room.getByID(req.params.id, callback)
 	    }
 	},
 	function (err, results) {
@@ -25,24 +25,24 @@ exports.room_admin = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    room : function (callback) {
-		room.roomGetFromID(req.params.id, callback)
+		Room.getOwnedByID(req.session.user, req.params.id, callback)
 	    },
 	    set : function (callback) {
-		question.questionListFromRoomId(req.params.id, callback);
+		question.listByRoomID(req.params.id, function (e,b) {callback(e,b)});
 	    },
 	    roomList : function (callback) {
-		room.roomList(callback);
+		Room.list(callback);
 	    },
 	    roomOwnedList :  function (callback) {
-		room.roomOwnedList(req.session.user, function (r) { callback(null, r) });
+		Room.ownedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
 		set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {
-	    console.log("this one", results);
-	    res.render('admin', results);
+//	    console.log("this one", results.set);
+	    res.render('play_admin', results);
 //	    res.render('rooms', results)
 	});
 };
