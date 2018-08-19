@@ -13,10 +13,10 @@ exports.question_list = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    questionList : function (callback) {
-		Question.questionListFromSetId(req.params.setId,function (e,b) {callback(e,b)});
+		Question.listOwnedFromSetId(req.params.setId,function (e,b) {callback(e,b)});
 	    },
 	    set : function (callback) {
-		Set.setGet(req.session.user, req.params.setId, callback);
+		Set.setOwnedGet(req.session.user, req.params.setId, callback);
 	    },
 	    title : function(callback) { callback(null, "Class Panic: Modification d'un set")}
 /*	    roomList : function (callback) {
@@ -41,11 +41,11 @@ exports.questionShow = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    question : function (callback) {
-		Question.questionGet(req.params.questionId,function (e,b) {callback(e,b)});
+		Question.getOwnedByID(req.params.questionId,function (e,b) {callback(e,b)});
 	    },
 	    title : function(callback) { callback(null, "Class Panic: Modification d'un set")},
 	    set : function (callback) {
-		Set.setGet(req.session.user, req.params.setId, callback);
+		Set.setOwnedGet(req.session.user, req.params.setId, callback);
 	    }
 /*	    roomList : function (callback) {
 		room.roomList(callback);
@@ -78,12 +78,12 @@ exports.question_update_get = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    question : function (callback) {
-		Question.questionGet(req.params.id,function (e,b) {callback(e,b)});
+		Question.getOwnedByID(req.session.user, req.params.id,function (e,b) {callback(e,b)});
 	    },
 	    newQuestion : function (callback) { callback(null, false) },
 	    title : function(callback) { callback(null, "Class Panic: Modification d'un set")},
 	    set : function (callback) {
-		Set.setGet(req.session.user, req.params.idSet, callback);
+		Set.setOwnedGet(req.session.user, req.params.idSet, callback);
 	    }
 /*	    roomList : function (callback) {
 		room.roomList(callback);
@@ -101,7 +101,7 @@ exports.question_update_get = function(req, res) {
 exports.question_create_get = function(req, res) {
     //    res.send('NOT IMPLEMENTED: Room list');
     tmp = {};
-    Set.setGet(req.session.user, req.params.idSet, function(err, r) {
+    Set.setOwnedGet(req.session.user, req.params.idSet, function(err, r) {
 	options = {
 	    title: "ClassPanic : créer une nouvelle question",
 	    user : req.session.user,

@@ -1,5 +1,5 @@
 * Choses à faire pour ClassPanic / QuestionDeCours / 20/20
-
+  
 * Meilleur formatage de code
 
 ** TODO enlever toute mention de "question" dans les accès à la base de donnée dans models/game.js, remplacer par des accès au modèle question.js
@@ -37,7 +37,8 @@ Auto réalisateur
 ** TODO Débugger les création sets/room/question
 
 ** TODO Refaire la page Jeu avec flex.
-** TODO Jeu avec un nb de réponses personnalisées
+** DONE Jeu avec un nb de réponses personnalisées
+   CLOSED: [2018-08-19 dim. 06:19]
 
 ** TODO Faire la page "mon compte"
 ** TODO Gérer les statistiques

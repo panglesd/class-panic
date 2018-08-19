@@ -17,6 +17,16 @@ exports.listByRoomID = function (id, callback) {
 	exports.listBySetID(qList[0].id, callback);
     });
 }
+exports.listOwnedBySetID = function (user, setID, callback) {
+    bdd.query("SELECT * FROM `question2` WHERE `class` = ? AND `owner` = ? ORDER BY indexSet", [setID, user.id], callback);
+}
+
+exports.listOwnedByRoomID = function (user, id, callback) {
+    bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?) AND `owner` = ?", [id, user.id], function(err, qList) {
+//	console.log(qList);
+	exports.listBySetID(qList[0].id, callback);
+    });
+}
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `question2` WHERE `id` = ?", [questionId], function (err, rows) {
 	q = rows[0];

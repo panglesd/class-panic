@@ -37,10 +37,10 @@ exports.set_manage = function(req, res) {
 		callback(null, req.session.user);
 	    },
 	    questionList : function (callback) {
-		question.questionListFromSetId(req.params.id,function (e,b) {callback(e,b)});
+		question.listOwnedBySetID(req.session.user, req.params.id,function (e,b) {callback(e,b)});
 	    },
 	    set : function (callback) {
-		Set.setGet(req.session.user, req.params.id, callback);
+		Set.setOwnedGet(req.session.user, req.params.id, callback);
 	    }
 /*	    roomList : function (callback) {
 		room.roomList(callback);

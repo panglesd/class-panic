@@ -15,29 +15,24 @@
 		  <div class="reponse notSelected" id="rep2"></div>
 	  <div class="reponse notSelected" id="rep3"></div>-->
 	</div> 
-	  <div id="leave"><a href="/classPanic/room">Quitter la salle</a></div>
+	  <div id="leave"><a href="/classPanic/manage/room">Quitter la salle</a></div>
       </div>
       <div id="controlPanel">
 	  <div class="controlPanel" id="reveal">Réveler</div>
 	  <div class="controlPanel" id="nextQuestion">Passer à la question suivante</div>
 	  <!--	      <div class="controlPanel" id="choose">La prochaine question sera</div>-->
-	  <ul id="chooseSet">
+<!--	  <ul id="chooseSet">
 	    <li style="display:flex; justify-content: space-between;" id="chooseQuestion" onclick="showHideSet()"> Choisir le set de questions : <span class="arrow"> > </span></li>
 	    
-<!--	      <div class="select">
-		  <select name="setQuestion" onchange="setUpdate()" id="setChosen">
-		      <option> </option>-->
 		      <% setOwnedList.forEach(function(set) { %>
 		      <li class="possibleSet" <%= set.id == room.questionSet ? "selected" : "" %>> <%= set.name %></li>
 		      <% }); %>
-		      <!--		  </select>
-					  </div>-->
-	  </ul>
+	  </ul> -->
 	  <ul id="chooseQFromSet">
 	    <li id="chooseQuestionNext"> Choisir la question suivante :</li>
 	    
 	    <% set.forEach(function(quest, index) { %>
-	    <li onclick="setNextQuestionId(this)" id="q<%= quest.id %>" class="<%= quest.id==room.id_currentQuestion ? "currentQuestion" :  "" %>">
+	    <li onclick="gotoQuestion(<%= quest.id %>)" id="q<%= quest.id %>" class="<%= quest.id==room.id_currentQuestion ? "currentQuestion" :  "" %>">
 	      <%= quest.enonce %>
 	      <%  //i = set.lQuestion[i].nextQuestion %>
 	    </li>

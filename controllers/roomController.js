@@ -114,8 +114,7 @@ exports.room_update_post = function(req, res) {
 };
 
 exports.room_manage = function (req, res) {
-    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `owner` = ?", [req.params.id, req.session.user.pseudo], function (err, rows) {
-	thisRoom = rows[0];
+    Room.getOwnedByID(req.session.user, req.params.id, function (err, thisRoom) {
 	async.parallel(
 	    {
 		title : function(callback) { callback(null, "ClassPanic: Administrer "+thisRoom.name)},

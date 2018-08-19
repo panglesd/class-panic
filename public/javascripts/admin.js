@@ -22,6 +22,7 @@ function changeQuestionPlease() {
 /*********************************************************************/
 
 function revealResults() {
+    console.log("rev");
     socketAdmin.emit("revealResults");
 }
 
@@ -29,7 +30,7 @@ function revealResults() {
 /*                 lorsque l'on veut aller à une question donnée     */
 /*********************************************************************/
 
-function revealResults(i) {
+function gotoQuestion(i) {
     socketAdmin.emit("changeToQuestion", i);
 }
 
@@ -59,7 +60,7 @@ socketAdmin.on('newStats', function (newStats) {
 /*********************************************************************/
 
 socketAdmin.on('newQuestion', function (reponse) {
-    console.log("fromAdmin", reponse);
+    console.log("fromAdminnewQuestion", reponse);
     document.querySelector("li.currentQuestion").classList.remove("currentQuestion");
 //    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
     document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");

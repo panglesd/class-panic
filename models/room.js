@@ -13,7 +13,7 @@ exports.getByID = function(id, callback) {
 exports.getOwnedByID = function(user, id, callback) {
     console.log("id", id);
 //    console.log("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [id, user.id]);
-    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [parseInt(id), user.id], function (err, resu) {
+    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [id, user.id], function (err, resu) {
 	//console.log(resu);
 	callback(err, resu[0])});
 };
