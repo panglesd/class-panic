@@ -8,8 +8,12 @@ var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
 var global_controller = require('../controllers/globalController');
 
+/*************************************************************/
+/*         Middleware de redirrection si non admin           */
+/*************************************************************/
+
 router.use(function (req, res, next) {
-    console.log("aaaaaaaaaaaaaaaa", req.session.user);
+//    console.log("aaaaaaaaaaaaaaaa", req.session.user);
     if(req.session.user.isAdmin)
 	next();
     else {
@@ -20,7 +24,6 @@ router.use(function (req, res, next) {
 
 
 
-/// ROOM ROUTES ///
 /*************************************************************/
 /*         Routes for managing                               */
 /*************************************************************/
@@ -81,7 +84,6 @@ router.post('/manage/set/:idSet/question/:id/', question_controller.question_upd
 // POST request for modifying a question.
 router.post('/manage/set/:idSet/question/:id/update', question_controller.question_update_post);
 router.get('/manage/set/:idSet/question/:id/update', question_controller.question_update_get);
-//router.get('/manage/set/:setId/question/:questionId', question_controller.questionShow);
 
 /*************************************************************/
 /*         Routes for playing                                */
@@ -91,42 +93,6 @@ router.get('/manage/set/:idSet/question/:id/update', question_controller.questio
 router.get('/admin/:id', game_controller.room_admin);
 // POST request for admining a room.
 router.post('/admin/:id', game_controller.room_admin);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// GET request for managing a question.
-// router.get('/manage/set/:idSet/question/:id', question_controller.question_manage);
-
-
-
-// GET request for the main managing set page.
-//router.get('/manage/set', room_controller.room_create);
-
-// GET request for managing a particular room.
-//router.get('/manage/set/:id', room_controller.room_create);
-
-// POST request for creating a set.
-//router.post('/manage/set/create', room_controller.room_create);
-
-// POST request for deleting a set.
-//router.post('/manage/set/:id/delete', room_controller.room_create);
-
-// POST request for modifying a set.
-//router.post('/manage/set/:id/delete', room_controller.room_create);
 
 
 module.exports = router;

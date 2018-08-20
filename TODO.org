@@ -6,7 +6,8 @@
 ** TODO Avoir une BDD avec des noms propres :)
 
 ** TODO Proprifier les controlleurs 
-** TODO Proprifier les routeurs
+** DONE Proprifier les routeurs
+   CLOSED: [2018-08-20 lun. 18:21]
 ** DONE Sécurité redirection user/admin/non loggé
    CLOSED: [2018-08-20 lun. 18:16]
 
