@@ -5,13 +5,18 @@
 ** TODO enlever toute mention de "question" dans les accès à la base de donnée dans models/game.js, remplacer par des accès au modèle question.js
 ** TODO Avoir une BDD avec des noms propres :)
 
+** TODO Proprifier les controlleurs 
+** TODO Proprifier les routeurs
+** DONE Sécurité redirection user/admin/non loggé
+   CLOSED: [2018-08-20 lun. 18:16]
+
+
 * Court terme
 
 ** TODO gérer la création de compte
 
 ** TODO gérer le cryptage de password
 
-** TODO Proprifier les controlleurs et routeur
 
 ** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
 

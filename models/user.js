@@ -42,7 +42,7 @@ exports.userUpdate = function (user, newUser, callback) {
     bdd.query('UPDATE `users` SET `pseudo`= ? WHERE `id` = ?', [user.pseudo, user.id], callback)
     // TO BE CHECKED
 }
-exports.userIsAdmin = function (user, callback) {
+exports.isAdmin = function (user, callback) {
     // TO BE IMPLEMENTED
 }
 

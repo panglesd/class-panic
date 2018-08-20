@@ -8,8 +8,10 @@ var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var classPanicRouteur = require('./routes/classPanic');
+var allVisibleRouter = require('./routes/allVisible');
+var userVisibleRouter = require('./routes/userVisible');
+var adminVisibleRouter = require('./routes/adminVisible');
+//var classPanicRouteur = require('./routes/classPanic');
 
 var app = express();
 
@@ -53,26 +55,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/', indexRouter);
-app.use('/classPanic', usersRouter);
-app.use(function (req, res, next) {
-    if(req.session) {
-	if(req.session.user) {
-	    console.log("accepted");
-	    next();
-	}
-	else {
-	    console.log("refused");
-	    res.redirect('/classPanic');
-	}
-    }
-    else {
-	console.log("refused");
-	res.redirect('/classPanic');
-    }
-});
-app.use('/classPanic', classPanicRouteur);
 
+app.use('/classPanic', allVisibleRouter);
 
+app.use('/classPanic', userVisibleRouter);
+
+app.use('/classPanic', adminVisibleRouter);
 
 app.get("/test-session", function(req,res,next) {
     res.writeHead(200, {"Content-Type": "text/html"});
