@@ -55,11 +55,12 @@ exports.questionCreate = function (user, question, set, callback) {
 	reponse[i-1]= { reponse: question["q"+i] , validity: false };
 	i++;
     }
+    console.log("ce que je veux", question);
 //    console.log(reponse);
-  //  console.log("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`) VALUES (? , ?, ?, ?, ?)",
+  //  console.log("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?)",
 //		[ question.enonce, 100, set.id, user.id, JSON.stringify(reponse) ])
-    bdd.query("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`) VALUES (? , ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
-	      [ question.enonce, 100, set.id, user.id, JSON.stringify(reponse) ],
+    bdd.query("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
+	      [ question.enonce, 100, set.id, user.id, JSON.stringify(reponse), question.correct ],
 	      function (err, r) {callback(err, r[0])});
     
 }

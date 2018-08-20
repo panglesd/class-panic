@@ -3,6 +3,7 @@
 * Meilleur formatage de code
 
 ** TODO enlever toute mention de "question" dans les accès à la base de donnée dans models/game.js, remplacer par des accès au modèle question.js
+** TODO Avoir une BDD avec des noms propres :)
 
 * Court terme
 
@@ -31,8 +32,7 @@ Auto réalisateur
 
 ** TODO Rediriger auto vers la page d'accueil en cas de session non valide
 
-** TODO Avoir une BDD avec des noms propres :)
-** TODO et un fichier pour la créer
+** TODO avoir un fichier pour créer la BDD
 
 ** TODO Débugger les création sets/room/question
 
@@ -40,6 +40,9 @@ Auto réalisateur
 ** DONE Jeu avec un nb de réponses personnalisées
    CLOSED: [2018-08-19 dim. 06:19]
 
+** TODO rajouter la possibilité d'avoir plusieurs réponses valides
+
+** TODO Rajouter la possibilité de poser une question à la volée...
 ** TODO Faire la page "mon compte"
 ** TODO Gérer les statistiques
 Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
@@ -52,6 +55,7 @@ Tout doit être loggé dans une table stats. Affichage des résultats dans la pa
 
 ** TODO Faire une appli android et Iphone
 ** TODO Créer des rêgles différentes, avec des timers par exemple, des champs de texte...
-
+** TODO Réfléchir à supprimer de la base de donée la table 'poll' et la coder en dur dans les rooms des sockets. 
+Avantages : moins d'accès à la bdd. Désavantage : pas de possibilités de lancer plusieur instances du serveur nodeJS (ce n'est déja pas possible...)
 
 

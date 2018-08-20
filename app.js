@@ -51,8 +51,25 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/classPanic', usersRouter);
+app.use(function (req, res, next) {
+    if(req.session) {
+	if(req.session.user) {
+	    console.log("accepted");
+	    next();
+	}
+	else {
+	    console.log("refused");
+	    res.redirect('/classPanic');
+	}
+    }
+    else {
+	console.log("refused");
+	res.redirect('/classPanic');
+    }
+});
 app.use('/classPanic', classPanicRouteur);
 
 

@@ -9,10 +9,6 @@ var game_controller = require('../controllers/gameController');
 var global_controller = require('../controllers/globalController');
 
 
-router.get('/', global_controller.login_get);
-router.get('/logout', global_controller.logout);
-router.post('/', global_controller.login_post);
-
 /// ROOM ROUTES ///
 /*************************************************************/
 /*         Routes for managing                               */

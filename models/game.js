@@ -115,11 +115,19 @@ exports.nextQuestionFromRoom = function (room, callback) {
 			   if (err1) throw err1;
 		       });
 	     }
-	     bdd.query("DELETE FROM `poll` WHERE `last_activity`+120*60<NOW() AND `roomID` = ?", [room.id], function () {
-		 bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [room.id], callback);
-	     });
+	     exports.flushOldPlayers(room, callback);
 	 });
 }
+/***********************************************************************/
+/*       Flusher les anciens participants d'une room                   */
+/***********************************************************************/
+
+exports.flushOldPlayer = function (room, callback) {
+    bdd.query("DELETE FROM `poll` WHERE `last_activity`+120*60<NOW() AND `roomID` = ?", [room.id], function () {
+	bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [room.id], callback);
+    });
+}
+
 /***********************************************************************/
 /*       Passer à une question donnée                                  */
 /***********************************************************************/
@@ -133,7 +141,7 @@ exports.setQuestionFromRoom = function (room, questionID, callback) {
                                )\
          WHERE `id` = ?", [room.id, questionID, room.id], function (err1, rows) {
 	     if (err1) throw err1;
-	     bdd.query("DELETE FROM `poll` WHERE `last_activity`+120*60<NOW() AND `roomID` = ?", [room.id], function () {
+	     bdd.query("DELETE FROM `poll` WHERE ADDTIME(`last_activity`,'0 3:0:0')<NOW() AND `roomID` = ?", [room.id], function () {
 		 bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [room.id], callback);
 	     });
 	 });
