@@ -14,10 +14,14 @@
 
 * Court terme
 
-** TODO gérer la création de compte
+** DONE gérer la création de compte
+   CLOSED: [2018-08-21 mar. 02:14]
 
-** TODO gérer le cryptage de password
+** DONE gérer le cryptage de password
+   CLOSED: [2018-08-21 mar. 02:15]
 
+
+** TODO Rajouter la page "mon compe"
 
 ** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
 

@@ -7,20 +7,24 @@
     </head>
     <body>
 	<div id="createAccount">
-	    <h2>Cr&eacute;er un compte</h2>
-	    <form method="post">
+	  <h2>Cr&eacute;er un compte</h2>
+	  <a href= "login/">Déjà un compte ?</a>
+	    <form method="post" action="/classPanic/user/create">
 		<table>
 		    <tr>
-			<td>Login :</td><td><input type="text" name="login"></td>
+			<td>Pseudo :</td><td><input type="text" name="pseudo"></td>
 		    </tr>
 		    <tr>
 			<td>Password :</td><td><input type="password" name="password"></td>
 		    </tr>
 		    <tr>
-			<td>Nom complet :</td><td><input type="password" name="password"></td>
+			<td>Nom complet :</td><td><input type="text" name="nomComplet"></td>
 		    </tr>
 		    <tr>
-			<td>Mot de passe pour être admin :</td><td><input type="password" name="password"></td>
+			<td>Email :</td><td><input type="text" name="email"></td>
+		    </tr>
+		    <tr>
+			<td>Mot de passe pour être admin :</td><td><input type="password" name="adminPassword"></td>
 		    </tr>
 		    <tr>
 			<td></td><td><input type="submit" value="Cr&eacute;er compte"></td>

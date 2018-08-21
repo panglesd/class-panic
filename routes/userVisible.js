@@ -13,18 +13,19 @@ var global_controller = require('../controllers/globalController');
 /*************************************************************/
 
 router.use(function (req, res, next) {
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", typeof(req.next));
     if(req.session) {
 	if(req.session.user) {
-//	    console.log("accepted");
+	    console.log("accepted");
 	    next();
 	}
 	else {
-//	    console.log("refused");
+	    console.log("refused");
 	    res.redirect('/classPanic');
 	}
     }
     else {
-//	console.log("refused");
+	console.log("refused");
 	res.redirect('/classPanic');
     }
 });

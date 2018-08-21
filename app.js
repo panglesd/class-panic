@@ -62,54 +62,6 @@ app.use('/classPanic', userVisibleRouter);
 
 app.use('/classPanic', adminVisibleRouter);
 
-app.get("/test-session", function(req,res,next) {
-    res.writeHead(200, {"Content-Type": "text/html"});
-    res.write('<!DOCTYPE html>'+
-	      '<html>'+
-	      '    <head>'+
-	      '        <meta charset="utf-8" />'+
-	      '        <title>Ma page Node.js !</title>'+
-	      '    </head>'+ 
-	      '    <body>'+
-	      '      <form method="post"> <input name="pe"><input type = "submit"></form>Voici un paragraphe <strong>HTML</strong> !</p>');
-    if(req.session.name) {
-	res.write('Your name is '+req.session.name);
-    }
-    else {
-	res.write('Give your name !');
-    }
-    res.write('    </body>'+
-	      '</html>');
-    res.end();
-});
-
-app.post("/test-session", function(req,res,next) {
-    if(req.body.pe!="") {
-	req.session.name=req.body.pe
-    }
-    res.writeHead(200, {"Content-Type": "text/html"});
-    res.write('<!DOCTYPE html>'+
-	      '<html>'+
-	      '    <head>'+
-	      '        <meta charset="utf-8" />'+
-	      '        <title>Ma page Node.js !</title>'+
-	      '    </head>'+ 
-	      '    <body>'+
-	      '      <form method="post"> <input name="pe"><input type = "submit"></form>Voici un paragraphe <strong>HTML</strong> !</p>');
-    if(req.session.name) {
-	res.write('Your name is '+req.session.name);
-    }
-    else {
-	res.write('Give your name !');
-	console.log(req.body);
-    }
-    res.write('    </body>'+
-	      '</html>');
-    res.end();
-});
-
-
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
