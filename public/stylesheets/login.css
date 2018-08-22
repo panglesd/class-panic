@@ -1,0 +1,27 @@
+html {
+    background:url("/images/blackboard-wallpaper3.jpg")  no-repeat center fixed;
+    background-size:cover;
+    min-height: 100%;
+    color:white;
+}
+
+#login, #createAccount{
+    position:absolute;
+    right:50%;
+    left:25%;
+    top:10%;
+    bottom:10%;
+    padding-top:10%;
+    color:white;
+}
+
+h2 {
+    color:white;
+    font-size:1.5em;
+    margin:10px;
+    font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
+}
+
+form * {
+    padding:10px;
+}

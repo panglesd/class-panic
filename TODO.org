@@ -50,7 +50,8 @@ Auto réalisateur
 
 ** TODO avoir un fichier pour créer la BDD
 
-** TODO Débugger les création sets/room/question
+** DONE Débugger les création sets/room/question
+   CLOSED: [2018-08-22 mer. 11:58]
 
 ** DONE Refaire le css des pages Jeu 
    CLOSED: [2018-08-22 mer. 11:21]

@@ -58,7 +58,7 @@ exports.questionCreate = function (user, question, set, callback) {
     console.log("ce que je veux", question);
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `question2` WHERE `class` = ? GROUP BY `class`", [set.id], function (er, ind) {
 	bdd.query("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
-		  [ question.enonce, ind[0].indexx, set.id, user.id, JSON.stringify(reponse), question.correct ],
+		  [ question.enonce, ind[0] ? ind[0].indexx : 0, set.id, user.id, JSON.stringify(reponse), question.correct ],
 		  function (err, r) {callback(err, r[0])});
     });
     
