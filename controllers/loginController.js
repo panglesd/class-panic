@@ -1,12 +1,20 @@
 var Users = require("../models/user");
 var room_controller = require('../controllers/roomController');
 
+/*************************************************************/
+/*         Controlleurs GET pour la connexion                */
+/*************************************************************/
+
+// Afficher la page de login
+
 exports.login_get = function(req, res) {
     if(req.session.user){
 	res.redirect("/classPanic/room");
     }
     res.render('login');
 };
+
+// Afficher la page d'inscription
 
 exports.sign_in_get = function(req, res) {
     if(req.session.user){
@@ -15,12 +23,27 @@ exports.sign_in_get = function(req, res) {
     res.render('signin');
 };
 
+// Se délogger
+
+exports.logout = function(req, res) {
+    req.session.user = null;
+    exports.login_get(req, res);
+};
+
+/*************************************************************/
+/*         Controlleurs POST pour la connexion               */
+/*************************************************************/
+
+// Créer un utilisateur
+
 exports.user_create_post = function(req, res) {
     console.log("me ego");
     Users.create(req.body, function () {
 	res.redirect("/classPanic")
     });
 };
+
+// Se logger
 
 exports.login_post = function(req, res) {
     console.log("A");
@@ -39,11 +62,4 @@ exports.login_post = function(req, res) {
 	    res.redirect("/classPanic/room");
 	}
     });    
-};
-
-
-
-exports.logout = function(req, res) {
-    req.session.user = null;
-    exports.login_get(req, res);
 };

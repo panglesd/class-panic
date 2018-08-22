@@ -5,7 +5,9 @@
 ** TODO enlever toute mention de "question" dans les accès à la base de donnée dans models/game.js, remplacer par des accès au modèle question.js
 ** TODO Avoir une BDD avec des noms propres :)
 
-** TODO Proprifier les controlleurs 
+** TODO Proprifier les modèles 
+** DONE Proprifier les controlleurs 
+   CLOSED: [2018-08-22 mer. 12:43]
 ** DONE Proprifier les routeurs
    CLOSED: [2018-08-20 lun. 18:21]
 ** DONE Sécurité redirection user/admin/non loggé

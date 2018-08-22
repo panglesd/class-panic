@@ -8,10 +8,8 @@ var async = require('async');
 
 module.exports = function (server) {
 
-//    var socket_io    = require( "socket.io" );
     var io = require('socket.io')(server);
-    // Socket.io
-//    var io           = socket_io();
+
     /**************************************************************************/
     /*                 Utilitaires d'envoi                                    */
     /**************************************************************************/
@@ -44,11 +42,9 @@ module.exports = function (server) {
 	    room.getByID(parseInt(newRoom), function (err, res) {
 		socket.room = res;
 		socket.join(newRoom);
-//		setTimeout(function () {console.log("socket is now in room", socket.room.name, "!");},1000);
 		game.questionFromRoomID(socket.room.id, function (err, question) {
 		    socket.emit("newQuestion", question);
 		    room.getStatus(socket.room, function (err, status) {
-//			console.log(status);
 			if(status == "revealed") {
 			    game.getAnonStatsFromRoom(socket.room.id, function (r,e) {
 				io.to(socket.room.id).emit("correction", e);
@@ -74,7 +70,6 @@ module.exports = function (server) {
 	/******************************************/
 
 	socket.on('chosenAnswer', function (answer) {
-//	    console.log("jai une reponse");
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		sendStats(socket.room)
 	    });
@@ -97,9 +92,7 @@ module.exports = function (server) {
 	    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
 		socket.room = res;
 		socket.join(socket.room.id);
-//		console.log("admin socket has joined room", newRoom, "!");
 		game.questionOwnedFromRoomID(socket.request.session.user, socket.room.id, function (err, question) {
-//		    console.log("fromadmin", question);
 		    socket.emit("newQuestion", question);
 		});
 		sendStats(socket.room);
@@ -126,7 +119,6 @@ module.exports = function (server) {
 	    console.log("on souhaite changer à la question", i)
 	    game.setQuestionFromRoom(socket.room, parseInt(i), function () {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
-//		    console.log("had", question);
 		    io.to(socket.room.id).emit("newQuestion", question);
 		    io.of('/admin').to(socket.room.id).emit("newQuestion", question);
 		    game.setStatusForRoom(socket.room, "pending", function () {sendStats(socket.room);});

@@ -4,9 +4,13 @@ var Set = require('../models/set');
 
 var async = require('async');
 
+/*************************************************************/
+/*         Controlleurs GET pour les rooms                   */
+/*************************************************************/
+
+// Afficher la liste des rooms afin d'y participer
 
 exports.room_list = function(req, res) {
-    //    res.send('NOT IMPLEMENTED: Room list');
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -18,14 +22,14 @@ exports.room_list = function(req, res) {
 	    }
 	},
 	function (err, results) {
-	    //	    console.log(results);
 	    res.render('rooms', results)
 	});
 };
 
 
-exports.room_admin_all = function(req, res) {
-    //    res.send('NOT IMPLEMENTED: Room list');
+// A supprimer si ça ne sert bien à rien
+
+/*exports.room_admin_all = function(req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Administrer une salle")},
@@ -43,69 +47,11 @@ exports.room_admin_all = function(req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
 	    res.render('admin_rooms', results)
 	});
-};
-exports.room_manage_all = function(req, res) {
-    //    res.send('NOT IMPLEMENTED: Room list');
-    async.parallel(
-	{
-	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
-	    user : function (callback) {
-		callback(null, req.session.user);
-	    },
-	    roomList : function (callback) {
-		Room.list(callback);
-	    },
-	    roomOwnedList :  function (callback) {
-		Room.ownedList(req.session.user, function (r) { callback(null, r) });
-	    },
-	    setOwnedList :  function (callback) {
-		Set.setOwnedList(req.session.user, callback);
-	    }
-	},
-	function (err, results) {
-//	    console.log(results);
-	    res.render('manage_rooms', results)
-	});
-};
+};*/
 
-
-exports.room_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author detail: ' + req.params.id);
-};
-
-
-
-exports.room_create_post = function(req, res) {
-    Room.create(req.session.user, req.body, function () {
-    res.redirect('/classPanic/manage/room');
-    });
-};
-
-
-exports.room_delete = function(req, res) {
-//    Room.roomDelete(req.session.user, req.params.id, function () {
-//	res.redirect("/manage/room");
-//    });
-};
-
-
-exports.room_delete_post = function(req, res) {
-    Room.delete(req.session.user, req.params.id, function () {
-	res.redirect("/classPanic/manage/room");
-    });
-};
-
-
-
-exports.room_update_post = function(req, res) {
-    //    console.log(req.body);
-    Room.update(req.session.user, req.params, req.body, function (id) {
-	res.redirect('/classPanic/manage/room/');
-    });
-};
+// Afficher le détails d'une room pour la modifier
 
 exports.room_manage = function (req, res) {
     Room.getOwnedByID(req.session.user, req.params.id, function (err, thisRoom) {
@@ -126,5 +72,58 @@ exports.room_manage = function (req, res) {
 		console.log(results);
 		res.render('manage_room', results);
 	    });
+    });
+};
+
+// Afficher la liste des rooms afin de les manager
+
+exports.room_manage_all = function(req, res) {
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    user : function (callback) {
+		callback(null, req.session.user);
+	    },
+	    roomList : function (callback) {
+		Room.list(callback);
+	    },
+	    roomOwnedList :  function (callback) {
+		Room.ownedList(req.session.user, function (r) { callback(null, r) });
+	    },
+	    setOwnedList :  function (callback) {
+		Set.setOwnedList(req.session.user, callback);
+	    }
+	},
+	function (err, results) {
+	    res.render('manage_rooms', results)
+	});
+};
+
+
+/*************************************************************/
+/*         Controlleurs POST pour modifier les rooms         */
+/*************************************************************/
+
+// Create
+
+exports.room_create_post = function(req, res) {
+    Room.create(req.session.user, req.body, function () {
+    res.redirect('/classPanic/manage/room');
+    });
+};
+
+//Delete
+
+exports.room_delete_post = function(req, res) {
+    Room.delete(req.session.user, req.params.id, function () {
+	res.redirect("/classPanic/manage/room");
+    });
+};
+
+//Update
+
+exports.room_update_post = function(req, res) {
+    Room.update(req.session.user, req.params, req.body, function (id) {
+	res.redirect('/classPanic/manage/room/');
     });
 };

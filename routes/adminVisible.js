@@ -6,18 +6,16 @@ var room_controller = require('../controllers/roomController');
 var set_controller = require('../controllers/setController');
 var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
-var global_controller = require('../controllers/globalController');
+var login_controller = require('../controllers/loginController');
 
 /*************************************************************/
 /*         Middleware de redirrection si non admin           */
 /*************************************************************/
 
 router.use(function (req, res, next) {
-//    console.log("aaaaaaaaaaaaaaaa", req.session.user);
     if(req.session.user.isAdmin)
 	next();
     else {
-//	console.log("refused");
 	res.redirect('/classPanic');
     }
 });

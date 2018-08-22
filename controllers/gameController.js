@@ -3,7 +3,8 @@ var Room = require('../models/room');
 var set = require('../models/set');
 var async = require('async');
 
-// Display Author update form on GET.
+// Controlleur pour entrer dans une room
+
 exports.room_enter = function(req, res) {
     async.parallel(
 	{
@@ -12,13 +13,13 @@ exports.room_enter = function(req, res) {
 	    }
 	},
 	function (err, results) {
-	    //	    console.log(results);
 	    res.render('play', results);
 	});
 };
 
+// Controlleur pour administrer une room
+
 exports.room_admin = function(req, res) {
-    //res.send('NOT IMPLEMENTED: Roome enter GET');
     async.parallel(
 	{
 	    user : function (callback) {
@@ -41,8 +42,6 @@ exports.room_admin = function(req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log("this one", results.set);
 	    res.render('play_admin', results);
-//	    res.render('rooms', results)
 	});
 };
