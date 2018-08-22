@@ -86,4 +86,6 @@ exports.questionUpdate = function (user, question, newQuestion, callback) {
 }
 
 
-
+exports.getFirstOfOwnedSet = function (user, setID, callback) {
+    bdd.query('SELECT * from `question2` WHERE owner = ? AND indexSet = 0 AND class = ?', [user.id, setID], function (err, rows) {callback(err, rows[0])});
+}

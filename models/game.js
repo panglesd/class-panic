@@ -122,8 +122,9 @@ exports.nextQuestionFromRoom = function (room, callback) {
 /*       Flusher les anciens participants d'une room                   */
 /***********************************************************************/
 
-exports.flushOldPlayer = function (room, callback) {
-    bdd.query("DELETE FROM `poll` WHERE `last_activity`+120*60<NOW() AND `roomID` = ?", [room.id], function () {
+exports.flushOldPlayers = function (room, callback) {
+    console.log("rromid", room.id);
+    bdd.query("DELETE FROM `poll` WHERE  ADDTIME(`last_activity`, '0 3:0:0')<NOW() AND `roomID` = ?", [room.id], function () {
 	bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [room.id], callback);
     });
 }

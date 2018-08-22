@@ -1,6 +1,6 @@
 <%- include('admin_header'); -%>
 
-<h2> Renommber ou supprimer "<%= set.name%>"</h2>
+<h2> Renommer ou supprimer "<%= set.name%>"</h2>
 <form action="/classPanic/manage/set/<%=set.id%>/update" method="post">
     Name : <input name="name" value="<%= set.name %>"> <br>
     <input type="submit" value="Modifier">

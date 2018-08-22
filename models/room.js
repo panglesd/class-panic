@@ -1,6 +1,8 @@
 bdd = require("./bdd");
 var async = require('async');
 
+var Question = require("./question");
+
 exports.getByID = function(id, callback) {
 //    console.log("id", id);
 //    console.log("id has type", typeof id)
@@ -50,12 +52,15 @@ exports.ownedList = function (user, callback) {
 //    callback([]);
 }
 exports.create = function (user, newRoom, callback) {
-    // TO BE CHECKED
-    
-    bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`) VALUES (?, (SELECT `firstQuestion` FROM `setDeQuestion` WHERE `id` = ?), 1, ?, "pending")', [newRoom.name, newRoom.questionSet, user.id], function(err, rows) {
-//	console.log(rows);
-	callback(rows);
- });
+    console.log(newRoom);
+    Question.getFirstOfOwnedSet(user, newRoom.questionSet, function (err, question) {
+	console.log("azert", question);
+	bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`) VALUES (?, ?, ?, ?, "pending")', [newRoom.name, question.id, newRoom.questionSet, user.id], function(err, rows) {
+	    //    bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`) VALUES (?, (SELECT `question2`.`id` FROM `setDeQuestion` INNER JOIN `question2` ON `setDeQuestion`.`id` = `question2`.`class` WHERE `setDeQuestion`.`id` = ? AND `question2`.`indexSet` = 0), ?, ?, "pending")', [newRoom.name, newRoom.questionSet, user.id], function(err, rows) {
+	    //	console.log(rows);
+	    callback(rows);
+	});
+    });
 }
 exports.getStatus = function (room, callback) {
     bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);})
