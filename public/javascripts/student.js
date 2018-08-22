@@ -73,16 +73,15 @@ for(var vari=0;vari<reponses.length;vari++) {
 
 function chooseAnswer(i) {
     socket.emit("chosenAnswer", i);
+    var reponses=document.querySelectorAll(".reponse");
+    reponses.forEach(function (rep) {
+	rep.classList.replace('selected', 'notSelected');
+    });
+    console.log('a');
     if(i>-1) {
+	console.log('a');
 	a = document.querySelector("#r"+i);
-	var reponses=document.querySelectorAll(".reponse");
-	for(var vari=0;vari<reponses.length;vari++) {
-	    value=reponses[vari];
-	    value.classList.remove("selected");
-	    value.classList.add("notSelected");
-	};
-	a.classList.remove("notSelected");
-	a.classList.add("selected");
+	a.classList.replace("notSelected", "selected");
     }
     console.log("socket emit chosen answer", i);
 }

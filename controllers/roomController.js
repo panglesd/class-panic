@@ -15,16 +15,10 @@ exports.room_list = function(req, res) {
 	    },
 	    roomList : function (callback) {
 		Room.list(callback);
-	    },
-	    roomOwnedList :  function (callback) {
-		Room.ownedList(req.session.user, function (r) { callback(null, r) });
-	    },
-	    setOwnedList :  function (callback) {
-		Set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {
-	    console.log(results);
+	    //	    console.log(results);
 	    res.render('rooms', results)
 	});
 };

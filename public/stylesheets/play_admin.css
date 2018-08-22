@@ -1,0 +1,50 @@
+/*****************************************************************************/
+/*            CSS du jeu pour les admins                                     */
+/*****************************************************************************/
+
+#answerContainer {
+    position:fixed;
+    left:0px;
+    right:30%;
+    top:0px;
+    bottom:0px;
+}
+#controlPanel {
+    position:fixed;
+    padding:20px;
+    left:70%;
+    right:0px;
+    top:0px;
+    bottom:0px;
+    color:white;
+    overflow:auto;
+    background-color:rgba(0, 0, 0, 0.5);
+}
+
+#controlPanel > * {
+    margin:30px;
+    padding:10px;
+    border-radius:5px;
+    background-color:rgba(0,0,0,0.5);
+}
+    
+
+#reveal, #nextQuestion, #chooseQuestion, #chooseQuestionNext {
+    font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
+}
+#reveal, #nextQuestion{
+    cursor:pointer;
+}
+#controlPanel li {
+    padding:10px;
+    border-bottom: 1px solid white;
+}
+
+li.currentQuestion {
+    border-left: 15px solid rgba(255,255,255,1);
+}
+
+#chooseQFromSet li:not(:first-child) {
+    cursor:pointer;
+}
+

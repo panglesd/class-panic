@@ -132,12 +132,6 @@ module.exports = function (server) {
 		    game.setStatusForRoom(socket.room, "pending", function () {sendStats(socket.room);});
 		});
 	    })
-//	    console.log("should emit to", socket.room, "the correction");
-//	    game.getAnonStatsFromRoom(socket.room, function (r,e) {
-//		console.log(r,e);
-//		io.to(socket.room.id).emit("correction", e);
-//		game.setStatusForRoom(socket.room, "revealed", function () {});
-//	    });	    
 	});
 	
 	/******************************************/
@@ -155,35 +149,23 @@ module.exports = function (server) {
 	socket.on('changeQuestionPlease', function (nextQuestion) {
 	    game.nextQuestionFromRoom(socket.room, function () {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
-//		    console.log("had", question);
 		    io.to(socket.room.id).emit("newQuestion", question);
 		    io.of('/admin').to(socket.room.id).emit("newQuestion", question);
 		    game.setStatusForRoom(socket.room, "pending", function () {sendStats(socket.room);});
 		});
 	    })
-
-	    //TO BE IMPLEMENTED
-	});
-
-	/******************************************/
-	/*  On m'envoie l'id de la prochaine question*/
-	/******************************************/
-
-	socket.on('chosenNextQuestion', function () {
-	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
-		// TO IMPLEMENT!!!!!!
-	    });
 	});
     });
-    io.of('/manage').on('connection', function(socket) {
 
-	/******************************************/
-	/*  On a choisi la room a administrer     */
-	/******************************************/
+    /**************************************************************************/
+    /*                 Fonction pour le management de questions en direct     */
+    /**************************************************************************/
+
+
+    io.of('/manage').on('connection', function(socket) {
 
 	socket.on('new order', function (newOrder) {
 	    if(socket.request.session) {
-//		console.log(newOrder);
 		set.reOrder(socket.request.session.user, newOrder);
 	    }
 	    else {

@@ -8,20 +8,20 @@
     <input type="button" onclick="addAnswer()" value="Ajouter une réponse">
     <input type="button" onclick="removeOneElem()" value="Enlever une réponse"><br>
     <% i = 1 ; question.reponses.forEach( function(reponsePossible) { %>
-	Réponse <%= i %> :
+	Réponse <%= i-1 %> :
 	<textarea class="reponse" name="q<%= i %>" id="q<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
 	<% i++;
 	}); %>
-    <div  id="ajoutrep"></div>
-    La réponse correcte est : <input type="number" name="correct" value="<%= question.correct%>">
-    <input type="submit" value="Enregistrer cette question">
+	<div  id="ajoutrep"></div>
+	La réponse correcte est : <input type="number" name="correct" value="<%= question.correct%>">
+	<input type="submit" value="Enregistrer cette question">
 </form>
 <% if (!newQuestion) { %>
-<div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
-    <form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="/classPanic/manage/set/<%= set.id %>/question/<%= question.id %>/delete">
-	<input type="submit" value="Supprimer cette question"">
-    </form>
-</div>
+    <div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
+	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="/classPanic/manage/set/<%= set.id %>/question/<%= question.id %>/delete">
+	    <input type="submit" value="Supprimer cette question"">
+	</form>
+    </div>
 <% } %>
 <a href="/classPanic/manage/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
 <script>
@@ -30,7 +30,7 @@
      b = document.createElement("textarea");
      c=document.querySelector("#ajoutrep");
      d = document.querySelectorAll(".reponse");
-     e = document.createTextNode("Réponse "+(d.length+1)+" :");
+     e = document.createTextNode("Réponse "+(d.length)+" :");
      b.style="width:100%";
      b.classList.add("reponse");
      b.id="q"+(d.length+1);
@@ -39,7 +39,7 @@
      a.insertBefore(b,c);
  }
  function renumber() {
-     i=1;
+     i=0;
      q = document.querySelectorAll(".reponse");
      q.forEach(function (elem) {  
 	 elem.previousSibling.data = "Réponse "+ i + " :";

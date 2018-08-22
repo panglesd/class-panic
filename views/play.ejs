@@ -3,23 +3,17 @@
     <head>
 	<meta charset="utf-8">
 	<title>title</title>
-	<link rel="stylesheet" href="/stylesheets/style.css">
+	<link rel="stylesheet" href="/stylesheets/css_reset.css">
+	<link rel="stylesheet" href="/stylesheets/play_student.css">
     </head>
     <body>
-	<!--      <h1>My own Quizz Panic</h1>-->
 	<div id="question" onclick="chooseAnswer(-1)"></div>
 	<div id="wrapperAnswer">
-	  <!--	  <div class="reponse notSelected" id="rep0"></div>
-		  <div class="reponse notSelected" id="rep1"></div>
-		  <div class="reponse notSelected" id="rep2"></div>
-	  <div class="reponse notSelected" id="rep3"></div>-->
 	</div> 
 	<div id="leave"><a href="/classPanic/room">Quitter la salle</a></div>
+
 	<script src="/socket.io/socket.io.js"></script>
 	<script> roomID = "<%= room.id %>"; </script>
 	<script src="/javascripts/student.js"></script>
-	<script>
-	  
-	</script>
     </body>
 </html>

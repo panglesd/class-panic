@@ -21,12 +21,17 @@
    CLOSED: [2018-08-21 mar. 02:15]
 
 
-** TODO Rajouter la page "mon compe"
+** TODO checker le css selector pour le défilement dans un bloc
+
+** TODO Checker les erreurs
+
+** TODO Rajouter la page "mon compte"
 
 ** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
 
 ** TODO Trouver un nom satisfaisant
 Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
+
 
 ** TODO Vérifier la sécurité
 Dans les update, select, delete, insert on doit toujours vérifier l'user
@@ -40,32 +45,45 @@ Auto réalisateur
 
 ** TODO Déployer facilement sur choum
 
-** TODO Rediriger auto vers la page d'accueil en cas de session non valide
+** DONE Rediriger auto vers la page d'accueil en cas de session non valide
+   CLOSED: [2018-08-22 mer. 11:21]
 
 ** TODO avoir un fichier pour créer la BDD
 
 ** TODO Débugger les création sets/room/question
 
-** TODO Refaire la page Jeu avec flex.
+** DONE Refaire le css des pages Jeu 
+   CLOSED: [2018-08-22 mer. 11:21]
+Au final je n'ai pas utilisé flex
+
 ** DONE Jeu avec un nb de réponses personnalisées
    CLOSED: [2018-08-19 dim. 06:19]
 
-** TODO rajouter la possibilité d'avoir plusieurs réponses valides
+** TODO Tester le tout
 
-** TODO Rajouter la possibilité de poser une question à la volée...
-** TODO Faire la page "mon compte"
+
+** TODO Randomiser l'affichage des réponses
+
+
+* Long terme
+
 ** TODO Gérer les statistiques
 Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
 
 ** TODO On peut ouvrir et fermer des salles.
 
-** TODO Tester le tout
+** TODO rajouter la possibilité d'avoir plusieurs réponses valides
 
-* Long terme
-
+** TODO Rajouter la possibilité de poser une question à la volée...
 ** TODO Faire une appli android et Iphone
 ** TODO Créer des rêgles différentes, avec des timers par exemple, des champs de texte...
 ** TODO Réfléchir à supprimer de la base de donée la table 'poll' et la coder en dur dans les rooms des sockets. 
 Avantages : moins d'accès à la bdd. Désavantage : pas de possibilités de lancer plusieur instances du serveur nodeJS (ce n'est déja pas possible...)
 
 
+** TODO Possibilité d'ajouter des images dans une question...
+
+* Version grande echelle
+
+A voir plus tard : créer la notion de cours, la possibilité d'inviter des étudiants à son cours, de demander de suivre un cours.
+Ensuite, chaque étdiant ne peut rentrer que dans les rooms des cours qu'il suit.

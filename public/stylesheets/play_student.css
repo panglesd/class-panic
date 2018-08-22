@@ -1,0 +1,53 @@
+/*****************************************************************************/
+/*            CSS du jeu pour les élèves                                     */
+/*****************************************************************************/
+
+html {
+    background:url("../images/blackboard-wallpaper3.jpg")  no-repeat center fixed;
+    background-size:cover;
+    min-height: 100%;
+    color:white;
+}
+
+#question {
+//    width: 100%;
+    font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
+    margin-top: 90px;
+    margin-bottom: 90px;
+    padding-left:20px;
+    padding-right:20px;
+    font-size:4em;
+    text-align:center;
+    cursor:pointer;
+}
+
+.reponse {
+//    display:inline-block;
+    display:block;
+    padding:20px;
+    border-radius:15px;
+    font-size:2em;
+    box-shadow: 4px 4px 8px black;
+    background-color:#F5F5DC;
+    color:#165a70;
+    transition: all .2s ease-in-out;
+    cursor:pointer;
+    margin:30px;  
+}
+
+.selected {
+    box-shadow: 10px 10px 8px black;
+    margin-left:15px;
+    margin-right:15px;
+}
+.notSelected {
+    //    transform: scale(0.7, 0.7);
+    margin-left:60px;
+    margin-right:60px;
+}
+#leave {
+    position: absolute;
+    right:10px;
+    bottom:10px;
+    color:white;
+}

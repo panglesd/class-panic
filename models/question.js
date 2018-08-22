@@ -56,12 +56,11 @@ exports.questionCreate = function (user, question, set, callback) {
 	i++;
     }
     console.log("ce que je veux", question);
-//    console.log(reponse);
-  //  console.log("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?)",
-//		[ question.enonce, 100, set.id, user.id, JSON.stringify(reponse) ])
-    bdd.query("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
-	      [ question.enonce, 100, set.id, user.id, JSON.stringify(reponse), question.correct ],
-	      function (err, r) {callback(err, r[0])});
+    bdd.query("SELECT MAX(indexSet+1) as indexx FROM `question2` WHERE `class` = ? GROUP BY `class`", [set.id], function (er, ind) {
+	bdd.query("INSERT INTO `question2`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
+		  [ question.enonce, ind[0].indexx, set.id, user.id, JSON.stringify(reponse), question.correct ],
+		  function (err, r) {callback(err, r[0])});
+    });
     
 }
 exports.questionDelete = function (user, question, callback) {
