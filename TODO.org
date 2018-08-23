@@ -6,6 +6,7 @@
 ** TODO Avoir une BDD avec des noms propres :)
 
 ** TODO Proprifier les modèles 
+Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGet ou juste get...)
 ** DONE Proprifier les controlleurs 
    CLOSED: [2018-08-22 mer. 12:43]
 ** DONE Proprifier les routeurs
@@ -31,12 +32,14 @@
 
 ** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
 
+** TODO mettre en paramètre le socket.onnect dans le javascript client-side
 ** TODO Trouver un nom satisfaisant
 Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
 
 
-** TODO Vérifier la sécurité
-Dans les update, select, delete, insert on doit toujours vérifier l'user
+** DONE Vérifier la sécurité
+   CLOSED: [2018-08-23 jeu. 06:43]
+Je suis passé à la version "owned"
 
 ** TODO Regarder pour mettre une licence sur le code
 Open source of course

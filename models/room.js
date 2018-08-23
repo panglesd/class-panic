@@ -3,17 +3,27 @@ var async = require('async');
 
 var Question = require("./question");
 
-exports.getByID = function(id, callback) {
-    console.log("SELECT * FROM `rooms` WHERE `id` = ?", [id]);
-    bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [parseInt(id)], function (err, resu) {
+/***********************************************************************/
+/*       Getters pour les rooms : individu                             */
+/***********************************************************************/
+
+// By ID
+
+exports.getByID = function(roomID, callback) {
+    bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
 	callback(err, resu[0])});
 };
 
-exports.getOwnedByID = function(user, id, callback) {
-    console.log("id", id);
-    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [id, user.id], function (err, resu) {
+exports.getOwnedByID = function(user, roomID, callback) {
+    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [roomID, user.id], function (err, resu) {
 	callback(err, resu[0])});
 };
+
+/***********************************************************************/
+/*       Getters pour les rooms : listes                               */
+/***********************************************************************/
+
+// By ID
 
 exports.list = function (callback) {
     bdd.query('SELECT * FROM rooms', function(err, rows) {
@@ -37,35 +47,62 @@ exports.list = function (callback) {
 	);
     });
 }
+
 exports.ownedList = function (user, callback) {
     bdd.query('SELECT `rooms`.id as id,`rooms`.`name` as name,`id_currentQuestion`, `questionSet`, `rooms`.`ownerID` as ownerID, `status`, `setDeQuestion`.name as nameSet FROM (rooms INNER JOIN setDeQuestion ON `rooms`.questionSet = `setDeQuestion`.`id`) WHERE `rooms`.`ownerID` = ?', [user.id], function(err, rows) {
 	callback(rows);
     });
 }
+
+// By Name
+
+exports.getByName= function (room, callback) {
+    bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) { callback(rows[0]) });
+}
+
+/***********************************************************************/
+/*       Gestion CRUD des rooms                                        */
+/***********************************************************************/
+
+// Create
+
 exports.create = function (user, newRoom, callback) {
-    console.log(newRoom);
     Question.getFirstOfOwnedSet(user, newRoom.questionSet, function (err, question) {
 	bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`) VALUES (?, ?, ?, ?, "pending")', [newRoom.name, question.id, newRoom.questionSet, user.id], function(err, rows) {
 	    callback(rows);
 	});
     });
 }
-exports.getStatus = function (room, callback) {
-    bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);})
-}
+
+// Delete
+
 exports.delete = function (user, room, callback) {
     bdd.query('DELETE FROM `rooms` WHERE `id` = ? AND `ownerID` = ?', [room, user.id], callback)
 }
+
+//Update
+
 exports.update = function (user, room, newRoom, callback) {
-    console.log('UPDATE `rooms` SET `name`= ?, `questionSet` = ? WHERE `id` = ? AND `ownerID` = ?', [newRoom.name, room.id, newRoom.questionSet, user.id]);
     bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ? WHERE `id` = ? AND `ownerID` = ?', [newRoom.name, newRoom.questionSet, room.id, user.id], callback)
 }
-exports.getByName= function (room, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) { callback(rows[0]) });
+
+/***********************************************************************/
+/*       Statuts et appartenance                                       */
+/***********************************************************************/
+
+exports.getStatus = function (room, callback) {
+    bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);})
 }
+
 exports.isOwnedBy= function (room, user, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, row) {
 	callback(row[0].ownerID==user.pseudo);
+    });
+}
+
+exports.setStatusForRoom = function (room, status, callback) {
+    bdd.query("UPDATE `rooms` SET `status` = ? WHERE `id` = ?", [status, room.id], function (err, rows) {
+	callback();
     });
 }
 
