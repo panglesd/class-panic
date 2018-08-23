@@ -2,7 +2,7 @@
 
 <h2>Modifier votre salle <%= room.name %></h2>
 
-<form action="/classPanic/manage/room/<%=room.id%>/update" method="post">
+<form action="<%= config.PATH %>/manage/room/<%=room.id%>/update" method="post">
     Name : <input name="name" value="<%= room.name %>"> <br>
     Acutellement avec le set :
     <select name="questionSet">
@@ -17,10 +17,10 @@
 
 <h2>Ou la supprimer</h2>
 
-<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="/classPanic/manage/room/<%=room.id%>/delete" method="post">
+<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="<%= config.PATH %>/manage/room/<%=room.id%>/delete" method="post">
     Irréversible : <input type="submit" value="Supprimer la salle <%= room.name%>">
 </form>
 
-<a style="display:block; margin:40px;" href="/classPanic/manage/room"> Retourner à la liste des rooms </a>
+<a style="display:block; margin:40px;" href="<%= config.PATH %>/manage/room"> Retourner à la liste des rooms </a>
 
 <%- include('admin_footer'); -%>

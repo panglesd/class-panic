@@ -1,7 +1,7 @@
 var User = require('../models/user');
 var Room = require('../models/room');
 var Set = require('../models/set');
-
+var config = require('../configuration');
 var async = require('async');
 
 /*************************************************************/
@@ -14,6 +14,7 @@ exports.room_list = function(req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
+	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
@@ -58,6 +59,7 @@ exports.room_manage = function (req, res) {
 	async.parallel(
 	    {
 		title : function(callback) { callback(null, "ClassPanic: Administrer "+thisRoom.name)},
+		config : function(callback) { callback(null, config) },	
 		user : function (callback) {
 		    callback(null, req.session.user);
 		},
@@ -81,6 +83,7 @@ exports.room_manage_all = function(req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
@@ -108,7 +111,7 @@ exports.room_manage_all = function(req, res) {
 
 exports.room_create_post = function(req, res) {
     Room.create(req.session.user, req.body, function () {
-    res.redirect('/classPanic/manage/room');
+    res.redirect(config.path+'/manage/room');
     });
 };
 
@@ -116,7 +119,7 @@ exports.room_create_post = function(req, res) {
 
 exports.room_delete_post = function(req, res) {
     Room.delete(req.session.user, req.params.id, function () {
-	res.redirect("/classPanic/manage/room");
+	res.redirect(config.PATH+"/manage/room");
     });
 };
 
@@ -124,6 +127,6 @@ exports.room_delete_post = function(req, res) {
 
 exports.room_update_post = function(req, res) {
     Room.update(req.session.user, req.params, req.body, function (id) {
-	res.redirect('/classPanic/manage/room/');
+	res.redirect(config.PATH+'/manage/room/');
     });
 };

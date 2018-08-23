@@ -3,12 +3,17 @@ var Room = require('../models/room');
 var Set = require('../models/set');
 var Question = require('../models/question');
 var async = require('async');
+var config = require("./../configuration");
 
 // Controlleur pour entrer dans une room
 
 exports.room_enter = function(req, res) {
     async.parallel(
 	{
+	    server : function(callback) {
+		callback(null, req.protocol + '://' + req.get('host') );
+	    },
+	    config : function(callback) { console.log(config); callback(null, config) },	
 	    room : function (callback) {
 		Room.getByID(req.params.id, callback)
 	    }
@@ -26,6 +31,10 @@ exports.room_admin = function(req, res) {
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
+	    server : function(callback) {
+		callback(null, req.protocol + '://' + req.get('host') );
+	    },
+	    config : function(callback) { callback(null, config) },	
 	    room : function (callback) {
 		Room.getOwnedByID(req.session.user, req.params.id, callback)
 	    },
@@ -39,7 +48,7 @@ exports.room_admin = function(req, res) {
 		Room.ownedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
-		set.setOwnedList(req.session.user, callback);
+		Set.setOwnedList(req.session.user, callback);
 	    }
 	},
 	function (err, results) {

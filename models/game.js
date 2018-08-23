@@ -102,7 +102,7 @@ exports.nextQuestionFromRoom = function (room, callback) {
 		       });
 	     }
 	     exports.flushOldPlayers(room, function() {
-		 Room.setStatus(room, "pending", callback);
+		 Room.setStatusForRoom(room, "pending", callback);
 	     });
 	 });
 }

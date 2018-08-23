@@ -8,6 +8,8 @@ var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
 var login_controller = require('../controllers/loginController');
 
+var config = require("../configuration");
+
 /*************************************************************/
 /*         Middleware de redirrection si non admin           */
 /*************************************************************/
@@ -16,7 +18,7 @@ router.use(function (req, res, next) {
     if(req.session.user.isAdmin)
 	next();
     else {
-	res.redirect('/classPanic');
+	res.redirect(config.PATH);
     }
 });
 

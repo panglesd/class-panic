@@ -1,6 +1,8 @@
 var User = require('../models/user');
 var Room = require('../models/room');
 var Set = require('../models/set');
+var Question = require('../models/question');
+var config = require("./../configuration");
 
 var async = require('async');
 
@@ -15,6 +17,7 @@ exports.set_manage_all = function(req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
@@ -35,11 +38,12 @@ exports.set_manage = function(req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
 	    questionList : function (callback) {
-		question.listOwnedBySetID(req.session.user, req.params.id,function (e,b) {callback(e,b)});
+		Question.listOwnedBySetID(req.session.user, req.params.id,function (e,b) {callback(e,b)});
 	    },
 	    set : function (callback) {
 		Set.setOwnedGet(req.session.user, req.params.id, callback);
@@ -59,7 +63,7 @@ exports.set_manage = function(req, res) {
 
 exports.set_create_post = function(req, res) {
     Set.setCreate(req.session.user, req.body, function (err, set) {
-	res.redirect('/classPanic/manage/set/'+set.id);
+	res.redirect(config.PATH+'/manage/set/'+set.id);
     });
 };
 
@@ -67,7 +71,7 @@ exports.set_create_post = function(req, res) {
 
 exports.set_delete_post = function(req, res) {
     Set.setDelete(req.session.user, req.params, function (err, set) {
-	res.redirect('/classPanic/manage/set');
+	res.redirect(config.PATH+'/manage/set');
     });
 };
 
@@ -75,6 +79,6 @@ exports.set_delete_post = function(req, res) {
 
 exports.set_update_post = function(req, res) {
     Set.setUpdate(req.session.user, req.params, req.body, function (err, set) {
-	res.redirect('/classPanic/manage/set');
+	res.redirect(config.PATH+'/manage/set');
     });
 };

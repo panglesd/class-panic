@@ -2,7 +2,7 @@
 
 <h2> Modification de la question <%= question.id %></h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
-<form id="newQuestion" method="post" action="/classPanic/manage/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
+<form id="newQuestion" method="post" action="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
     Énoncé :
     <textarea name="enonce" style="width:100%"><%= question.enonce %></textarea> 
     <input type="button" onclick="addAnswer()" value="Ajouter une réponse">
@@ -18,12 +18,12 @@
 </form>
 <% if (!newQuestion) { %>
     <div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
-	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="/classPanic/manage/set/<%= set.id %>/question/<%= question.id %>/delete">
+	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= question.id %>/delete">
 	    <input type="submit" value="Supprimer cette question"">
 	</form>
     </div>
 <% } %>
-<a href="/classPanic/manage/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
+<a href="<%= config.PATH %>/manage/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
 <script>
  function addAnswer () {
      a=document.querySelector("#newQuestion");

@@ -2,9 +2,7 @@
   
 * Meilleur formatage de code
 
-** TODO enlever toute mention de "question" dans les accès à la base de donnée dans models/game.js, remplacer par des accès au modèle question.js
 ** TODO Avoir une BDD avec des noms propres :)
-
 ** TODO Proprifier les modèles 
 Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGet ou juste get...)
 ** DONE Proprifier les controlleurs 
@@ -24,15 +22,18 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
    CLOSED: [2018-08-21 mar. 02:15]
 
 
-** TODO checker le css selector pour le défilement dans un bloc
+** DONE checker le css selector pour le défilement dans un bloc
+   CLOSED: [2018-08-23 jeu. 11:22]
 
 ** TODO Checker les erreurs
 
 ** TODO Rajouter la page "mon compte"
 
-** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
+** DONE mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
+   CLOSED: [2018-08-23 jeu. 18:18]
 
-** TODO mettre en paramètre le socket.connect dans le javascript client-side
+** DONE mettre en paramètre le socket.connect dans le javascript client-side
+   CLOSED: [2018-08-23 jeu. 18:19]
 ** TODO Trouver un nom satisfaisant
 Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
 

@@ -12,8 +12,8 @@
 		     </ul>
 		<div>
 		    <ul>
- 			<a class="room" href="/classPanic/manage/room/<%= room.id %>"><li> Modifier </li></a>
-			<a class="room" href="/classPanic/admin/<%= room.id %>"><li> Administrer </li></a>
+ 			<a class="room" href="<%= config.PATH %>/manage/room/<%= room.id %>"><li> Modifier </li></a>
+			<a class="room" href="<%= config.PATH %>/admin/<%= room.id %>"><li> Administrer </li></a>
 		    </ul>
 		</div>
 	    </li>
@@ -22,7 +22,7 @@
     <li class="room">
 	<span class="froom">Créer une nouvelle salle</span>
 	<div>
-	<form id="formNewRoom" action="/classPanic/manage/room/create" method="post">
+	<form id="formNewRoom" action="<%= config.PATH %>/manage/room/create" method="post">
 	    <input placeholder="Nom de la room" name="name">
 	    <select name="questionSet">
 		<% setOwnedList.forEach( function (set) { %>

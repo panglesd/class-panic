@@ -5,7 +5,7 @@
 <ul class="room">
     <% setOwnedList.forEach(function(set) { %>
 	<li class="room">
-	    <a class="room" href="/classPanic/manage/set/<%= set.id %>">
+	    <a class="room" href="<%= config.PATH %>/manage/set/<%= set.id %>">
 		<span class="froom"><%= set.name %></span>
 		<!--	      <ul>		
 		     <li>Nombre de participants : <%=// room.number %></li>
@@ -20,7 +20,7 @@
     <li class="room">
 	<span class="froom">Créer un nouveau set</span>
 	<div>
-	<form id="formNewSet" action="/classPanic/manage/set/create" method="post">
+	<form id="formNewSet" action="<%= config.PATH %>/manage/set/create" method="post">
 	    <input placeholder="Nom du set" name="name">
 	</form>
 	    <ul> <li> <span style="cursor:pointer" onclick="document.querySelector('#formNewSet').submit()">Créer</span> </li> </ul>

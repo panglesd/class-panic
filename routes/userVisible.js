@@ -8,6 +8,8 @@ var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
 var login_controller = require('../controllers/loginController');
 
+var config = require('../configuration');
+
 /*************************************************************/
 /*         Middleware de redirection si non loggé            */
 /*************************************************************/
@@ -20,12 +22,12 @@ router.use(function (req, res, next) {
 	}
 	else {
 	    console.log("refused");
-	    res.redirect('/classPanic');
+	    res.redirect(config.PATH);
 	}
     }
     else {
 	console.log("refused");
-	res.redirect('/classPanic');
+	res.redirect(config.PATH);
     }
 });
 

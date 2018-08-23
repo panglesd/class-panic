@@ -12,7 +12,7 @@
 	<div id="question" onclick="chooseAnswer(-1)"></div>
 	<div id="wrapperAnswer">
 	</div> 
-	  <div id="leave"><a href="/classPanic/manage/room">Quitter la salle</a></div>
+	  <div id="leave"><a href="<%= config.PATH %>/manage/room">Quitter la salle</a></div>
       </div>
       <div id="controlPanel">
 	  <div class="controlPanel" id="reveal">Réveler</div>
@@ -43,8 +43,12 @@
 	  </div>
       </div>
       <div id="nbVoters"> </div>
-      <script src="/socket.io/socket.io.js"></script>
-      <script> roomID = <%= room.id %>; console.log(roomID); </script>
+      <script src="/socket.io/socket.io.js">
+      </script>
+      <script>
+       var server = <%= server %>;
+       var roomID = <%= room.id %>;
+      </script>
       <script src="/javascripts/student.js"></script>
       <script src="/javascripts/admin.js"></script> 
       <script>

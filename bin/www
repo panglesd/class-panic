@@ -8,11 +8,14 @@ var app = require('../app');
 var debug = require('debug')('classpanic2:server');
 var http = require('http');
 
+var config = require('./../configuration');
+
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+//var port = normalizePort(process.env.PORT || '3000');
+var port = config.PORT;
 app.set('port', port);
 
 /**

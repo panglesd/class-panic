@@ -1,5 +1,6 @@
-var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
+//var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
+var socketAdmin = io.connect(server+'/admin');
 
 /*********************************************************************/
 /*                 Actions à effectuer à toute connection            */

@@ -7,18 +7,18 @@ var logger = require('morgan');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
 
-var indexRouter = require('./routes/index');
 var allVisibleRouter = require('./routes/allVisible');
 var userVisibleRouter = require('./routes/userVisible');
 var adminVisibleRouter = require('./routes/adminVisible');
-//var classPanicRouteur = require('./routes/classPanic');
+
+var config = require('./configuration');
 
 var app = express();
 
 var server = require('http').Server(app);
 
 var io = require("./controllers/sockets.js")(server);
-app.io           = io;
+app.io = io;
 
 var mysql = require('mysql')
  
@@ -35,10 +35,6 @@ var sessionMiddleware=session({
 
 app.use(sessionMiddleware);
 
-//io.of("/admin").use(function(socket, next) {
-//    sessionMiddleware(socket.request, socket.request.res, next);
-//});
-
 io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
@@ -53,14 +49,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(config.PATH, allVisibleRouter);
 
-app.use('/', indexRouter);
+app.use(config.PATH, userVisibleRouter);
 
-app.use('/classPanic', allVisibleRouter);
-
-app.use('/classPanic', userVisibleRouter);
-
-app.use('/classPanic', adminVisibleRouter);
+app.use(config.PATH, adminVisibleRouter);
 
 
 // catch 404 and forward to error handler

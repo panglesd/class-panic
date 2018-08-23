@@ -2,6 +2,7 @@ var User = require('../models/user');
 var Room = require('../models/room');
 var Set = require('../models/set');
 var Question = require('../models/question');
+var config = require("./../configuration");
 
 var async = require('async');
 
@@ -14,17 +15,18 @@ var async = require('async');
 exports.question_list = function(req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
-	    user : function (callback) {
+	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    config: function(callback) { callback(null, config) },	
+	    user: function (callback) {
 		callback(null, req.session.user);
 	    },
-	    questionList : function (callback) {
+	    questionList: function (callback) {
 		Question.listOwnedFromSetId(req.params.setId,function (e,b) {callback(e,b)});
 	    },
-	    set : function (callback) {
+	    set: function (callback) {
 		Set.setOwnedGet(req.session.user, req.params.setId, callback);
 	    },
-	    title : function(callback) { callback(null, "Class Panic: Modification d'un set")}
+	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")}
 	},
 	function (err, results) {
 	    console.log(results.questionList);
@@ -37,15 +39,16 @@ exports.question_list = function(req, res) {
 exports.questionShow = function(req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
-	    user : function (callback) {
+	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    config: function(callback) { callback(null, config) },	
+	    user: function (callback) {
 		callback(null, req.session.user);
 	    },
-	    question : function (callback) {
+	    question: function (callback) {
 		Question.getOwnedByID(req.params.questionId,function (e,b) {callback(e,b)});
 	    },
-	    title : function(callback) { callback(null, "Class Panic: Modification d'un set")},
-	    set : function (callback) {
+	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")},
+	    set: function (callback) {
 		Set.setOwnedGet(req.session.user, req.params.setId, callback);
 	    }
 	},
@@ -62,7 +65,8 @@ exports.question_create_get = function(req, res) {
     Set.setOwnedGet(req.session.user, req.params.idSet, function(err, r) {
 	options = {
 	    title: "ClassPanic : créer une nouvelle question",
-	    user : req.session.user,
+	    user: req.session.user,
+	    config: function(callback) { callback(null, config) },	
 	    newQuestion: true,
 	    question: {
 		reponses : [{
@@ -82,16 +86,17 @@ exports.question_create_get = function(req, res) {
 exports.question_update_get = function(req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
-	    user : function (callback) {
+	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    config: function(callback) { callback(null, config) },	
+	    user: function (callback) {
 		callback(null, req.session.user);
 	    },
-	    question : function (callback) {
+	    question: function (callback) {
 		Question.getOwnedByID(req.session.user, req.params.id,function (e,b) {callback(e,b)});
 	    },
-	    newQuestion : function (callback) { callback(null, false) },
-	    title : function(callback) { callback(null, "Class Panic: Modification d'un set")},
-	    set : function (callback) {
+	    newQuestion: function (callback) { callback(null, false) },
+	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")},
+	    set: function (callback) {
 		Set.setOwnedGet(req.session.user, req.params.idSet, callback);
 	    }
 	},
@@ -108,19 +113,19 @@ exports.question_update_get = function(req, res) {
 // Create
 
 exports.question_create_post = function(req, res) {
-    Question.questionCreate(req.session.user, req.body, {id:req.params.idSet}, function(err, id) { res.redirect("/classPanic/manage/set/"+req.params.idSet) ; });
+    Question.questionCreate(req.session.user, req.body, {id:req.params.idSet}, function(err, id) { res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ; });
 };
 
 // Update
 
 exports.question_update_post = function(req, res) {
     Question.questionUpdate(req.session.user, req.params, req.body, function() {
-	res.redirect("/classPanic/manage/set/"+req.params.idSet);
+	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
     });
 };
 
 // Delete
 
 exports.question_delete_post = function(req, res) {
-    Question.questionDelete(req.session.user, req.params,  function(err, id) { res.redirect("/classPanic/manage/set/"+req.params.idSet) ; });
+    Question.questionDelete(req.session.user, req.params,  function(err, id) { res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ; });
 };

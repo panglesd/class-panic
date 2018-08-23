@@ -1,14 +1,14 @@
 <%- include('admin_header'); -%>
 
 <h2> Renommer ou supprimer "<%= set.name%>"</h2>
-<form action="/classPanic/manage/set/<%=set.id%>/update" method="post">
+<form action="<%= config.PATH %>/manage/set/<%=set.id%>/update" method="post">
     Name : <input name="name" value="<%= set.name %>"> <br>
     <input type="submit" value="Modifier">
 </form>
 
 <h2>Ou la supprimer</h2>
 
-<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="/classPanic/manage/set/<%=set.id%>/delete" method="post">
+<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/manage/set/<%=set.id%>/delete" method="post">
     Irréversible : <input type="submit" value='Supprimer le set "<%= set.name%>"'>
 </form>
 
@@ -20,13 +20,13 @@
 	<li class="question" id="q<%= q.id %>">
 		<span class="froom"><%= q.enonce %></span>
 		<div>
-			<a class="room" href="/classPanic/manage/set/<%= set.id %>/question/<%= q.id %>"> Modifier </a>
+			<a class="room" href="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= q.id %>"> Modifier </a>
 		</div>
 	</li>
     <% });%>
     </ul>
     <ul>
-	<a href="/classPanic/manage/set/<%= set.id %>/question/create">
+	<a href="<%= config.PATH %>/manage/set/<%= set.id %>/question/create">
 	    <li class="room">
 		<span class="froom">Créer une nouvelle question</span>
 		<!--	<div>
@@ -36,7 +36,7 @@
 	</a>
 </ul>
 
-<a style="display:block; margin:40px;" href="/classPanic/manage/set"> Retourner à la liste des sets </a>
+<a style="display:block; margin:40px;" href="<%= config.PATH %>/manage/set"> Retourner à la liste des sets </a>
 <script src="/javascripts/Sortable.js">
  </script>
  <script src="/socket.io/socket.io.js"></script>
