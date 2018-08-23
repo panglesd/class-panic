@@ -1,6 +1,7 @@
 var user = require('../models/user');
 var Room = require('../models/room');
-var set = require('../models/set');
+var Set = require('../models/set');
+var Question = require('../models/question');
 var async = require('async');
 
 // Controlleur pour entrer dans une room
@@ -29,7 +30,7 @@ exports.room_admin = function(req, res) {
 		Room.getOwnedByID(req.session.user, req.params.id, callback)
 	    },
 	    set : function (callback) {
-		question.listByRoomID(req.params.id, function (e,b) {callback(e,b)});
+		Question.listByRoomID(req.params.id, function (e,b) {callback(e,b)});
 	    },
 	    roomList : function (callback) {
 		Room.list(callback);

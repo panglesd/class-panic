@@ -32,7 +32,7 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
 
 ** TODO mettre en paramètre le prefixe "/classPanic/" et mettre le plus de chemins possibles en relatif
 
-** TODO mettre en paramètre le socket.onnect dans le javascript client-side
+** TODO mettre en paramètre le socket.connect dans le javascript client-side
 ** TODO Trouver un nom satisfaisant
 Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
 
@@ -53,7 +53,8 @@ Auto réalisateur
 ** DONE Rediriger auto vers la page d'accueil en cas de session non valide
    CLOSED: [2018-08-22 mer. 11:21]
 
-** TODO avoir un fichier pour créer la BDD
+** DONE avoir un fichier pour créer la BDD
+   CLOSED: [2018-08-23 jeu. 07:37]
 
 ** DONE Débugger les création sets/room/question
    CLOSED: [2018-08-22 mer. 11:58]
