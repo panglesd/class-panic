@@ -42,7 +42,8 @@ Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
    CLOSED: [2018-08-23 jeu. 06:43]
 Je suis passé à la version "owned"
 
-** TODO Regarder pour mettre une licence sur le code
+** DONE Regarder pour mettre une licence sur le code
+   CLOSED: [2018-08-23 jeu. 18:20]
 Open source of course
 
 ** DONE Ajouter un TODO
@@ -50,6 +51,7 @@ Open source of course
 Auto réalisateur
 
 ** TODO Déployer facilement sur choum
+** TODO Écrire un README
 
 ** DONE Rediriger auto vers la page d'accueil en cas de session non valide
    CLOSED: [2018-08-22 mer. 11:21]

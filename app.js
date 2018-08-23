@@ -22,9 +22,9 @@ app.io = io;
 
 var mysql = require('mysql')
  
-var optionsSessionMySQL = require('./credentials').optionsSessionMySQL;
+var optionsMySQL = require('./credentials').optionsMySQL;
  
-var sessionStore = new MySQLStore(optionsSessionMySQL);
+var sessionStore = new MySQLStore(optionsMySQL);
 var sessionMiddleware=session({
     key: 'session_cookie_namezeze',
     secret: 'session_cookie_secretzaza',
