@@ -107,14 +107,27 @@ exports.nextQuestionFromRoom = function (room, callback) {
 	 });
 }
 /***********************************************************************/
-/*       Flusher les anciens participants d'une room                   */
+/*       Entrer et sortir d'une room                                   */
 /***********************************************************************/
 
+// Flusher les anciens participants d'une room
+
 exports.flushOldPlayers = function (room, callback) {
-    console.log("rromid", room.id);
     bdd.query("DELETE FROM `poll` WHERE  ADDTIME(`last_activity`, '0 3:0:0')<NOW() AND `roomID` = ?", [room.id], function () {
 	bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [room.id], callback);
     });
+}
+
+// Partir d'une salle
+
+exports.leaveRoom = function (user, room, callback) {
+    bdd.query("DELETE FROM `poll` WHERE  `pseudo`= ? AND `roomID` = ?", [user.pseudo, room.id], callback);
+}
+
+// Entrer dans une salle
+
+exports.enterRoom = function (user, room, callback) {
+    bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, -1, ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
 }
 
 /***********************************************************************/

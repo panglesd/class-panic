@@ -32,6 +32,7 @@ module.exports = function (server) {
 
     io.on('connection', function (socket) {
 
+
 	/******************************************/
 	/*  Quelqu'un a choisi une room           */
 	/******************************************/
@@ -42,14 +43,16 @@ module.exports = function (server) {
 	    room.getByID(parseInt(newRoom), function (err, res) {
 		socket.room = res;
 		socket.join(newRoom);
-		game.questionFromRoomID(socket.room.id, function (err, question) {
-		    socket.emit("newQuestion", question);
-		    room.getStatus(socket.room, function (err, status) {
-			if(status == "revealed") {
-			    game.getStatsFromOwnedRoom(socket.room.id, function (r,e) {
-				io.to(socket.room.id).emit("correction", e);
-			    });
-			}
+		game.enterRoom(socket.request.session.user, socket.room, function (err) {
+		    game.questionFromRoomID(socket.room.id, function (err, question) {
+			socket.emit("newQuestion", question);
+			room.getStatus(socket.room, function (err, status) {
+			    if(status == "revealed") {
+				game.getStatsFromOwnedRoom(socket.room.id, function (r,e) {
+				    io.to(socket.room.id).emit("correction", e);
+				});
+			    }
+			});
 		    });
 		});
 	    });
@@ -72,6 +75,16 @@ module.exports = function (server) {
 	socket.on('chosenAnswer', function (answer) {
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		sendStats(socket.room)
+	    });
+	});
+
+	/******************************************/
+	/*  On quitte la salle                    */
+	/******************************************/
+
+	socket.on('disconnect', function (reason) {
+	    game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
+		throw err;
 	    });
 	});
     });
