@@ -44,6 +44,7 @@ module.exports = function (server) {
 		socket.room = res;
 		socket.join(newRoom);
 		game.enterRoom(socket.request.session.user, socket.room, function (err) {
+		    sendStats(socket.room);
 		    game.questionFromRoomID(socket.room.id, function (err, question) {
 			socket.emit("newQuestion", question);
 			room.getStatus(socket.room, function (err, status) {
@@ -84,7 +85,8 @@ module.exports = function (server) {
 
 	socket.on('disconnect', function (reason) {
 	    game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
-		throw err;
+		if (err) throw err;
+		sendStats(socket.room);
 	    });
 	});
     });
