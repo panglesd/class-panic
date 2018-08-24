@@ -50,7 +50,9 @@ Open source of course
    CLOSED: [2018-08-15 mer. 02:40]
 Auto réalisateur
 
-** TODO Déployer facilement sur choum
+** DONE Déployer sur choum
+   CLOSED: [2018-08-24 Fri 03:16]
+** TODO Déployer facilement
 ** TODO Écrire un README
 
 ** DONE Rediriger auto vers la page d'accueil en cas de session non valide
