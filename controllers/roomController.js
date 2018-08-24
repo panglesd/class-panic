@@ -111,7 +111,7 @@ exports.room_manage_all = function(req, res) {
 
 exports.room_create_post = function(req, res) {
     Room.create(req.session.user, req.body, function () {
-    res.redirect(config.path+'/manage/room');
+    res.redirect(config.PATH+'/manage/room');
     });
 };
 

@@ -66,7 +66,7 @@ exports.question_create_get = function(req, res) {
 	options = {
 	    title: "ClassPanic : créer une nouvelle question",
 	    user: req.session.user,
-	    config: function(callback) { callback(null, config) },	
+	    config: config,	
 	    newQuestion: true,
 	    question: {
 		reponses : [{
