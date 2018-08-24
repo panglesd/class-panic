@@ -46,7 +46,7 @@ module.exports = function (server) {
 		    socket.emit("newQuestion", question);
 		    room.getStatus(socket.room, function (err, status) {
 			if(status == "revealed") {
-			    game.getAnonStatsFromRoom(socket.room.id, function (r,e) {
+			    game.getStatsFromOwnedRoom(socket.room.id, function (r,e) {
 				io.to(socket.room.id).emit("correction", e);
 			    });
 			}
