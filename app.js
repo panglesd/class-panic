@@ -17,8 +17,6 @@ var app = express();
 
 var server = require('http').Server(app);
 
-var io = require("./controllers/sockets.js")(server);
-app.io = io;
 
 var mysql = require('mysql')
  
@@ -35,21 +33,9 @@ var sessionMiddleware=session({
 
 app.use(sessionMiddleware);
 
-// IO middleswares :
+var io = require("./controllers/sockets.js")(server, sessionMiddleware);
+app.io = io;
 
-//On ajoute une session si existante à l'objet socket
-io.use(function(socket, next) {
-    sessionMiddleware(socket.request, socket.request.res, next);
-});
-
-// On n'accepte que des sessions existantes et un user défini
-io.use(function(socket, next) {
-    if(socket.request.session) {
-	if(socket.request.session.user) {
-	    next();
-	}
-    }
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -6,10 +6,34 @@ var async = require('async');
 
 
 
-module.exports = function (server) {
+module.exports = function (server, sessionMiddleware) {
 
     var io = require('socket.io')(server);
 
+    /**************************************************************************/
+    /*                 IO middlewares                                         */
+    /**************************************************************************/
+    
+    //On ajoute une session si existante à l'objet socket
+    io.use(function(socket, next) {
+	sessionMiddleware(socket.request, socket.request.res, next);
+    });
+    
+    // On n'accepte que des sessions existantes et un user défini
+    io.use(function(socket, next) {
+	if(socket.request.session) {
+	    if(socket.request.session.user) {
+		next();
+	    }
+	    else {
+		console.log("socket refused !");
+	    }
+	}
+	else {
+	    console.log("socket refused !");
+	}
+    });
+    
     /**************************************************************************/
     /*                 Utilitaires d'envoi                                    */
     /**************************************************************************/
@@ -34,10 +58,12 @@ module.exports = function (server) {
     /*                 Fonction pour gérer les eleves                         */
     /**************************************************************************/
 
-    io.on('connection', function (socket) {
-
+    io.of("/student").on('connection', function (socket) {
+	if(socket.request.session) {
+	    if(socket.request.session.user) {
+		console.log("socket.request.session.user is ",socket.request.session.user);
 	/******************************************/
-	/*  Middlesware de socket                 */
+	/*  Middleware de socket                  */
 	/******************************************/
 
 	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
@@ -60,6 +86,7 @@ module.exports = function (server) {
 	    room.getByID(parseInt(newRoom), function (err, res) {
 		socket.room = res;
 		socket.join(newRoom);
+		console.log("socket.request.session.user is ",socket.request.session.user);
 		game.enterRoom(socket.request.session.user, socket.room, function (err) {
 		    sendOwnedStats(socket.room);
 		    game.questionFromRoomID(socket.room.id, function (err, question) {
@@ -67,7 +94,7 @@ module.exports = function (server) {
 			room.getStatus(socket.room, function (err, status) {
 			    if(status == "revealed") {
 				game.getStatsFromRoomID(socket.room.id, function (r,e) {
-				    io.to(socket.room.id).emit("correction", e);
+				    io.of("/student").to(socket.room.id).emit("correction", e);
 				});
 			    }
 			});
@@ -106,6 +133,8 @@ module.exports = function (server) {
 		sendOwnedStats(socket.room);
 	    });
 	});
+	    }
+	}
     });
 
     /**************************************************************************/
@@ -113,6 +142,9 @@ module.exports = function (server) {
     /**************************************************************************/
 
     io.of('/admin').on('connection', function(socket) {
+
+	if(socket.request.session) {
+	    if(socket.request.session.user) {
 
 	/******************************************/
 	/*  Middlesware de socket                 */
@@ -153,7 +185,7 @@ module.exports = function (server) {
 	socket.on('revealResults', function () {
 	    console.log("should emit to", socket.room.id, "the correction");
 	    game.getStatsFromRoomID(socket.room.id, function (r,e) {
-		io.to(socket.room.id).emit("correction", e);
+		io.of("/student").to(socket.room.id).emit("correction", e);
 		room.setStatusForRoom(socket.room, "revealed", function () {});
 	    });	    
 	});
@@ -166,7 +198,7 @@ module.exports = function (server) {
 	    console.log("on souhaite changer à la question", i)
 	    game.setQuestionFromRoom(socket.room, parseInt(i), function () {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
-		    io.to(socket.room.id).emit("newQuestion", question);
+		    io.of("/student").to(socket.room.id).emit("newQuestion", question);
 		    io.of('/admin').to(socket.room.id).emit("newQuestion", question);
 		    room.setStatusForRoom(socket.room, "pending", function () {sendOwnedStats(socket.room);});
 		});
@@ -188,12 +220,14 @@ module.exports = function (server) {
 	socket.on('changeQuestionPlease', function (nextQuestion) {
 	    game.nextQuestionFromRoom(socket.room, function () {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
-		    io.to(socket.room.id).emit("newQuestion", question);
+		    io.of("/student").to(socket.room.id).emit("newQuestion", question);
 		    io.of('/admin').to(socket.room.id).emit("newQuestion", question);
 		    room.setStatusForRoom(socket.room, "pending", function () {sendOwnedStats(socket.room);});
 		});
 	    })
 	});
+	    }
+	}
     });
 
     /**************************************************************************/
@@ -203,6 +237,8 @@ module.exports = function (server) {
 
     io.of('/manage').on('connection', function(socket) {
 
+	if(socket.request.session) {
+	    if(socket.request.session.user) {
 	socket.on('new order', function (newOrder) {
 	    if(socket.request.session) {
 		set.reOrder(socket.request.session.user, newOrder);
@@ -210,6 +246,8 @@ module.exports = function (server) {
 	    else {
 	    }
 	});
+	    }
+	}
     });
 
     return io;

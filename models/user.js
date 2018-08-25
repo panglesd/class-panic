@@ -1,5 +1,6 @@
-bdd = require("./bdd");
+var bdd = require("./bdd");
 
+var config = require("../configuration.js");
 var bcrypt = require("bcrypt");;
 const saltRounds = 10;;
 
@@ -33,7 +34,7 @@ exports.userByID = function (userID, callback) {
 
 exports.create = function (user, callback) {
     bcrypt.hash(user.password, saltRounds, function(err, hash) {
-	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`) VALUES (?, ?, ?, ?, ?)', [user.pseudo, hash, user.email, user.nomComplet, user.adminPassword == "classPanix" ], function(err, rows) {
+	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`) VALUES (?, ?, ?, ?, ?)', [user.pseudo, hash, user.email, user.nomComplet, user.adminPassword == config.ADMINPASSWD ], function(err, rows) {
 	    console.log(rows);
 	    callback(rows);
 	});

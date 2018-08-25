@@ -1,5 +1,5 @@
 //var socket = io.connect('http://192.168.0.12:3000/');
-var socket = io.connect(server);
+var socket = io.connect(server+"/student");
 //var socket = io.connect('http://localhost:3000/');
 
 /*********************************************************************/
