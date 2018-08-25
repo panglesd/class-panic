@@ -39,7 +39,6 @@ exports.set_manage = function(req, res) {
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
 	    server : function(callback) {
-	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
 	    config : function(callback) { callback(null, config) },	
