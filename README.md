@@ -22,16 +22,16 @@ npm install
 ```
 
 ### Set up the database
--Create a database
--Import classPanic.sql in your databse
--Create a user that has all access to this database
--Fill credentials.js so that the server can access the database:
+- Create a database
+- Import classPanic.sql in your databse
+- Create a user that has all access to this database
+- Fill credentials.js so that the server can access the database:
 ```shell
 cp credentials.js.example credentials.js
 emacs credentials.js
 ```
 ### choose configuration
--Choose port, route and admin password in configuration.js
+- Choose port, route and admin password in configuration.js
 ```shell
 emacs configuration.js
 ```
