@@ -110,9 +110,14 @@ exports.room_manage_all = function(req, res) {
 // Create
 
 exports.room_create_post = function(req, res) {
-    Room.create(req.session.user, req.body, function () {
-    res.redirect(config.PATH+'/manage/room');
-    });
+    if(req.body.questionSet) {
+	Room.create(req.session.user, req.body, function (err) {
+	    res.redirect(config.PATH+'/manage/room');
+	});
+    }
+    else {
+	res.redirect(config.PATH+'/manage/room');
+    }
 };
 
 //Delete
