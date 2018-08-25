@@ -236,16 +236,16 @@ module.exports = function (server, sessionMiddleware) {
 
 
     io.of('/manage').on('connection', function(socket) {
-
+	console.log("AHAAHAHHAHAHAHAH");
 	if(socket.request.session) {
 	    if(socket.request.session.user) {
-	socket.on('new order', function (newOrder) {
-	    if(socket.request.session) {
-		set.reOrder(socket.request.session.user, newOrder);
-	    }
-	    else {
-	    }
-	});
+		socket.on('new order', function (newOrder) {
+		    if(socket.request.session) {
+			set.reOrder(socket.request.session.user, newOrder);
+		    }
+		    else {
+		    }
+		});
 	    }
 	}
     });

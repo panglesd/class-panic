@@ -38,6 +38,10 @@ exports.set_manage = function(req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    server : function(callback) {
+	    server : function(callback) {
+		callback(null, req.protocol + '://' + req.get('host') );
+	    },
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, req.session.user);
