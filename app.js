@@ -38,6 +38,13 @@ app.use(sessionMiddleware);
 io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
+io.use(function(socket, next) {
+    if(socket.request.session) {
+	if(socket.request.session.user) {
+	    next();
+	}
+    }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
