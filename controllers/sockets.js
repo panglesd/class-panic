@@ -36,7 +36,20 @@ module.exports = function (server) {
 
     io.on('connection', function (socket) {
 
+	/******************************************/
+	/*  Middlesware de socket                 */
+	/******************************************/
 
+	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
+	
+	socket.use(function (packet, next) {
+	    console.log("packet is", packet);
+	    if(packet[0]=="chooseRoom")
+		next();
+	    if(socket.room)
+		next();
+	});
+	
 	/******************************************/
 	/*  Quelqu'un a choisi une room           */
 	/******************************************/
@@ -101,6 +114,20 @@ module.exports = function (server) {
 
     io.of('/admin').on('connection', function(socket) {
 
+	/******************************************/
+	/*  Middlesware de socket                 */
+	/******************************************/
+
+	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
+	
+	socket.use(function (packet, next) {
+	    console.log("packet is", packet);
+	    if(packet[0]=="chooseRoom")
+		next();
+	    if(socket.room)
+		next();
+	});
+	
 	/******************************************/
 	/*  On a choisi la room a administrer     */
 	/******************************************/

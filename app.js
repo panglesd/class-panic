@@ -35,11 +35,15 @@ var sessionMiddleware=session({
 
 app.use(sessionMiddleware);
 
+// IO middleswares :
+
+//On ajoute une session si existante à l'objet socket
 io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
+
+// On n'accepte que des sessions existantes et un user défini
 io.use(function(socket, next) {
-    console.log("socket.request is "socket.request);
     if(socket.request.session) {
 	if(socket.request.session.user) {
 	    next();
