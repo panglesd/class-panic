@@ -125,7 +125,7 @@ module.exports = function (server) {
 
 	socket.on('revealResults', function () {
 	    console.log("should emit to", socket.room.id, "the correction");
-	    game.getStatsFromRoomID(socket.request.session.user, socket.room.id, function (r,e) {
+	    game.getStatsFromRoomID(socket.room.id, function (r,e) {
 		io.to(socket.room.id).emit("correction", e);
 		room.setStatusForRoom(socket.room, "revealed", function () {});
 	    });	    

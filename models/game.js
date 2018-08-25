@@ -53,7 +53,7 @@ exports.getStatsFromRoomID = function (roomID, callback) {
     async.parallel(
 	{
 	    anonStats : function (callback) {
-		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? GROUP BY response", [roomID], function(err, row) {callback(err,row)});
+		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? AND `poll`.`pseudo` != (SELECT pseudo FROM users WHERE id = (SELECT ownerID FROM rooms WHERE `id` = ?)) GROUP BY response", [roomID, roomID], function(err, row) {callback(err,row)});
 	    },
 	    correctAnswer : function (callback) {
 		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [roomID], function(a,b) {callback(a,b[0].correct);});
