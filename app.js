@@ -39,6 +39,7 @@ io.use(function(socket, next) {
     sessionMiddleware(socket.request, socket.request.res, next);
 });
 io.use(function(socket, next) {
+    console.log("socket.request is "socket.request);
     if(socket.request.session) {
 	if(socket.request.session.user) {
 	    next();
