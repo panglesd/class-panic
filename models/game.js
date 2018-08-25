@@ -49,27 +49,27 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 /*       Récupérer les statistiques d'une room                         */
 /***********************************************************************/
 
-exports.getStatsFromOwnedRoom = function (room, callback) {
+exports.getStatsFromRoomID = function (roomID, callback) {
     async.parallel(
 	{
 	    anonStats : function (callback) {
-		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? GROUP BY response", [room], function(err, row) {callback(err,row)});
+		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? GROUP BY response", [roomID], function(err, row) {callback(err,row)});
 	    },
 	    correctAnswer : function (callback) {
-		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [room], function(a,b) {callback(a,b[0].correct);});
+		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [roomID], function(a,b) {callback(a,b[0].correct);});
 	    }
 	},
 	callback);
     
 }
-exports.getStatsFromRoom = function (room, callback) {
+exports.getStatsFromOwnedRoomID = function (roomID, callback) {
     async.parallel(
 	{
 	    namedStats : function (callback) {
-		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `poll`.`response` FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [room], function(err, row) {callback(err, row)});
+		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `poll`.`response` FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ? AND `poll`.`pseudo` != (SELECT pseudo FROM users WHERE id = (SELECT ownerID FROM rooms WHERE `id` = ?)) ", [roomID, roomID], function(err, row) {callback(err, row)});
 	    },
 	    correctAnswer : function (callback) {
-		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [room], function (err, res) {callback(err, res[0].correct)});
+		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [roomID], function (err, res) {callback(err, res[0].correct)});
 	    }
 	},
 	callback);

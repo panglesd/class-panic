@@ -20,8 +20,12 @@ module.exports = function (server) {
 	});
     }
 
-    function sendStats(room) {
+/*    function sendStats(room) {
 	game.getStatsFromRoom(room.id, function (err, stats) {
+	    io.of("/admin").to(room.id).emit("newStats", stats)
+	}); */
+    function sendOwnedStats(room) {
+	game.getStatsFromOwnedRoomID(room.id, function (err, stats) {
 	    io.of("/admin").to(room.id).emit("newStats", stats)
 	});
     }
@@ -44,12 +48,12 @@ module.exports = function (server) {
 		socket.room = res;
 		socket.join(newRoom);
 		game.enterRoom(socket.request.session.user, socket.room, function (err) {
-		    sendStats(socket.room);
+		    sendOwnedStats(socket.room);
 		    game.questionFromRoomID(socket.room.id, function (err, question) {
 			socket.emit("newQuestion", question);
 			room.getStatus(socket.room, function (err, status) {
 			    if(status == "revealed") {
-				game.getStatsFromOwnedRoom(socket.room.id, function (r,e) {
+				game.getStatsFromRoomID(socket.room.id, function (r,e) {
 				    io.to(socket.room.id).emit("correction", e);
 				});
 			    }
@@ -75,7 +79,7 @@ module.exports = function (server) {
 
 	socket.on('chosenAnswer', function (answer) {
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
-		sendStats(socket.room)
+		sendOwnedStats(socket.room)
 	    });
 	});
 
@@ -86,7 +90,7 @@ module.exports = function (server) {
 	socket.on('disconnect', function (reason) {
 	    game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
 		if (err) throw err;
-		sendStats(socket.room);
+		sendOwnedStats(socket.room);
 	    });
 	});
     });
@@ -111,7 +115,7 @@ module.exports = function (server) {
 		game.questionOwnedFromRoomID(socket.request.session.user, socket.room.id, function (err, question) {
 		    socket.emit("newQuestion", question);
 		});
-		sendStats(socket.room);
+		sendOwnedStats(socket.room);
 	    });
 	});
 
@@ -121,7 +125,7 @@ module.exports = function (server) {
 
 	socket.on('revealResults', function () {
 	    console.log("should emit to", socket.room.id, "the correction");
-	    game.getStatsFromOwnedRoom(socket.room.id, function (r,e) {
+	    game.getStatsFromRoomID(socket.request.session.user, socket.room.id, function (r,e) {
 		io.to(socket.room.id).emit("correction", e);
 		room.setStatusForRoom(socket.room, "revealed", function () {});
 	    });	    
@@ -137,7 +141,7 @@ module.exports = function (server) {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
 		    io.to(socket.room.id).emit("newQuestion", question);
 		    io.of('/admin').to(socket.room.id).emit("newQuestion", question);
-		    room.setStatusForRoom(socket.room, "pending", function () {sendStats(socket.room);});
+		    room.setStatusForRoom(socket.room, "pending", function () {sendOwnedStats(socket.room);});
 		});
 	    })
 	});
@@ -159,7 +163,7 @@ module.exports = function (server) {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
 		    io.to(socket.room.id).emit("newQuestion", question);
 		    io.of('/admin').to(socket.room.id).emit("newQuestion", question);
-		    room.setStatusForRoom(socket.room, "pending", function () {sendStats(socket.room);});
+		    room.setStatusForRoom(socket.room, "pending", function () {sendOwnedStats(socket.room);});
 		});
 	    })
 	});
