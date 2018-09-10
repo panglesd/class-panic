@@ -53,7 +53,8 @@ Auto réalisateur
 ** DONE Déployer sur choum
    CLOSED: [2018-08-24 Fri 03:16]
 ** TODO Déployer facilement
-** TODO Écrire un README
+** DONE Écrire un README
+   CLOSED: [2018-09-07 Fri 06:07]
 
 ** DONE Rediriger auto vers la page d'accueil en cas de session non valide
    CLOSED: [2018-08-22 mer. 11:21]
