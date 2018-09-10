@@ -9,6 +9,14 @@
   <body>
       <div id="login">
 	<h2>Se connecter</h2>
+	  <div class="msg">
+	    <ul>
+	      <% if(typeof msgs == 'object' && msgs) {
+		 msgs.forEach(function (msg) { %>
+	      <li> <%= msg %> </li>
+	      <% });} %>
+	    </ul>
+	  </div>
 	<a href= "<%= config.PATH %>/signin">Pas de compte ?</a>
 	  <form method="post" action="<%= config.PATH %>">
 	      <table>
