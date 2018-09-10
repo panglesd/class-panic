@@ -4,13 +4,15 @@ var Set = require('../models/set');
 var config = require('../configuration');
 var async = require('async');
 
+
+
 /*************************************************************/
-/*         Controlleurs GET pour les rooms                   */
+/*         Fonctions render pour les rooms                   */
 /*************************************************************/
 
-// Afficher la liste des rooms afin d'y participer
+// Render rooms.ejs
 
-exports.room_list = function(req, res) {
+renderRooms = function(req, res, msgs) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -18,43 +20,22 @@ exports.room_list = function(req, res) {
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
+	    msgss : function(callback) {
+		callback(null, msgs);
+	    },
 	    roomList : function (callback) {
 		Room.list(callback);
 	    }
 	},
 	function (err, results) {
+	    console.log(results);
 	    res.render('rooms', results)
 	});
-};
+}
 
+// Render manage_room.ejs
 
-// A supprimer si ça ne sert bien à rien
-
-/*exports.room_admin_all = function(req, res) {
-    async.parallel(
-	{
-	    title : function(callback) { callback(null, "ClassPanic: Administrer une salle")},
-	    user : function (callback) {
-		callback(null, req.session.user);
-	    },
-	    roomList : function (callback) {
-		Room.list(callback);
-	    },
-	    roomOwnedList :  function (callback) {
-		Room.ownedList(req.session.user, function (r) { callback(null, r) });
-	    },
-	    setOwnedList :  function (callback) {
-		Set.setOwnedList(req.session.user, callback);
-	    }
-	},
-	function (err, results) {
-	    res.render('admin_rooms', results)
-	});
-};*/
-
-// Afficher le détails d'une room pour la modifier
-
-exports.room_manage = function (req, res) {
+renderRoomManage = function (req, res, msgs) {
     Room.getOwnedByID(req.session.user, req.params.id, function (err, thisRoom) {
 	async.parallel(
 	    {
@@ -66,20 +47,22 @@ exports.room_manage = function (req, res) {
 		room :  function (callback) {
 		    callback(null, thisRoom);
 		},
+		msgs : function(callback) {
+		    callback(null, msgs);
+		},
 	    	setOwnedList :  function (callback) {
 		    Set.setOwnedList(req.session.user, callback);
 		}
 	    },
 	    function (err, results) {
-		console.log(results);
 		res.render('manage_room', results);
 	    });
     });
 };
 
-// Afficher la liste des rooms afin de les manager
+// Render manage_rooms.ejs
 
-exports.room_manage_all = function(req, res) {
+renderManageRooms = function(req, res, msgs) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -89,6 +72,9 @@ exports.room_manage_all = function(req, res) {
 	    },
 	    roomList : function (callback) {
 		Room.list(callback);
+	    },
+	    msgs : function(callback) {
+		callback(null, msgs);
 	    },
 	    roomOwnedList :  function (callback) {
 		Room.ownedList(req.session.user, function (r) { callback(null, r) });
@@ -102,6 +88,29 @@ exports.room_manage_all = function(req, res) {
 	});
 };
 
+/*************************************************************/
+/*         Controlleurs GET pour les rooms                   */
+/*************************************************************/
+
+// Afficher la liste des rooms afin d'y participer
+
+exports.room_list = function(req, res) {
+    renderRooms(req,res,[]);
+};
+
+
+// Afficher le détails d'une room pour la modifier
+
+exports.room_manage = function (req, res) {
+    renderRoomManage(req, res, []);
+};
+
+// Afficher la liste des rooms afin de les manager
+
+exports.room_manage_all = function(req, res) {
+    renderManageRooms(req, res, []);
+};
+
 
 /*************************************************************/
 /*         Controlleurs POST pour modifier les rooms         */
@@ -112,7 +121,9 @@ exports.room_manage_all = function(req, res) {
 exports.room_create_post = function(req, res) {
     if(req.body.questionSet) {
 	Room.create(req.session.user, req.body, function (err) {
-	    res.redirect(config.PATH+'/manage/room');
+	    //	    res.redirect(config.PATH+'/manage/room');
+	    console.log(req.body);
+	    renderRoomManage(req, res, "Room  créée !");
 	});
     }
     else {
