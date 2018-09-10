@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" href="/stylesheets/style_main.css">
+  </head>
+  <body>
+    <div id="main_wrapper">
+      <h1>Class Panic</h1>
+      <nav>
+	<ul>
+	  <li><a href="<%= config.PATH %>/room">Rejoindre une salle</a></li>
+	  <%- user.isAdmin ? '<li><a href="'+ config.PATH +'/manage/room">Administrer</a></li>' : "" %>
+<!--	  <li><a href="<%= config.PATH %>/user">Mon compte</a></li>-->
+	  <li><a id="leave" href="<%= config.PATH %>/logout">Se d&eacute;connecter</a></li>
+      </nav>
+      <div class="wrapper" id="connect_wrapper">
+	<h2>Se connecter à une salle</h2>
+	<ul class="room">
+	  <% roomList.forEach(function(room) { %>
+	  <a class="room" href="<%= config.PATH %>/room/<%= room.id %>">
+	    <li class="room">
+	      <span class="froom"><%= room.name %></span>
+	      <ul>
+		<li>Nombre de participants : <%= room.number %></li>
+		<li>Administrateur: <%=room.owner %></li>
+	      </ul>
+	      <div>
+		Rejoindre
+	      </div>
+	    </li>
+	  </a>
+	  <% });%>
+	</ul>
+      </div>
+      <div id="footer"> <a id="leave" href="<%= config.PATH %>/logout">Se deconnecter (<%= user.pseudo %>)</a></div>
+    </div>
+  </body>
+</html>
