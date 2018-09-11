@@ -50,7 +50,7 @@ exports.list = function (callback) {
 
 exports.ownedList = function (user, callback) {
     bdd.query('SELECT `rooms`.id as id,`rooms`.`name` as name,`id_currentQuestion`, `questionSet`, `rooms`.`ownerID` as ownerID, `status`, `setDeQuestion`.name as nameSet FROM (rooms INNER JOIN setDeQuestion ON `rooms`.questionSet = `setDeQuestion`.`id`) WHERE `rooms`.`ownerID` = ?', [user.id], function(err, rows) {
-	callback(rows);
+	callback(err, rows);
     });
 }
 
