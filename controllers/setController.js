@@ -47,7 +47,7 @@ renderManageSet = function(req, user, setID, msgs, res) {
 		callback(null, user);
 	    },
 	    questionList : function (callback) {
-		Question.listOwnedBySetID(user, setID, callback);
+		Question.listOwnedBySetID(user, setID, function(a,b) {callback(a,b)});
 	    },
 	    msgs: function(callback) { callback(null, msgs) },
 	    set : function (callback) {
@@ -68,11 +68,17 @@ renderManageSet = function(req, user, setID, msgs, res) {
 exports.set_manage_all = function(req, res) {
     renderManageSets(req.session.user, [], res);
 };
+exports.set_manage_all_msgs = function(req, res, msgs) {
+    renderManageSets(req.session.user, msgs, res);
+};
 
 // Afficher le détails d'un set
 
 exports.set_manage = function(req, res) {
     renderManageSet(req, req.session.user, req.params.id, [], res);
+};
+exports.set_manage_msgs = function(req, res, msgs) {
+    renderManageSet(req, req.session.user, req.params.id, msgs, res);
 };
 
 /*************************************************************/
@@ -83,7 +89,10 @@ exports.set_manage = function(req, res) {
 
 exports.set_create_post = function(req, res) {
     Set.setCreate(req.session.user, req.body, function (err, set) {
-	renderManageSet(req, req.session.user, set.id, ["Set créé !"], res);
+	if(err)
+	    renderManageSet(req, req.session.user, set.id, ["Impossible de créer le set !"], res);
+	else
+	    renderManageSet(req, req.session.user, set.id, ["Set créé !"], res);
     });
 };
 
@@ -91,7 +100,11 @@ exports.set_create_post = function(req, res) {
 
 exports.set_delete_post = function(req, res) {
     Set.setDelete(req.session.user, req.params, function (err, set) {
-	renderManageSets(req.session.user, ["Set supprimé"], res);
+	console.log(err);
+	if(err) 
+	    renderManageSets(req.session.user, ["Impossible de supprimer le set, sans doute est-il utilisé dans une room"], res);
+	else
+	    renderManageSets(req.session.user, ["Set supprimé"], res);
     });
 };
 
@@ -99,6 +112,9 @@ exports.set_delete_post = function(req, res) {
 
 exports.set_update_post = function(req, res) {
     Set.setUpdate(req.session.user, req.params, req.body, function (err, set) {
-	renderManageSets(req.session.user, ["Set mis à jour"], res);
+	if(err) 
+	    renderManageSets(req.session.user, ["Impossible de modifier le set"], res);
+	else
+	    renderManageSets(req.session.user, ["Set mis à jour"], res);
     });
 };

@@ -121,14 +121,18 @@ exports.room_manage_all = function(req, res) {
 
 exports.room_create_post = function(req, res) {
     if(req.body.questionSet) {
-	Room.create(req.session.user, req.body, function (err) {
+	Room.create(req.session.user, req.body, function (err,r) {
 	    //	    res.redirect(config.PATH+'/manage/room');
-//	    console.log(req.body);
-	    renderManageRooms(req.session.user, ["Room  créée !"], res);
+	    //	    console.log(req.body);
+	    if(err)
+		renderManageRooms(req.session.user, ["Impossible de créer la room !"], res);
+	    else
+		renderManageRooms(req.session.user, ["Room  créée !"], res);
 	});
     }
     else {
-	res.redirect(config.PATH+'/manage/room');
+	renderManageRooms(req.session.user, ["Impossible de créer la room : merci de spécifier un set valide à associer"], res);
+//	res.redirect(config.PATH+'/manage/room');
     }
 };
 
@@ -136,7 +140,10 @@ exports.room_create_post = function(req, res) {
 
 exports.room_delete_post = function(req, res) {
     Room.delete(req.session.user, req.params.id, function () {
-	renderManageRooms(req.session.user, ["Room supprimée"], res);
+	if(err)
+	    renderManageRooms(req.session.user, ["Impossible de supprimer la room"], res);
+	else
+	    renderManageRooms(req.session.user, ["Room supprimée"], res);
 //	res.redirect(config.PATH+"/manage/room");
     });
 };
@@ -145,7 +152,10 @@ exports.room_delete_post = function(req, res) {
 
 exports.room_update_post = function(req, res) {
     Room.update(req.session.user, req.params, req.body, function (id) {
-	renderRoomManage(req.session.user, req.params.id, ["Room updaté"], res);
+	if(err)
+	    renderRoomManage(req.session.user, req.params.id, ["Impossible de modifier la room"], res);
+	else
+	    renderRoomManage(req.session.user, req.params.id, ["Room updaté"], res);
 //	res.redirect(config.PATH+'/manage/room/');
     });
 };

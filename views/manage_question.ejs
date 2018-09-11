@@ -1,6 +1,6 @@
 <%- include('admin_header'); -%>
 
-<h2> Modification de la question <%= question.id %></h2>
+<h2> <%= newQuestion ? "Création" : "Modification" %> d'une question</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <form id="newQuestion" method="post" action="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
     Énoncé :

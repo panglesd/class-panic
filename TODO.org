@@ -12,6 +12,7 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
 ** DONE Sécurité redirection user/admin/non loggé
    CLOSED: [2018-08-20 lun. 18:16]
 
+** TODO Proprifier le hack de questionController
 
 * Court terme
 
@@ -75,7 +76,7 @@ Au final je n'ai pas utilisé flex
 
 
 ** TODO Randomiser l'affichage des réponses
-
+** TODO Vérifier les RESTRICT/CASCADE pour la bdd (dans le fichier)
 
 * Long terme
 
