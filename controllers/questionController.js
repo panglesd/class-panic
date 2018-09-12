@@ -96,7 +96,7 @@ exports.question_update_post = function(req, res) {
 // Delete
 
 exports.question_delete_post = function(req, res) {
-    Question.questionDelete(req.session.user, req.params,  function(err, id) {
+    Question.questionDelete(req.session.user, parseInt(req.params.id),  function(err, id) {
 	console.log(err);
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err)

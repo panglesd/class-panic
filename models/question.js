@@ -79,7 +79,7 @@ exports.questionCreate = function (user, question, set, callback) {
 	reponse[i-1]= { reponse: question["q"+i] , validity: false };
 	i++;
     }
-    console.log("ce que je veux", question);
+//    console.log("ce que je veux", question);
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [set.id], function (er, ind) {
 	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
 		  [ question.enonce, ind[0] ? ind[0].indexx : 0, set.id, user.id, JSON.stringify(reponse), question.correct ],
@@ -90,9 +90,17 @@ exports.questionCreate = function (user, question, set, callback) {
 
 // Suppression
 
-exports.questionDelete = function (user, question, callback) {
-    console.log("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [question.id, user.id]);
-    bdd.query("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [parseInt(question.id), user.id], callback);
+exports.questionDelete = function (user, questionID, callback) {
+    //    console.log("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [question.id, user.id]);
+    exports.getOwnedByID(user, questionID, function(err, question) {
+	bdd.query("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionID, user.id], function(err, res) {
+	    if(err)
+		callback(err, null)
+	    else {
+		bdd.query("UPDATE `questions` SET `indexSet`=indexSet-1 WHERE `indexSet`>? AND `class`=? AND `owner`=?", [question.indexSet, question.class, user.id], callback);
+	    }
+	});
+    });
 }
 
 // Update
