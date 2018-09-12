@@ -139,7 +139,7 @@ exports.room_create_post = function(req, res) {
 //Delete
 
 exports.room_delete_post = function(req, res) {
-    Room.delete(req.session.user, req.params.id, function () {
+    Room.delete(req.session.user, req.params.id, function (err, info) {
 	if(err)
 	    renderManageRooms(req.session.user, ["Impossible de supprimer la room"], res);
 	else
