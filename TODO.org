@@ -12,6 +12,7 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
 ** DONE Sécurité redirection user/admin/non loggé
    CLOSED: [2018-08-20 lun. 18:16]
 
+** TODO Virer tous les logs inutiles
 
 * Court terme
 
@@ -74,6 +75,7 @@ Au final je n'ai pas utilisé flex
 
 ** TODO Tester le tout
 
+** TODO voir pour le problème de timers.enroll deprecated (express-session-mysql est bloqué sur mysql v2.15, on peut manuellement l'upgrader en v2.16)
 
 ** TODO Randomiser l'affichage des réponses
 
