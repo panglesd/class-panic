@@ -81,7 +81,8 @@ Au final je n'ai pas utilisé flex
 
 ** TODO Randomiser l'affichage des réponses
 
-** TODO faire les routes GET de delete, update, etc...
+** DONE faire les routes GET de delete, update, etc...
+   CLOSED: [2018-09-12 mer. 22:26]
 ** TODO Refaire l'interface d'ajout d'une question
 ** TODO Vérifier les RESTRICT/CASCADE pour la bdd (dans le fichier)
 
