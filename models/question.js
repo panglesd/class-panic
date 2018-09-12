@@ -62,7 +62,14 @@ exports.getOwnedByID = function (user, questionId, callback) {
 // By room
 
 exports.getFirstOfOwnedSet = function (user, setID, callback) {
-    bdd.query('SELECT * from `questions` WHERE owner = ? AND indexSet = 0 AND class = ?', [user.id, setID], function (err, rows) {callback(err, rows[0])});
+    bdd.query('SELECT * from `questions` WHERE owner = ? AND indexSet = 0 AND class = ?', [user.id, setID], function (err, rows) {
+	if(err)
+	    callback(err, null)
+	else if (rows.length == 0)
+	    callback("Set associé vide");
+	else
+	    callback(err, rows[0]);
+    });
 }
 
 /***********************************************************************/
