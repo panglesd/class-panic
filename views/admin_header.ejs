@@ -18,3 +18,11 @@
 	      <li><a id="leave" href="<%= config.PATH %>/logout">Se d&eacute;connecter</a></li>
       </nav>
       <div class="wrapper" id="connect_wrapper">
+	  <div class="msg">
+	    <ul>
+	      <% if(typeof msgs == 'object' && msgs) {
+		 msgs.forEach(function (msg) { %>
+	      <li> <%= msg %> </li>
+	      <% });} %>
+	    </ul>
+	  </div>
