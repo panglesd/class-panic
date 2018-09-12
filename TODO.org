@@ -86,6 +86,9 @@ Au final je n'ai pas utilisé flex
 ** TODO Refaire l'interface d'ajout d'une question
 ** TODO Vérifier les RESTRICT/CASCADE pour la bdd (dans le fichier)
 
+** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion...
+
+
 * Long terme
 
 ** TODO Gérer les statistiques
