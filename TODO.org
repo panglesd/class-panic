@@ -12,7 +12,8 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
 ** DONE Sécurité redirection user/admin/non loggé
    CLOSED: [2018-08-20 lun. 18:16]
 
-** TODO Virer tous les logs inutiles
+** DONE Virer tous les logs inutiles
+   CLOSED: [2018-09-12 mer. 13:25]
 ** TODO Proprifier le hack de questionController
 
 * Court terme

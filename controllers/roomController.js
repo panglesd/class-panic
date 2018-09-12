@@ -28,7 +28,7 @@ renderRooms = function(user, msgs, res) {
 	    }
 	},
 	function (err, results) {
-	    console.log(results);
+//	    console.log(results);
 	    res.render('rooms', results)
 	});
 }

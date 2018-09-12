@@ -41,7 +41,7 @@ renderManageQuestion = function(user, questionID, setID, msgs, res) {
 	    }
 	},
 	function (err, results) {
-	    console.log(results);
+//	    console.log(results);
 	    res.render('manage_question', results)
 	});
 };
@@ -97,7 +97,7 @@ exports.question_update_post = function(req, res) {
 
 exports.question_delete_post = function(req, res) {
     Question.questionDelete(req.session.user, parseInt(req.params.id),  function(err, id) {
-	console.log(err);
+//	console.log(err);
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err)
 	    SetController.set_manage_msgs(req, res, ["Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !"]);

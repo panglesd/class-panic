@@ -61,7 +61,7 @@ module.exports = function (server, sessionMiddleware) {
     io.of("/student").on('connection', function (socket) {
 	if(socket.request.session) {
 	    if(socket.request.session.user) {
-		console.log("socket.request.session.user is ",socket.request.session.user);
+//		console.log("socket.request.session.user is ",socket.request.session.user);
 	/******************************************/
 	/*  Middleware de socket                  */
 	/******************************************/
@@ -69,7 +69,7 @@ module.exports = function (server, sessionMiddleware) {
 	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
 	
 	socket.use(function (packet, next) {
-	    console.log("packet is", packet);
+//	    console.log("packet is", packet);
 	    if(packet[0]=="chooseRoom")
 		next();
 	    if(socket.room)
@@ -86,7 +86,7 @@ module.exports = function (server, sessionMiddleware) {
 	    room.getByID(parseInt(newRoom), function (err, res) {
 		socket.room = res;
 		socket.join(newRoom);
-		console.log("socket.request.session.user is ",socket.request.session.user);
+//		console.log("socket.request.session.user is ",socket.request.session.user);
 		game.enterRoom(socket.request.session.user, socket.room, function (err) {
 		    sendOwnedStats(socket.room);
 		    game.questionFromRoomID(socket.room.id, function (err, question) {
@@ -153,7 +153,7 @@ module.exports = function (server, sessionMiddleware) {
 	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
 	
 	socket.use(function (packet, next) {
-	    console.log("packet is", packet);
+//	    console.log("packet is", packet);
 	    if(packet[0]=="chooseRoom")
 		next();
 	    if(socket.room)
@@ -167,7 +167,7 @@ module.exports = function (server, sessionMiddleware) {
 	socket.on('chooseRoom', function (newRoom) {
 	    if (socket.room)
 		socket.leave(socket.room.id);
-	    console.log(socket.request.session);
+//	    console.log(socket.request.session);
 	    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
 		socket.room = res;
 		socket.join(socket.room.id);
@@ -183,7 +183,7 @@ module.exports = function (server, sessionMiddleware) {
 	/******************************************/
 
 	socket.on('revealResults', function () {
-	    console.log("should emit to", socket.room.id, "the correction");
+//	    console.log("should emit to", socket.room.id, "the correction");
 	    game.getStatsFromRoomID(socket.room.id, function (r,e) {
 		io.of("/student").to(socket.room.id).emit("correction", e);
 		room.setStatusForRoom(socket.room, "revealed", function () {});
@@ -195,7 +195,7 @@ module.exports = function (server, sessionMiddleware) {
 	/******************************************/
 
 	socket.on('changeToQuestion', function (i) {
-	    console.log("on souhaite changer à la question", i)
+//	    console.log("on souhaite changer à la question", i)
 	    game.setQuestionFromRoom(socket.room, parseInt(i), function () {
 		game.questionFromRoomID(socket.room.id, function (err, question) {
 		    io.of("/student").to(socket.room.id).emit("newQuestion", question);
@@ -236,7 +236,6 @@ module.exports = function (server, sessionMiddleware) {
 
 
     io.of('/manage').on('connection', function(socket) {
-	console.log("AHAAHAHHAHAHAHAH");
 	if(socket.request.session) {
 	    if(socket.request.session.user) {
 		socket.on('new order', function (newOrder) {

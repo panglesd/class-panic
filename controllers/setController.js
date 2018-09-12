@@ -100,7 +100,7 @@ exports.set_create_post = function(req, res) {
 
 exports.set_delete_post = function(req, res) {
     Set.setDelete(req.session.user, req.params, function (err, set) {
-	console.log(err);
+//	console.log(err);
 	if(err) 
 	    renderManageSets(req.session.user, ["Impossible de supprimer le set, sans doute est-il utilisé dans une room"], res);
 	else

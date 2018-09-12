@@ -24,7 +24,7 @@ exports.listOwnedBySetID = function (user, setID, callback) {
 // List by room ID
 
 exports.listByRoomID = function (id, callback) {
-    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
+//    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
     bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id], function(err, qList) {
 	exports.listBySetID(qList[0].id, callback);
     });
@@ -55,7 +55,6 @@ exports.getOwnedByID = function (user, questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionId, user.id], function (err, rows) {
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
-	console.log(q);
 	callback(err, q)
     });
 }

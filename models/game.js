@@ -11,16 +11,13 @@ Set = require("./set");
 /***********************************************************************/
 
 exports.questionFromRoomID = function (roomID, callback) {
-    console.log("I am with", roomID);
     Room.getByID(roomID, function (err, room) {
 	Question.getByID(room.id_currentQuestion, function (err, row) { callback(err, row) }); 
     });
 }
 
 exports.questionOwnedFromRoomID = function (user, room, callback) {
-    console.log("I am with", room);
     Room.getOwnedByID(user, room, function (err, room) {
-	console.log("next step", room);
 	Question.getOwnedByID(user, room.id_currentQuestion, function (err, row) {callback(err, row) }); 
     });
 }
