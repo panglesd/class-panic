@@ -80,6 +80,7 @@ Au final je n'ai pas utilisé flex
 ** TODO Randomiser l'affichage des réponses
 
 ** TODO faire les routes GET de delete, update, etc...
+** TODO Refaire l'interface d'ajout d'une question
 
 * Long terme
 
