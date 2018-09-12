@@ -87,6 +87,7 @@ Au final je n'ai pas utilisé flex
 ** TODO Vérifier les RESTRICT/CASCADE pour la bdd (dans le fichier)
 
 ** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion...
+** TODO Empecher les noms vides
 
 
 * Long terme
