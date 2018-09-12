@@ -127,5 +127,5 @@ exports.question_update_post = function(req, res) {
 // Delete
 
 exports.question_delete_post = function(req, res) {
-    Question.questionDelete(req.session.user, req.params,  function(err, id) { res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ; });
+    Question.questionDelete(req.session.user, parseInt(req.params.id),  function(err, id) { res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ; });
 };
