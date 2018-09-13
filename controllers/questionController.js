@@ -70,7 +70,7 @@ exports.question_update_get = function(req, res) {
 // Create
 
 exports.question_create_post = function(req, res) {
-    Question.questionCreate(req.session.user, req.body, {id:req.params.idSet}, function(err, info) {
+    Question.questionCreate(req.session.user, req.body, req.params.idSet, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ;
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err)

@@ -8,22 +8,18 @@
 	    <span class="froom">Énoncé :</span>
 	    <textarea name="enonce" style="width:100%;height:200px;"><%= question.enonce %></textarea>
 	</li>
-	<% i = 1 ; question.reponses.forEach( function(reponsePossible) { %>
-	    <li class="question" style="background-color:rgba(<%=i-1==question.correct ? "0,75" : "75,0" %>,0,0.5)">
-		<span class="froom"> Réponse <%= i-1 %> :</span>
-		<textarea class="reponse" name="q<%= i %>" id="q<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
-<!--		<input type="radio" name="correct" value="<%=i-1%>" <%=i-1==question.correct ? "checked" : "" %>> Ceci est la bonne réponse.-->
-<!--		<input type="button" onclick="addAnswer()" value="Ajouter une réponse">
-     <input type="button" onclick="removeOneElem()" value="Enlever cette réponse"><br>-->
-		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;">Choisir comme réponse correcte</li></ul></div>
+	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
+	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
+		<span class="froom"> Réponse <%= i %> :</span>
+		<textarea class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
+		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
 	    </li>
 	    <% i++;
 	    }); %>
 	    <div  id="ajoutrep"></div>
-	   <li class="room"> <span class="froom">+</span> <!--<input type="button" onclick="addAnswer()" value="Ajouter une réponse"/>--></li>
-<!--	    <input type="button" onclick="removeOneElem()" value="Enlever cette réponse">-->
-	    <!--	La réponse correcte est : <input type="number" name="correctd" value="<%= question.correct%>">-->
-	    <input type="button" value="Enregistrer cette question">
+	    <li onclick="addAnswer()" class="room"> <span class="froom">+<span></li>
+	    <input name="correct" id="true" type="hidden" value="<%= question.correct %>">
+	    <input type="submit" value="Enregistrer cette question">
     </ul>
 </form>
 <% if (!newQuestion) { %>
@@ -40,22 +36,32 @@
      b = document.createElement("li");
      c=document.querySelector("#ajoutrep");
      d = document.querySelectorAll(".reponse");
-     b.innerHTML="<span class=\"froom\"> Réponse "+(d.length)+" :</span><textarea class=\"reponse\" name=\"q"+d.length+"\" id=\"q"+d.length+"\" style=\"width:100%\"></textarea><div><ul><li style=\"display:inline-block; margin-left:20px;\"><a class=\"room\" onclick=\"removeElement(this)\">Enlever cette réponse</a></li><li style=\"display:inline-block; margin-left:20px;\">Choisir comme réponse correcte</li></ul></div>";
-     b.style="background-color:rgba(75,0,0,0.5)";
-     b.classList.add("question");
+     n=d.length;
+     b.innerHTML="<span class=\"froom\"> Réponse "+(n)+" :</span><textarea class=\"nreponse\" name=\""+n+"\" id=\""+n+"\" style=\"width:100%\"></textarea><div><ul><li style=\"display:inline-block; margin-left:20px;\"><a class=\"room\" onclick=\"removeElement(this)\">Enlever cette réponse</a></li><li style=\"display:inline-block; margin-left:20px;\" onclick=\"setTrue(this)\">Choisir comme réponse correcte</li></ul></div>";
+//     b.style="background-color:rgba(75,0,0,0.5)";
+     b.classList.add("reponse");
      a.insertBefore(b,c);
  }
 
+ function setTrue(elem) {
+     a=document.querySelector(".true");
+     if (a)
+	 a.classList.remove("true");
+     elem.parentNode.parentNode.parentNode.classList.add("true");
+//     document.querySelector("#true").value=elem.parentNode.parentNode.parentNode.querySelector("textarea").id;
+     document.querySelector("#true").value=document.querySelector(".true textarea").id;
+ }
  
  function renumber() {
      i=0;
-     q = document.querySelectorAll(".reponse");
+     q = document.querySelectorAll(".nreponse");
      q.forEach(function (elem) {  
 	 elem.previousElementSibling.innerHTML = "Réponse "+ i + " :";
-	 elem.name="q"+i;
-	 elem.id="q"+i;
+	 elem.name=""+i;
+	 elem.id=""+i;
 	 i++;
      });
+     document.querySelector("#true").value=document.querySelector(".true textarea").id;
  }
  function removeElement(elem) {
      elem.parentNode.parentNode.parentNode.parentNode.remove();
