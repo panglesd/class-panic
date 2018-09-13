@@ -202,11 +202,12 @@ input {
 input[type=submit]  {
     background-color: black;
     color:white;
+    margin:15px;
 }
 input[type=button] {
     background-color: black;
     color:white;
-    margin-left:30px;
+    margin:15px;
 }
 table input[type=submit]{
     width:100%;
