@@ -83,7 +83,8 @@ Au final je n'ai pas utilisé flex
 
 ** DONE faire les routes GET de delete, update, etc...
    CLOSED: [2018-09-12 mer. 22:26]
-** TODO Refaire l'interface d'ajout d'une question
+** DONE Refaire l'interface d'ajout d'une question
+   CLOSED: [2018-09-13 jeu. 23:22]
 ** TODO Vérifier les RESTRICT/CASCADE pour la bdd (dans le fichier)
 
 ** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion...
