@@ -81,12 +81,10 @@ exports.getFirstOfOwnedSet = function (user, setID, callback) {
 exports.questionCreate = function (user, question, setID, callback) {
     i=0;
     reponse = [];
-    while(question[""+i]) {
-	reponse[i]= { reponse: question[""+i] , validity: false };
+    while(question[i]) {
+	reponse[i]= { reponse: question[i] , validity: false };
 	i++;
     }
-    console.log(question);
-//    console.log("ce que je veux", question);
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
 		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, JSON.stringify(reponse), question.correct ],
@@ -114,10 +112,10 @@ exports.questionDelete = function (user, questionID, callback) {
 
 exports.questionUpdate = function (user, question, newQuestion, callback) {
     i=0;
-    console.log(newQuestion);
+//    console.log(newQuestion);
     reponse = [];
-    while(newQuestion[""+i]) {
-	reponse[i]= { reponse: newQuestion[""+i] , validity: false };
+    while(newQuestion[i]) {
+	reponse[i]= { reponse: newQuestion[i] , validity: false };
 	i++;
     }
     bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `correct` = ?  WHERE `id` = ? AND `owner` = ?",
