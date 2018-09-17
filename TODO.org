@@ -91,6 +91,21 @@ Au final je n'ai pas utilisé flex
 ** TODO Empecher les noms vides
 
 
+* BUGs
+
+** TODO Lors d'une reconnexion, on recrée un nouvelle réponse au lieu d'updater la précédente...
+** TODO Bug game.questionFromRoom is not a function
+/home/panglesd/class-panic/controllers/sockets.js:111
+            game.questionFromRoom(socket.room, function (question) {
+                 ^
+
+TypeError: game.questionFromRoom is not a function
+    at Socket.<anonymous> (/home/panglesd/class-panic/controllers/sockets.js:111:11)
+    at Socket.emit (events.js:182:13)
+    at /home/panglesd/class-panic/node_modules/socket.io/lib/socket.js:528:12
+    at process._tickCallback (internal/process/next_tick.js:61:11)
+[nodemon] app crashed - waiting for file changes before starting...
+
 * Long terme
 
 ** TODO Gérer les statistiques
