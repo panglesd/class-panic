@@ -68,3 +68,58 @@ socketAdmin.on('newQuestion', function (reponse) {
     document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
 //    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
 });
+
+/*********************************************************************/
+/*                 Pour les questions custom                         */
+/*********************************************************************/
+
+backToSetQuestion = function (event) {
+    document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
+    document.querySelector("#customQuestion").onclick = customQuestion;
+    sendQuestionPlease();
+}
+
+addReponse = function (event) {
+    n = document.createElement("div");
+    n.classList.add("reponse");
+    n.classList.add("notSelected");
+    n.innerHTML = "<span contentEditable=\"true\">Réponse éditable</span><button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
+    document.querySelector("#plus").parentNode.insertBefore(n,document.querySelector("#plus"));
+}
+
+removeReponse = function (elem) {
+//    console.log(event);
+    elem.parentNode.remove();
+}
+
+sendReponse = function() {
+    newQuestion = {};
+    newQuestion.reponses = [];
+    i=0;
+    document.querySelectorAll("#wrapperAnswer div span").forEach(function(span) {
+	newQuestion.reponses.push(span.innerHTML);
+	if(span.parentNode.classList.contains("juste"))
+	    newQuestion.correct = i;
+	i++;
+    });
+    
+    console.log(newQuestion);
+
+    socketAdmin.send("myNewQuestion", newQuestion);
+}
+
+chooseAsCorrect = function (elem) {
+    console.log(elem);
+    if(temp=document.querySelector(".juste"))
+	temp.classList.remove("juste");
+    elem.parentNode.classList.add("juste");
+}
+
+customQuestion = function(event) {
+    document.querySelector("#question").contentEditable = true;//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
+    document.querySelector("#question").innerHTML = "Question éditable";//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
+    document.querySelector("#wrapperAnswer").innerHTML = "<div class=\"reponse notSelected juste\" id=\"r0\"><span contentEditable=\"true\">Réponse éditable</span> <button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
+    document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+    document.querySelector("#customQuestion").onclick = backToSetQuestion;
+    
+}

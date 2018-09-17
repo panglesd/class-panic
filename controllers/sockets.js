@@ -227,6 +227,15 @@ module.exports = function (server, sessionMiddleware) {
 			});
 		    })
 		});
+
+		/******************************************/
+		/*  On souhaite une question custom       */
+		/******************************************/
+		
+		socket.on('changeSet', function (set) {
+		    //TO BE IMPLEMENTED
+		});
+		
 	    }
 	}
     });
