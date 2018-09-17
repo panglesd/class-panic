@@ -97,15 +97,17 @@ sendReponse = function() {
     newQuestion.reponses = [];
     i=0;
     document.querySelectorAll("#wrapperAnswer div span").forEach(function(span) {
-	newQuestion.reponses.push(span.innerHTML);
+	newQuestion.reponses.push({reponse:span.innerHTML, validity:false});
 	if(span.parentNode.classList.contains("juste"))
 	    newQuestion.correct = i;
 	i++;
     });
+    newQuestion.enonce = document.querySelector("#question").innerHTML;
     
     console.log(newQuestion);
-
-    socketAdmin.send("myNewQuestion", newQuestion);
+//    backToSetQuestion(); 
+    socketAdmin.emit("customQuestion", newQuestion);
+    
 }
 
 chooseAsCorrect = function (elem) {
