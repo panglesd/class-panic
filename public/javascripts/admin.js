@@ -63,7 +63,8 @@ socketAdmin.on('newStats', function (newStats) {
 
 socketAdmin.on('newQuestion', function (reponse) {
     console.log("fromAdminnewQuestion", reponse);
-    document.querySelector("li.currentQuestion").classList.remove("currentQuestion");
+    if(temp=document.querySelector("li.currentQuestion"))
+	temp.classList.remove("currentQuestion");
 //    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
     document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
 //    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
@@ -76,7 +77,8 @@ socketAdmin.on('newQuestion', function (reponse) {
 backToSetQuestion = function (event) {
     document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
     document.querySelector("#customQuestion").onclick = customQuestion;
-    sendQuestionPlease();
+    //    sendQuestionPlease();
+    socketAdmin.emit("backToSet");
 }
 
 addReponse = function (event) {
