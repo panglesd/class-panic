@@ -65,6 +65,10 @@ socketAdmin.on('newQuestion', function (reponse) {
     console.log("fromAdminnewQuestion", reponse);
     if(temp=document.querySelector("li.currentQuestion"))
 	temp.classList.remove("currentQuestion");
+    if(reponse.id) {
+	document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
+	document.querySelector("#customQuestion").onclick = customQuestion;
+    }
 //    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
     document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
 //    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
