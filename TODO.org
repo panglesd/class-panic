@@ -90,10 +90,12 @@ Au final je n'ai pas utilisé flex
 ** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion...
 ** TODO Empecher les noms vides
 
+** TODO style css pour souligner dans quelle page nous sommes dans le menu
 
 * BUGs
 
-** TODO Lors d'une reconnexion, on recrée un nouvelle réponse au lieu d'updater la précédente...
+** DONE Lors d'une reconnexion, on recrée un nouvelle réponse au lieu d'updater la précédente...
+   CLOSED: [2018-09-19 mer. 00:17]
 ** DONE Bug game.questionFromRoom is not a function
    CLOSED: [2018-09-17 lun. 14:16]
 /home/panglesd/class-panic/controllers/sockets.js:111
