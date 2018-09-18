@@ -40,37 +40,42 @@ module.exports = function (server, sessionMiddleware) {
     
     function sendRoomQuestion(socket, callback) {
 //	console.log("io",io.of("/student").to(socket.room.id).customQuestion);
-	if(io.of("/student").to(socket.room.id).customQuestion) {
-	    socket.emit("newQuestion", io.of("/student").to(socket.room.id).customQuestion);
+/*	if(io.of("/student").to(socket.room.id).question) {
+	    console.log("j,mijomkij");
+	    socket.emit("newQuestion", io.of("/student").to(socket.room.id).question);
 	}
-	else
+	else {*/
 	    game.questionFromRoomID(socket.room.id, function (err, question) {
+		console.log("j,mijomkij2");
 		socket.emit("newQuestion", question);
+		callback();
 	    });
-	callback();
+//	}
     }
     function sendRoomOwnedQuestion(user, socket, callback) {
-//	console.log("io",io.of("/student").to(socket.room.id).customQuestion);
-	if(io.of("/student").to(socket.room.id).customQuestion) {
-	    socket.emit("newQuestion", io.of("/admin").to(socket.room.id).customQuestion);
+/*	console.log("io",io.of("/student").to(socket.room.id).customQuestion);
+	if(io.of("/student").to(socket.room.id).question) {
+	    socket.emit("newQuestion", io.of("/admin").to(socket.room.id).question);
 	}
-	else
-	    game.questionOwnedFromRoomID(user, socket.room.id, function (err, question) {
-		socket.emit("newQuestion", question);
-	    });
-	callback();
+	else*/
+	game.questionOwnedFromRoomID(user, socket.room.id, function (err, question) {
+	    socket.emit("newQuestion", question);
+	    callback();
+	});
     }
 
     function broadcastRoomQuestion(room, callback) {
 //	console.log("io",io.of("/student").to(room.id).customQuestion);
-	if(io.of("/student").to(room.id).customQuestion) {
-	    io.of("/student").to(room.id).emit("newQuestion",io.of("/student").to(room.id).customQuestion);
+/*	if(io.of("/student").to(room.id).question) {
+	    io.of("/student").to(room.id).emit("newQuestion",io.of("/student").to(room.id).question);
 	}
-	else
-	    game.questionFromRoomID(room.id, function (err, question) {
-		io.of("/student").to(room.id).emit("newQuestion", question);
-	    });
-	callback();
+	else*/
+	console.log("room", room);
+	game.questionFromRoomID(room.id, function (err, question) {
+	    console.log("azdsfezqs", question);
+	    io.of("/student").to(room.id).emit("newQuestion", question);
+	    callback();
+	});
     }
     
     /*    function sendStats(room) {
@@ -210,7 +215,7 @@ module.exports = function (server, sessionMiddleware) {
 		    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
 			socket.room = res;
 			socket.join(socket.room.id);
-			sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
+			sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
 /*			game.questionOwnedFromRoomID(socket.request.session.user, socket.room.id, function (err, question) {
 			    socket.emit("newQuestion", question);
 			});*/
@@ -226,7 +231,7 @@ module.exports = function (server, sessionMiddleware) {
 		    //	    console.log("should emit to", socket.room.id, "the correction");
 		    game.getStatsFromRoomID(socket.room.id, function (r,e) {
 			io.of("/student").to(socket.room.id).emit("correction", e);
-			room.setStatusForRoom(socket.room, "revealed", function () {});
+			room.setStatusForRoomID(socket.room.id, "revealed", function () {});
 		    });	    
 		});
 		
@@ -236,10 +241,10 @@ module.exports = function (server, sessionMiddleware) {
 		
 		socket.on('changeToQuestion', function (i) {
 		    //	    console.log("on souhaite changer à la question", i)
-		    game.setQuestionFromRoom(socket.room, parseInt(i), function () {
-			room.setStatusForRoom(socket.room, "pending", function () {
+		    game.setQuestionFromRoomID(socket.room.id, parseInt(i), function () {
+			room.setStatusForRoomID(socket.room.id, "pending", function () {
 			    sendOwnedStats(socket.room);
-			    sendRoomQuestion(socket, function () {});
+			    broadcastRoomQuestion(socket.room, function (err) {console.log("donnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnne");if(err) throw err});
 			    sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
 			    /*			    game.questionFromRoomID(socket.room.id, function (err, question) {
 						    io.of("/student").to(socket.room.id).emit("newQuestion", question);
@@ -262,10 +267,13 @@ module.exports = function (server, sessionMiddleware) {
 		/******************************************/
 		
 		socket.on('changeQuestionPlease', function (nextQuestion) {
-		    io.of("/student").to(socket.room.id).customQuestion = undefined;
-		    game.nextQuestionFromRoom(socket.room, function () {
-			room.setStatusForRoom(socket.room, "pending", function () {			    
-			    sendRoomQuestion(socket, function () {});
+		    console.log("sfdfjok,lsdjks,djkse,ldjnkzelsd");
+//		    io.of("/student").to(socket.room.id).question = undefined;
+		    game.nextQuestionFromRoomID(socket.room.id, function (err) {
+			console.log("sfdfjok,lsdjks,djkse,ldjnkzelsd");
+			room.setStatusForRoomID(socket.room.id, "pending", function () {
+			    console.log("sfdfjok,lsdjks,djkse,ldjnkzelsd");
+			    broadcastRoomQuestion(socket.room, function () {});
 			    sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
 			    /*			    game.questionFromRoomID(socket.room.id, function (err, question) {
 						    io.of("/student").to(socket.room.id).emit("newQuestion", question);
@@ -282,9 +290,9 @@ module.exports = function (server, sessionMiddleware) {
 		socket.on('customQuestion', function (customQuestion) {
 		    
 		    console.log(customQuestion);
-		    io.of("/student").to(socket.room.id).customQuestion = customQuestion;
-		    broadcastRoomQuestion(socket, function() {})
-		    
+		    //		    io.of("/student").to(socket.room.id).question = customQuestion;
+		    game.setQuestion(socket.room.id, customQuestion);
+		    broadcastRoomQuestion(socket.room, function() {})
 		});
 		
 	    }
