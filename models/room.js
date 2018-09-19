@@ -109,8 +109,8 @@ exports.isOwnedBy= function (room, user, callback) {
     });
 }
 
-exports.setStatusForRoom = function (room, status, callback) {
-    bdd.query("UPDATE `rooms` SET `status` = ? WHERE `id` = ?", [status, room.id], function (err, rows) {
+exports.setStatusForRoomID = function (roomID, status, callback) {
+    bdd.query("UPDATE `rooms` SET `status` = ? WHERE `id` = ?", [status, roomID], function (err, rows) {
 	callback();
     });
 }

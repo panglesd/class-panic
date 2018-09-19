@@ -80,7 +80,7 @@ Au final je n'ai pas utilisé flex
 ** TODO voir pour le problème de timers.enroll deprecated (express-session-mysql est bloqué sur mysql v2.15, on peut manuellement l'upgrader en v2.16)
 
 ** TODO Randomiser l'affichage des réponses
-
+   Fait (mais commenté) modulo le fait que ça se passe du coté client...
 ** DONE faire les routes GET de delete, update, etc...
    CLOSED: [2018-09-12 mer. 22:26]
 ** DONE Refaire l'interface d'ajout d'une question
@@ -89,13 +89,14 @@ Au final je n'ai pas utilisé flex
 
 ** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion...
 ** TODO Empecher les noms vides
-
 ** DONE style css pour souligner dans quelle page nous sommes dans le menu...
    CLOSED: [2018-09-19 mer. 14:31]
-** TODO mettre configuration.js en configuration.js.example et mettre à jour le README en accord avec cela...
+** TODO mettre configuration.js en configuration.js.example et mettre à jour le README en accord avec cela
+
 * BUGs
 
-** TODO Lors d'une reconnexion, on recrée un nouvelle réponse au lieu d'updater la précédente...
+** DONE Lors d'une reconnexion, on recrée un nouvelle réponse au lieu d'updater la précédente...
+   CLOSED: [2018-09-19 mer. 00:17]
 ** DONE Bug game.questionFromRoom is not a function
    CLOSED: [2018-09-17 lun. 14:16]
 /home/panglesd/class-panic/controllers/sockets.js:111
