@@ -40,6 +40,7 @@ module.exports = function (server, sessionMiddleware) {
     
     function sendRoomQuestion(socket, callback) {
 	game.questionFromRoomID(socket.room.id, function (err, question) {
+//	    question.reponses.sort(function() { return 0.5 - Math.random() });
 	    socket.emit("newQuestion", question);
 	    callback();
 	});
@@ -54,8 +55,9 @@ module.exports = function (server, sessionMiddleware) {
     function broadcastRoomQuestion(room, callback) {
 	console.log("room", room);
 	game.questionFromRoomID(room.id, function (err, question) {
-	    console.log("azdsfezqs", question);
+//	    question.reponses.sort(function() { return 0.5 - Math.random() });
 	    io.of("/student").to(room.id).emit("newQuestion", question);
+	    io.of("/admin").to(room.id).emit("newQuestion", question);
 	    callback();
 	});
     }
@@ -142,10 +144,12 @@ module.exports = function (server, sessionMiddleware) {
 		/******************************************/
 		
 		socket.on('disconnect', function (reason) {
-		    game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
-			if (err) throw err;
-			sendOwnedStats(socket.room);
-		    });
+		    if(socket.room) {
+			game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
+			    if (err) throw err;
+			    sendOwnedStats(socket.room);
+			});
+		    }
 		});
 	    }
 	}

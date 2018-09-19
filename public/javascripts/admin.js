@@ -63,15 +63,26 @@ socketAdmin.on('newStats', function (newStats) {
 
 socketAdmin.on('newQuestion', function (reponse) {
     console.log("fromAdminnewQuestion", reponse);
-    if(temp=document.querySelector("li.currentQuestion"))
+    if(temp=document.querySelector("li.inactiveQuestion")) {
+	if(reponse.id)
+	    temp.classList.remove("inactiveQuestion")
+    }
+    if(temp=document.querySelector("li.currentQuestion")) {
 	temp.classList.remove("currentQuestion");
+	console.log("reponse is", reponse);
+	if(!reponse.id)
+	    temp.classList.add("inactiveQuestion")
+    }
     if(reponse.id) {
 	document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
 	document.querySelector("#customQuestion").onclick = customQuestion;
+	document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
     }
-//    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
-    document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
-//    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
+    else {
+	document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+	document.querySelector("#customQuestion").onclick = backToSetQuestion;
+    }
+    document.querySelector("#question").contentEditable = false;
 });
 
 /*********************************************************************/
@@ -81,6 +92,7 @@ socketAdmin.on('newQuestion', function (reponse) {
 backToSetQuestion = function (event) {
     document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
     document.querySelector("#customQuestion").onclick = customQuestion;
+//    document.querySelector("#question").contentEditable = false;
     //    sendQuestionPlease();
     socketAdmin.emit("backToSet");
 }
@@ -89,7 +101,7 @@ addReponse = function (event) {
     n = document.createElement("div");
     n.classList.add("reponse");
     n.classList.add("notSelected");
-    n.innerHTML = "<span contentEditable=\"true\">Réponse éditable</span><button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
+    n.innerHTML = "<span contenteditable=\"true\">Réponse éditable</span><button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
     document.querySelector("#plus").parentNode.insertBefore(n,document.querySelector("#plus"));
 }
 
@@ -103,12 +115,12 @@ sendReponse = function() {
     newQuestion.reponses = [];
     i=0;
     document.querySelectorAll("#wrapperAnswer div span").forEach(function(span) {
-	newQuestion.reponses.push({reponse:span.innerHTML, validity:false});
+	newQuestion.reponses.push({reponse:span.textContent, validity:false});
 	if(span.parentNode.classList.contains("juste"))
 	    newQuestion.correct = i;
 	i++;
     });
-    newQuestion.enonce = document.querySelector("#question").innerHTML;
+    newQuestion.enonce = document.querySelector("#question").textContent;
     
     console.log(newQuestion);
 //    backToSetQuestion(); 
