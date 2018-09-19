@@ -71,14 +71,12 @@ exports.create = function (user, newRoom, callback) {
 	if(err)
 	    callback(err, null)
 	else {
-	    if(question) {
-		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`) VALUES (?, ?, ?, ?, "pending")', [newRoom.name, question.id, newRoom.questionSet, user.id], function(err, rows) {
+	    if(question) 
+		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`) VALUES (?, ?, ?, ?, "pending", ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question)], function(err, rows) {
 		    callback(err, rows);
 		});
-	    }
-	    else {
+	    else 
 		callback(err);
-	    }
 	}
     });
 }

@@ -68,8 +68,11 @@ exports.getFirstOfOwnedSet = function (user, setID, callback) {
 	    callback(err, null)
 	else if (rows.length == 0)
 	    callback("Set associé vide");
-	else
-	    callback(err, rows[0]);
+	else {
+	    q = rows[0];
+	    q.reponses = JSON.parse(q.reponses);
+	    callback(err, q);
+	}
     });
 }
 

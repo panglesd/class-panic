@@ -11,7 +11,9 @@ Set = require("./set");
 /***********************************************************************/
 
 exports.questionFromRoomID = function (roomID, callback) {
-    bdd.query("SELECT question FROM rooms WHERE id = ?", roomID, function(err, row) { callback(err,JSON.parse(row[0].question))})
+    bdd.query("SELECT question FROM rooms WHERE id = ?", roomID, function(err, row) {
+	callback(err,JSON.parse(row[0].question))
+    });
 }
 
 exports.questionOwnedFromRoomID = function (user, roomID, callback) {
