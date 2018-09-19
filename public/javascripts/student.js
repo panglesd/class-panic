@@ -16,7 +16,7 @@ socket.on('connect', () => {
 /*********************************************************************/
 
 socket.on('newQuestion', function (reponse) {
-    console.log(reponse);
+//    console.log(reponse);
     document.querySelector("#question").textContent=reponse.enonce;
     wrapper = document.querySelector("#wrapperAnswer");
     while (wrapper.firstChild) {
@@ -27,9 +27,10 @@ socket.on('newQuestion', function (reponse) {
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
 	elem.id = "r"+index;
-	elem.addEventListener("click", function (ev) {
-	    chooseAnswer(index);
-	});
+	if(typeof isAdmin == "undefined")
+	    elem.addEventListener("click", function (ev) {
+		chooseAnswer(index);
+	    });
 	elem.textContent = rep.reponse;
 	wrapper.appendChild(elem);
     });
@@ -40,7 +41,7 @@ socket.on('newQuestion', function (reponse) {
 /*********************************************************************/
 
 socket.on('correction', function (correction) {
-    console.log(correction);
+//    console.log(correction);
     document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
     //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
     document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
@@ -51,7 +52,7 @@ socket.on('correction', function (correction) {
 	if(v.answer!=-1) {
 //	    console.log("#rep"+v.answer);
 	    document.querySelector("#r"+v.answer).style.background =
-	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100.-5)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
+	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100./*-5*/)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
 	}
     });
 });
@@ -79,12 +80,9 @@ function chooseAnswer(i) {
     reponses.forEach(function (rep) {
 	rep.classList.replace('selected', 'notSelected');
     });
-    console.log('a');
     if(i>-1) {
-	console.log('a');
 	a = document.querySelector("#r"+i);
 	a.classList.replace("notSelected", "selected");
     }
-    console.log("socket emit chosen answer", i);
 }
 

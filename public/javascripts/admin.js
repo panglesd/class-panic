@@ -1,6 +1,7 @@
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketAdmin = io.connect(server+'/admin');
+var isAdmin = true;
 
 /*********************************************************************/
 /*                 Actions à effectuer à toute connection            */
@@ -20,11 +21,18 @@ function changeQuestionPlease() {
 }
 
 /*********************************************************************/
+/*                 pour redemander d'envoyer la question             */
+/*********************************************************************/
+
+function sendOwnedQuestionPlease() {
+    socket.emit("sendQuestionPlease");
+}
+
+/*********************************************************************/
 /*                 lorsque l'on veut reveler les resultats           */
 /*********************************************************************/
 
 function revealResults() {
-    console.log("rev");
     socketAdmin.emit("revealResults");
 }
 
@@ -41,7 +49,7 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketAdmin.on('newStats', function (newStats) {
-    console.log(newStats);
+//    console.log(newStats);
     ul = document.createElement("ul")
     ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
@@ -62,26 +70,27 @@ socketAdmin.on('newStats', function (newStats) {
 /*********************************************************************/
 
 socketAdmin.on('newQuestion', function (reponse) {
-    console.log("fromAdminnewQuestion", reponse);
+//    console.log("fromAdminnewQuestion", reponse);
     if(temp=document.querySelector("li.inactiveQuestion")) {
 	if(reponse.id)
 	    temp.classList.remove("inactiveQuestion")
     }
     if(temp=document.querySelector("li.currentQuestion")) {
 	temp.classList.remove("currentQuestion");
-	console.log("reponse is", reponse);
+//	console.log("reponse is", reponse);
 	if(!reponse.id)
 	    temp.classList.add("inactiveQuestion")
     }
     if(reponse.id) {
-	document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
-	document.querySelector("#customQuestion").onclick = customQuestion;
 	document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
     }
+    document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
+    document.querySelector("#customQuestion").onclick = customQuestion;
+/*    }
     else {
 	document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
 	document.querySelector("#customQuestion").onclick = backToSetQuestion;
-    }
+    }*/
     document.querySelector("#question").contentEditable = false;
 });
 
@@ -93,8 +102,8 @@ backToSetQuestion = function (event) {
     document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
     document.querySelector("#customQuestion").onclick = customQuestion;
 //    document.querySelector("#question").contentEditable = false;
-    //    sendQuestionPlease();
-    socketAdmin.emit("backToSet");
+    sendOwnedQuestionPlease();
+//    socketAdmin.emit("backToSet");
 }
 
 addReponse = function (event) {
@@ -106,7 +115,6 @@ addReponse = function (event) {
 }
 
 removeReponse = function (elem) {
-//    console.log(event);
     elem.parentNode.remove();
 }
 
@@ -122,14 +130,14 @@ sendReponse = function() {
     });
     newQuestion.enonce = document.querySelector("#question").textContent;
     
-    console.log(newQuestion);
+//    console.log(newQuestion);
 //    backToSetQuestion(); 
     socketAdmin.emit("customQuestion", newQuestion);
     
 }
 
 chooseAsCorrect = function (elem) {
-    console.log(elem);
+//    console.log(elem);
     if(temp=document.querySelector(".juste"))
 	temp.classList.remove("juste");
     elem.parentNode.classList.add("juste");

@@ -53,7 +53,7 @@ module.exports = function (server, sessionMiddleware) {
     }
     
     function broadcastRoomQuestion(room, callback) {
-	console.log("room", room);
+//	console.log("room", room);
 	game.questionFromRoomID(room.id, function (err, question) {
 //	    question.reponses.sort(function() { return 0.5 - Math.random() });
 	    io.of("/student").to(room.id).emit("newQuestion", question);
@@ -125,7 +125,7 @@ module.exports = function (server, sessionMiddleware) {
 		/******************************************/
 		
 		socket.on('sendQuestionPlease', function () {
-		    console.log(socket.room);
+//		    console.log(socket.room);
 		    sendRoomQuestion(socket,function() {});
 		});
 		
@@ -134,6 +134,7 @@ module.exports = function (server, sessionMiddleware) {
 		/******************************************/
 		
 		socket.on('chosenAnswer', function (answer) {
+//		    console.log(answer);
 		    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 			sendOwnedStats(socket.room)
 		    });
@@ -230,6 +231,15 @@ module.exports = function (server, sessionMiddleware) {
 		});
 		
 		/******************************************/
+		/*  Un admin me demande la question       */
+		/******************************************/
+		
+		socket.on('sendQuestionPlease', function () {
+//		    console.log(socket.room);
+		    sendRoomOwnedQuestion(socket.request.session.user, socket, function() {});
+		});
+		
+		/******************************************/
 		/*  On souhaite passer à la question suivante */
 		/******************************************/
 		
@@ -248,9 +258,11 @@ module.exports = function (server, sessionMiddleware) {
 		/******************************************/
 		
 		socket.on('customQuestion', function (customQuestion) {
-		    console.log(customQuestion);
+		    //		    console.log(customQuestion);
+		    delete(customQuestion.id);
 		    game.setQuestion(socket.room.id, customQuestion, function () {
-			broadcastRoomQuestion(socket.room, function(err, res) { console.log("broadcast done");})
+			broadcastRoomQuestion(socket.room, function(err, res) {});
+			sendOwnedStats(socket.room);
 		    });
 		});
 
@@ -258,12 +270,12 @@ module.exports = function (server, sessionMiddleware) {
 		/*  On souhaite revenir aux questions du set*/
 		/******************************************/
 		
-		socket.on('backToSet', function () {
-		    console.log("backToSet");
+/*		socket.on('backToSet', function () {
+//		    console.log("backToSet");
 		    game.backToSet(socket.room.id, function(err, res) {
-			broadcastRoomQuestion(socket.room, function(err,res) {console.log("broadcast done");})
+			broadcastRoomQuestion(socket.room, function(err,res) {})
 		    });
-		});
+		});*/
 	    }
 	}
     });

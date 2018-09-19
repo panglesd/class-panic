@@ -130,7 +130,7 @@ exports.enterRoom = function (user, room, callback) {
 
 exports.setQuestion = function(roomID, question, callback) {
     exports.flushOldPlayers(roomID, function(err) {
-	query = "UPDATE rooms SET question = ? "+(question.id ? (", id_currentQuestion = " + question.id) : "") +" WHERE id = ?";
+	query = "UPDATE rooms SET status = \"pending\", question = ? "+(question.id ? (", id_currentQuestion = " + question.id) : "") +" WHERE id = ?";
 //	console.log(query);
 	bdd.query(query, [JSON.stringify(question), roomID], function(err, res) { callback(err, res);});
     });
