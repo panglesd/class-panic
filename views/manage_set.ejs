@@ -1,4 +1,4 @@
-<%- include('admin_header'); -%>
+<%- include('admin_header', {active:"sets"}); -%>
 
 <h2> Renommer ou supprimer "<%= set.name%>"</h2>
 <form action="<%= config.PATH %>/manage/set/<%=set.id%>/update" method="post">

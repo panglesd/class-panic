@@ -10,10 +10,10 @@
       <h1>Class Panic</h1>
       <nav>
 	<ul>
-	  <li><a href="<%= config.PATH %>/room">Rejoindre une salle</a></li>
-	  <%- user.isAdmin ? '<li><a href="'+ config.PATH +'/manage/room">Administrer</a></li>' : "" %>
+	  <a href="<%= config.PATH %>/room"><li class="selected">Rejoindre une salle</li></a>
+	  <%- user.isAdmin ? '<a href="'+ config.PATH +'/manage/room"><li>Administrer</li>' : "" %></a>
 <!--	  <li><a href="<%= config.PATH %>/user">Mon compte</a></li>-->
-	  <li><a id="leave" href="<%= config.PATH %>/logout">Se d&eacute;connecter</a></li>
+	  <a id="leave" href="<%= config.PATH %>/logout"><li>Se d&eacute;connecter</li></a>
       </nav>
       <div class="wrapper" id="connect_wrapper">
 	<h2>Se connecter à une salle</h2>
