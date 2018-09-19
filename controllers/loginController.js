@@ -12,7 +12,7 @@ exports.login_get = function(req, res) {
     if(req.session.user){
 	res.redirect(config.PATH+"/room");
     }
-    res.render('login', {config: config});
+    res.render('login', {config: config, msgs: []});
 };
 
 // Afficher la page d'inscription
@@ -21,14 +21,15 @@ exports.sign_in_get = function(req, res) {
     if(req.session.user){
 	res.redirect(config.PATH+"/room");
     }
-    res.render('signin', {config: config});
+    res.render('signin', {config: config, msgs: []});
 };
 
 // Se délogger
 
 exports.logout = function(req, res) {
     req.session.user = null;
-    exports.login_get(req, res);
+    // exports.login_get(req, res);
+    res.redirect(config.PATH+"/login");
 };
 
 /*************************************************************/
@@ -38,22 +39,24 @@ exports.logout = function(req, res) {
 // Créer un utilisateur
 
 exports.user_create_post = function(req, res) {
-    Users.create(req.body, function () {
-	res.redirect(config.PATH)
+    Users.create(req.body, function (err, rows) {
+	if(err) {
+//	    console.log(err);
+	    res.render('signin', {config: config, msgs: ["Impossible de créer votre compte : sans doute le pseudo est-il déjà utilisé."]});
+	}
+	else {
+	    res.redirect(config.PATH)
+	}
     });
 };
 
 // Se logger
 
 exports.login_post = function(req, res) {
-    console.log("A");
     Users.userCheck(req.body.login, req.body.password, function (err, user) {
-	console.log("F");
-	console.log('user is ', user);
 	if (!user)
-	    res.redirect(config.PATH);
+	    res.render('login', {config: config, msgs: ["Connexion impossible, vérifiez vos identifiants"]});
 	else {
-	    console.log("user = user");
 	    req.session.user=user;
 	    res.redirect(config.PATH+"/room");
 	}

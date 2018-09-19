@@ -11,18 +11,11 @@ Set = require("./set");
 /***********************************************************************/
 
 exports.questionFromRoomID = function (roomID, callback) {
-    console.log("I am with", roomID);
-    Room.getByID(roomID, function (err, room) {
-	Question.getByID(room.id_currentQuestion, function (err, row) { callback(err, row) }); 
-    });
+    bdd.query("SELECT question FROM rooms WHERE id = ?", roomID, function(err, row) { callback(err,JSON.parse(row[0].question))})
 }
 
-exports.questionOwnedFromRoomID = function (user, room, callback) {
-    console.log("I am with", room);
-    Room.getOwnedByID(user, room, function (err, room) {
-	console.log("next step", room);
-	Question.getOwnedByID(user, room.id_currentQuestion, function (err, row) {callback(err, row) }); 
-    });
+exports.questionOwnedFromRoomID = function (user, roomID, callback) {
+    bdd.query("SELECT question FROM rooms WHERE id = ? AND ownerID = ?", [roomID, user.id], function(err, row) { callback(err, JSON.parse(row[0].question))})
 }
 
 /***********************************************************************/
@@ -56,7 +49,7 @@ exports.getStatsFromRoomID = function (roomID, callback) {
 		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? AND `poll`.`pseudo` != (SELECT pseudo FROM users WHERE id = (SELECT ownerID FROM rooms WHERE `id` = ?)) GROUP BY response", [roomID, roomID], function(err, row) {callback(err,row)});
 	    },
 	    correctAnswer : function (callback) {
-		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [roomID], function(a,b) {callback(a,b[0].correct);});
+		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
 	    }
 	},
 	callback);
@@ -69,7 +62,7 @@ exports.getStatsFromOwnedRoomID = function (roomID, callback) {
 		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `poll`.`response` FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ? AND `poll`.`pseudo` != (SELECT pseudo FROM users WHERE id = (SELECT ownerID FROM rooms WHERE `id` = ?)) ", [roomID, roomID], function(err, row) {callback(err, row)});
 	    },
 	    correctAnswer : function (callback) {
-		bdd.query("SELECT correct FROM `questions` WHERE `id` = (SELECT `id_currentQuestion` FROM `rooms` WHERE `id` = ?)", [roomID], function (err, res) {callback(err, res[0].correct)});
+		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
 	    }
 	},
 	callback);
@@ -79,42 +72,43 @@ exports.getStatsFromOwnedRoomID = function (roomID, callback) {
 /*       Passer à la question suivante d'une room                      */
 /***********************************************************************/
 
-exports.nextQuestionFromRoom = function (room, callback) {
-    bdd.query(
-	"UPDATE `rooms` SET \
-        `id_currentQuestion` = (SELECT id FROM `questions` WHERE \
-                                   `class` = (SELECT questionSet FROM (SELECT * FROM `rooms`) AS trick WHERE id = ?)    \
-                               AND `indexSet` > (SELECT indexSet FROM `questions` WHERE \
-                                                   id = (SELECT id_currentQuestion FROM (SELECT * FROM `rooms`) AS trick WHERE id = ?)\
-                                                )  \
-                               ORDER BY indexSet LIMIT 1\
-                               )\
-         WHERE `id` = ?", [room.id, room.id, room.id], function (err1, rows) {
-	     if (err1) {
-		 bdd.query(
-		     "UPDATE `rooms` SET \
-                        `id_currentQuestion` = (SELECT id FROM `questions` WHERE \
-                                   `class` = (SELECT questionSet FROM (SELECT * FROM `rooms`) AS trick WHERE id = ?)    \
-                               AND `indexSet` = 0 \
-                               )\
-                       WHERE `id` = ?", [room.id, room.id], function (err1, rows) {
-			   if (err1) throw err1;
-		       });
-	     }
-	     exports.flushOldPlayers(room, function() {
-		 Room.setStatusForRoom(room, "pending", callback);
-	     });
-	 });
+exports.nextQuestionFromRoomID = function (roomID, callback) {
+    async.waterfall([
+	function(callback) {    // 1 Récupérer l'indice vers lequel on pointe,
+	    bdd.query("SELECT * FROM `questions` INNER JOIN `rooms` ON `questions`.id = id_currentQuestion WHERE `rooms`.id = ?", [roomID],
+		      function(err,rows) { callback(err, rows[0])});
+	},
+	function(currentQ, callback) {    // 2 Voir s'il existe une question après
+	    bdd.query("SELECT * FROM `questions` WHERE `class` = ? AND `indexSet` = ?", [currentQ.class, currentQ.indexSet+1], function(err, row) { callback(err, row[0], currentQ.class) })
+	},
+	function(nextQ, currentClass, callback) {    // 3 Sinon, chercher la première question
+	    if(nextQ) 
+		callback(null, nextQ);
+	    else 
+		bdd.query("SELECT * FROM `questions` WHERE `class` = ? AND `indexSet` = ?", [currentClass, 0], function(err, row) { callback(err, row[0]) })
+	},
+	function(nextQ, callback) {    // 4 Updater la room
+	    nextQ.reponses = JSON.parse(nextQ.reponses);
+	    bdd.query("UPDATE `rooms` SET `id_currentQuestion` = ?, `question` = ? WHERE id = ?", [nextQ.id, JSON.stringify(nextQ), roomID], function(err) {
+		Room.setStatusForRoomID(roomID, "pending", function() {
+		    exports.flushOldPlayers(roomID, callback);
+		});
+	    });
+	}
+    ],
+		    function(err, res){ callback(err);}
+		   );
 }
+
 /***********************************************************************/
 /*       Entrer et sortir d'une room                                   */
 /***********************************************************************/
 
 // Flusher les anciens participants d'une room
 
-exports.flushOldPlayers = function (room, callback) {
-    bdd.query("DELETE FROM `poll` WHERE  ADDTIME(`last_activity`, '0 3:0:0')<NOW() AND `roomID` = ?", [room.id], function () {
-	bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [room.id], callback);
+exports.flushOldPlayers = function (roomID, callback) {
+    bdd.query("DELETE FROM `poll` WHERE  ADDTIME(`last_activity`, '0 3:0:0')<NOW() AND `roomID` = ?", [roomID], function () {
+	bdd.query("UPDATE `poll` SET `response`=-1 WHERE `roomID`= ? ", [roomID], callback);
     });
 }
 
@@ -134,18 +128,32 @@ exports.enterRoom = function (user, room, callback) {
 /*       Passer à une question donnée                                  */
 /***********************************************************************/
 
-exports.setQuestionFromRoom = function (room, questionID, callback) {
-    bdd.query(
-	"UPDATE `rooms` SET \
-        `id_currentQuestion` = (SELECT id FROM `questions` WHERE \
-                                   `class` = (SELECT questionSet FROM (SELECT * FROM `rooms`) AS trick WHERE id = ?)    \
-                                    AND `id` = ? \
-                               )\
-         WHERE `id` = ?", [room.id, questionID, room.id], function (err1, rows) {
-	     if (err1) throw err1;
-	     exports.flushOldPlayers(room, function() {
-		 Room.setStatusForRoom(room, "pending", callback);
-	     });
-	 });
+exports.setQuestion = function(roomID, question, callback) {
+    exports.flushOldPlayers(roomID, function(err) {
+	query = "UPDATE rooms SET status = \"pending\", question = ? "+(question.id ? (", id_currentQuestion = " + question.id) : "") +" WHERE id = ?";
+//	console.log(query);
+	bdd.query(query, [JSON.stringify(question), roomID], function(err, res) { callback(err, res);});
+    });
+}
+
+/***********************************************************************/
+/*       Passer à une question donnée par son ID                       */
+/***********************************************************************/
+
+exports.setQuestionFromRoomID = function (roomID, questionID, callback) {
+    Question.getByID(questionID, function(err, question) {exports.setQuestion(roomID, question, callback)});
+}
+
+/***********************************************************************/
+/*       Passer d'une question custom à celle du set                   */
+/***********************************************************************/
+
+exports.backToSet = function (roomID, callback) {
+    query = "SELECT * FROM `questions` WHERE id = (SELECT id_currentQuestion FROM rooms WHERE id = ?)";
+    bdd.query(query, [roomID], function (err, questionL) {
+	question = questionL[0];
+	question.reponses = JSON.parse(question.reponses);
+	exports.setQuestion(roomID, questionL[0], callback);
+    });
 }
 

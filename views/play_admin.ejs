@@ -36,6 +36,9 @@
 	    <% }); %>
 	    <%// } while (i != set.firstQ) %>
 	  </ul>
+	  <div onclick="customQuestion()" class="controlPanel" id="customQuestion" style="font-family: Impact, 'Arial Black', Arial, Verdana, sans-serif;">
+	      Créer sa question temporaire
+	  </div>
 	  <div class="controlPanel" id="stats">
 	    <ul>
 	      <li style="font-family: Impact, 'Arial Black', Arial, Verdana, sans-serif;"> Ce qu'en disent les élèves : </li>
@@ -59,6 +62,7 @@
 	
 	document.querySelector("#reveal").addEventListener("click", revealResults);
 	document.querySelector("#nextQuestion").addEventListener("click", changeQuestionPlease);
+//	document.querySelector("#customQuestion").addEventListener("click", );
 
 
 	/* De la mise en page */

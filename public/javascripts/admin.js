@@ -1,6 +1,7 @@
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketAdmin = io.connect(server+'/admin');
+var isAdmin = true;
 
 /*********************************************************************/
 /*                 Actions à effectuer à toute connection            */
@@ -20,11 +21,18 @@ function changeQuestionPlease() {
 }
 
 /*********************************************************************/
+/*                 pour redemander d'envoyer la question             */
+/*********************************************************************/
+
+function sendOwnedQuestionPlease() {
+    socket.emit("sendQuestionPlease");
+}
+
+/*********************************************************************/
 /*                 lorsque l'on veut reveler les resultats           */
 /*********************************************************************/
 
 function revealResults() {
-    console.log("rev");
     socketAdmin.emit("revealResults");
 }
 
@@ -41,7 +49,7 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketAdmin.on('newStats', function (newStats) {
-    console.log(newStats);
+//    console.log(newStats);
     ul = document.createElement("ul")
     ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
@@ -62,9 +70,84 @@ socketAdmin.on('newStats', function (newStats) {
 /*********************************************************************/
 
 socketAdmin.on('newQuestion', function (reponse) {
-    console.log("fromAdminnewQuestion", reponse);
-    document.querySelector("li.currentQuestion").classList.remove("currentQuestion");
-//    document.querySelector("li.nextQuestion").classList.remove("nextQuestion");
-    document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
-//    document.querySelector("li#q"+reponse.nextQuestion).classList.add("nextQuestion");
+//    console.log("fromAdminnewQuestion", reponse);
+    if(temp=document.querySelector("li.inactiveQuestion")) {
+	if(reponse.id)
+	    temp.classList.remove("inactiveQuestion")
+    }
+    if(temp=document.querySelector("li.currentQuestion")) {
+	temp.classList.remove("currentQuestion");
+//	console.log("reponse is", reponse);
+	if(!reponse.id)
+	    temp.classList.add("inactiveQuestion")
+    }
+    if(reponse.id) {
+	document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
+    }
+    document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
+    document.querySelector("#customQuestion").onclick = customQuestion;
+/*    }
+    else {
+	document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+	document.querySelector("#customQuestion").onclick = backToSetQuestion;
+    }*/
+    document.querySelector("#question").contentEditable = false;
 });
+
+/*********************************************************************/
+/*                 Pour les questions custom                         */
+/*********************************************************************/
+
+backToSetQuestion = function (event) {
+    document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
+    document.querySelector("#customQuestion").onclick = customQuestion;
+//    document.querySelector("#question").contentEditable = false;
+    sendOwnedQuestionPlease();
+//    socketAdmin.emit("backToSet");
+}
+
+addReponse = function (event) {
+    n = document.createElement("div");
+    n.classList.add("reponse");
+    n.classList.add("notSelected");
+    n.innerHTML = "<span contenteditable=\"true\">Réponse éditable</span><button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
+    document.querySelector("#plus").parentNode.insertBefore(n,document.querySelector("#plus"));
+}
+
+removeReponse = function (elem) {
+    elem.parentNode.remove();
+}
+
+sendReponse = function() {
+    newQuestion = {};
+    newQuestion.reponses = [];
+    i=0;
+    document.querySelectorAll("#wrapperAnswer div span").forEach(function(span) {
+	newQuestion.reponses.push({reponse:span.textContent, validity:false});
+	if(span.parentNode.classList.contains("juste"))
+	    newQuestion.correct = i;
+	i++;
+    });
+    newQuestion.enonce = document.querySelector("#question").textContent;
+    
+//    console.log(newQuestion);
+//    backToSetQuestion(); 
+    socketAdmin.emit("customQuestion", newQuestion);
+    
+}
+
+chooseAsCorrect = function (elem) {
+//    console.log(elem);
+    if(temp=document.querySelector(".juste"))
+	temp.classList.remove("juste");
+    elem.parentNode.classList.add("juste");
+}
+
+customQuestion = function(event) {
+    document.querySelector("#question").contentEditable = true;//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
+    document.querySelector("#question").innerHTML = "Question éditable";//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
+    document.querySelector("#wrapperAnswer").innerHTML = "<div class=\"reponse notSelected juste\" id=\"r0\"><span contentEditable=\"true\">Réponse éditable</span> <button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
+    document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+    document.querySelector("#customQuestion").onclick = backToSetQuestion;
+    
+}

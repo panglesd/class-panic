@@ -34,15 +34,18 @@ router.use(function (req, res, next) {
 
 // POST request for deleting a room.
 router.post('/manage/room/:id/delete', room_controller.room_delete_post);
+router.get('/manage/room/:id/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a room.
 router.post('/manage/room/:id/update', room_controller.room_update_post);
-
-// GET request for managing a particular room.
-router.get('/manage/room/:id', room_controller.room_manage);
+router.get('/manage/room/:id/update', (req,res) => {res.redirect('./');});
 
 // POST request for creating a room.
 router.post('/manage/room/create', room_controller.room_create_post);
+router.get('/manage/room/create', (req,res) => {res.redirect('./');});
+
+// GET request for managing a particular room.
+router.get('/manage/room/:id', room_controller.room_manage);
 
 // GET request for the main managing room page.
 router.get('/manage/room', room_controller.room_manage_all);
@@ -53,15 +56,18 @@ router.get('/manage/room', room_controller.room_manage_all);
 
 // POST request for deleting a set.
 router.post('/manage/set/:id/delete', set_controller.set_delete_post);
+router.get('/manage/set/:id/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a set.
 router.post('/manage/set/:id/update', set_controller.set_update_post);
-
-// GET request for managing a particular set.
-router.get('/manage/set/:id', set_controller.set_manage);
+router.get('/manage/set/:id/update', (req,res) => {res.redirect('./');});
 
 // POST request for creating a set.
 router.post('/manage/set/create', set_controller.set_create_post);
+router.get('/manage/set/create', (req,res) => {res.redirect('./');});
+
+// GET request for managing a particular set.
+router.get('/manage/set/:id', set_controller.set_manage);
 
 // GET request for the main managing set page.
 router.get('/manage/set', set_controller.set_manage_all);
@@ -75,7 +81,8 @@ router.get('/manage/set/:idSet/question/create', question_controller.question_cr
 router.post('/manage/set/:idSet/question/create', question_controller.question_create_post);
 
 // POST request for deleting a question.
- router.post('/manage/set/:idSet/question/:id/delete', question_controller.question_delete_post);
+router.post('/manage/set/:idSet/question/:id/delete', question_controller.question_delete_post);
+router.get('/manage/set/:idSet/question/:id/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a question.
 router.get('/manage/set/:idSet/question/:id/', question_controller.question_update_get);

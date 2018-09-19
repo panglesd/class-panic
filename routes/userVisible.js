@@ -17,16 +17,16 @@ var config = require('../configuration');
 router.use(function (req, res, next) {
     if(req.session) {
 	if(req.session.user) {
-	    console.log("accepted");
+//	    console.log("accepted");
 	    next();
 	}
 	else {
-	    console.log("refused");
+//	    console.log("refused");
 	    res.redirect(config.PATH);
 	}
     }
     else {
-	console.log("refused");
+//	console.log("refused");
 	res.redirect(config.PATH);
     }
 });

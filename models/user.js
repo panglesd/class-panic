@@ -10,7 +10,7 @@ const saltRounds = 10;;
 
 exports.userList = function (callback) {
     bdd.query('SELECT * FROM users', function(err, rows) {
-	console.log(rows);
+//	console.log(rows);
 	callback(rows);
     });
 }
@@ -21,7 +21,7 @@ exports.userList = function (callback) {
 
 exports.userByID = function (userID, callback) {
     bdd.query('SELECT * FROM users WHERE id = ?', [userID],  function(err, rows) {
-	console.log(rows);
+//	console.log(rows);
 	callback(rows);
     });
 }
@@ -35,8 +35,8 @@ exports.userByID = function (userID, callback) {
 exports.create = function (user, callback) {
     bcrypt.hash(user.password, saltRounds, function(err, hash) {
 	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`) VALUES (?, ?, ?, ?, ?)', [user.pseudo, hash, user.email, user.nomComplet, user.adminPassword == config.ADMINPASSWD ], function(err, rows) {
-	    console.log(rows);
-	    callback(rows);
+//	    console.log(rows);
+	    callback(err,rows);
 	});
     });
 }

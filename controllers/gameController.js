@@ -13,7 +13,7 @@ exports.room_enter = function(req, res) {
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
-	    config : function(callback) { console.log(config); callback(null, config) },	
+	    config : function(callback) { /*console.log(config);*/ callback(null, config) },	
 	    room : function (callback) {
 		Room.getByID(req.params.id, callback)
 	    }

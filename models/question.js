@@ -24,7 +24,7 @@ exports.listOwnedBySetID = function (user, setID, callback) {
 // List by room ID
 
 exports.listByRoomID = function (id, callback) {
-    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
+//    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
     bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id], function(err, qList) {
 	exports.listBySetID(qList[0].id, callback);
     });
@@ -44,6 +44,7 @@ exports.listOwnedByRoomID = function (user, id, callback) {
 
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
+//	console.log(rows);
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
 	q.reponses.forEach(function(rep) { delete rep.validity });
@@ -55,7 +56,6 @@ exports.getOwnedByID = function (user, questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionId, user.id], function (err, rows) {
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
-	console.log(q);
 	callback(err, q)
     });
 }
@@ -63,7 +63,14 @@ exports.getOwnedByID = function (user, questionId, callback) {
 // By room
 
 exports.getFirstOfOwnedSet = function (user, setID, callback) {
-    bdd.query('SELECT * from `questions` WHERE owner = ? AND indexSet = 0 AND class = ?', [user.id, setID], function (err, rows) {callback(err, rows[0])});
+    bdd.query('SELECT * from `questions` WHERE owner = ? AND indexSet = 0 AND class = ?', [user.id, setID], function (err, rows) {
+	if(err)
+	    callback(err, null)
+	else if (rows.length == 0)
+	    callback("Set associé vide");
+	else
+	    callback(err, rows[0]);
+    });
 }
 
 /***********************************************************************/
@@ -72,17 +79,16 @@ exports.getFirstOfOwnedSet = function (user, setID, callback) {
 
 // Création
 
-exports.questionCreate = function (user, question, set, callback) {
-    i=1;
+exports.questionCreate = function (user, question, setID, callback) {
+    i=0;
     reponse = [];
-    while(question["q"+i]) {
-	reponse[i-1]= { reponse: question["q"+i] , validity: false };
+    while(question[i]) {
+	reponse[i]= { reponse: question[i] , validity: false };
 	i++;
     }
-    console.log("ce que je veux", question);
-    bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [set.id], function (er, ind) {
+    bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`) VALUES (? , ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
-		  [ question.enonce, ind[0] ? ind[0].indexx : 0, set.id, user.id, JSON.stringify(reponse), question.correct ],
+		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, JSON.stringify(reponse), question.correct ],
 		  function (err, r) {callback(err, r[0])});
     });
     
@@ -90,18 +96,27 @@ exports.questionCreate = function (user, question, set, callback) {
 
 // Suppression
 
-exports.questionDelete = function (user, question, callback) {
-    console.log("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [question.id, user.id]);
-    bdd.query("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [parseInt(question.id), user.id], callback);
+exports.questionDelete = function (user, questionID, callback) {
+    //    console.log("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [question.id, user.id]);
+    exports.getOwnedByID(user, questionID, function(err, question) {
+	bdd.query("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionID, user.id], function(err, res) {
+	    if(err)
+		callback(err, null)
+	    else {
+		bdd.query("UPDATE `questions` SET `indexSet`=indexSet-1 WHERE `indexSet`>? AND `class`=? AND `owner`=?", [question.indexSet, question.class, user.id], callback);
+	    }
+	});
+    });
 }
 
 // Update
 
 exports.questionUpdate = function (user, question, newQuestion, callback) {
-    i=1;
+    i=0;
+//    console.log(newQuestion);
     reponse = [];
-    while(newQuestion["q"+i]) {
-	reponse[i-1]= { reponse: newQuestion["q"+i] , validity: false };
+    while(newQuestion[i]) {
+	reponse[i]= { reponse: newQuestion[i] , validity: false };
 	i++;
     }
     bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `correct` = ?  WHERE `id` = ? AND `owner` = ?",

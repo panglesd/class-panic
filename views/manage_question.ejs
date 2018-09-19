@@ -1,20 +1,26 @@
-<%- include('admin_header'); -%>
+<%- include('admin_header', {active:"sets"}); -%>
 
-<h2> Modification de la question <%= question.id %></h2>
+<h2> <%= newQuestion ? "Création" : "Modification" %> d'une question</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <form id="newQuestion" method="post" action="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
-    Énoncé :
-    <textarea name="enonce" style="width:100%"><%= question.enonce %></textarea> 
-    <input type="button" onclick="addAnswer()" value="Ajouter une réponse">
-    <input type="button" onclick="removeOneElem()" value="Enlever une réponse"><br>
-    <% i = 1 ; question.reponses.forEach( function(reponsePossible) { %>
-	Réponse <%= i-1 %> :
-	<textarea class="reponse" name="q<%= i %>" id="q<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
-	<% i++;
-	}); %>
-	<div  id="ajoutrep"></div>
-	La réponse correcte est : <input type="number" name="correct" value="<%= question.correct%>">
-	<input type="submit" value="Enregistrer cette question">
+    <ul class="room" id="listeQue">
+	<li class="room">
+	    <span class="froom">Énoncé :</span>
+	    <textarea name="enonce" style="width:100%;height:200px;"><%= question.enonce %></textarea>
+	</li>
+	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
+	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
+		<span class="froom"> Réponse <%= i %> :</span>
+		<textarea class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
+		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
+	    </li>
+	    <% i++;
+	    }); %>
+	    <div  id="ajoutrep"></div>
+	    <li onclick="addAnswer()" class="room"> <span class="froom">+<span></li>
+	    <input name="correct" id="true" type="hidden" value="<%= question.correct %>">
+	    <input type="submit" value="Enregistrer cette question">
+    </ul>
 </form>
 <% if (!newQuestion) { %>
     <div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
@@ -26,33 +32,40 @@
 <a href="<%= config.PATH %>/manage/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
 <script>
  function addAnswer () {
-     a=document.querySelector("#newQuestion");
-     b = document.createElement("textarea");
+     a=document.querySelector("#listeQue");
+     b = document.createElement("li");
      c=document.querySelector("#ajoutrep");
      d = document.querySelectorAll(".reponse");
-     e = document.createTextNode("Réponse "+(d.length)+" :");
-     b.style="width:100%";
+     n=d.length;
+     b.innerHTML="<span class=\"froom\"> Réponse "+(n)+" :</span><textarea class=\"nreponse\" name=\""+n+"\" id=\""+n+"\" style=\"width:100%\"></textarea><div><ul><li style=\"display:inline-block; margin-left:20px;\"><a class=\"room\" onclick=\"removeElement(this)\">Enlever cette réponse</a></li><li style=\"display:inline-block; margin-left:20px;\" onclick=\"setTrue(this)\">Choisir comme réponse correcte</li></ul></div>";
+//     b.style="background-color:rgba(75,0,0,0.5)";
      b.classList.add("reponse");
-     b.id="q"+(d.length+1);
-     b.name="q"+(d.length+1);
-     a.insertBefore(e,c);
      a.insertBefore(b,c);
  }
+
+ function setTrue(elem) {
+     a=document.querySelector(".true");
+     if (a)
+	 a.classList.remove("true");
+     elem.parentNode.parentNode.parentNode.classList.add("true");
+//     document.querySelector("#true").value=elem.parentNode.parentNode.parentNode.querySelector("textarea").id;
+     document.querySelector("#true").value=document.querySelector(".true textarea").id;
+ }
+ 
  function renumber() {
      i=0;
-     q = document.querySelectorAll(".reponse");
+     q = document.querySelectorAll(".nreponse");
      q.forEach(function (elem) {  
-	 elem.previousSibling.data = "Réponse "+ i + " :";
+	 elem.previousElementSibling.innerHTML = "Réponse "+ i + " :";
+	 elem.name=""+i;
+	 elem.id=""+i;
 	 i++;
      });
+     document.querySelector("#true").value=document.querySelector(".true textarea").id;
  }
- function removeOneElem() {
-     b=document.querySelector("#newQuestion");
-     a=document.querySelectorAll(".reponse");
-     if(a.length>1) {
-	 b.removeChild(a[a.length-1].previousSibling);
-	 b.removeChild(a[a.length-1]);
-     }
- }
+ function removeElement(elem) {
+     elem.parentNode.parentNode.parentNode.parentNode.remove();
+     renumber();
+}
 </script>
 <%- include('admin_footer'); -%>
