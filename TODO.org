@@ -15,6 +15,7 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
 ** DONE Virer tous les logs inutiles
    CLOSED: [2018-09-12 mer. 13:25]
 ** TODO Proprifier le hack de questionController
+** TODO Isoler toutes les query
 
 * Court terme
 
@@ -38,7 +39,7 @@ Presque fait, il manque juste une harmonisation des noms... (getBy/FromID, setGe
 ** DONE mettre en paramètre le socket.connect dans le javascript client-side
    CLOSED: [2018-08-23 jeu. 18:19]
 ** TODO Trouver un nom satisfaisant
-Candidats : ClassPanic, QuestionDeCours, Zero Pointé, ...
+Candidats : ClassPanic, QuestionDeCours, Zero Pointé, QuestionALaCon...
 
 
 ** DONE Vérifier la sécurité
@@ -87,11 +88,14 @@ Au final je n'ai pas utilisé flex
    CLOSED: [2018-09-13 jeu. 23:22]
 ** TODO Vérifier les RESTRICT/CASCADE pour la bdd (dans le fichier)
 
-** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion...
+** TODO Réfléchir à ce qui est le mieux pour indexSet et currentQuestion
 ** TODO Empecher les noms vides
 ** DONE style css pour souligner dans quelle page nous sommes dans le menu...
    CLOSED: [2018-09-19 mer. 14:31]
 ** TODO mettre configuration.js en configuration.js.example et mettre à jour le README en accord avec cela
+** TODO Gérer les statistiques
+Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
+
 
 * BUGs
 
@@ -110,10 +114,21 @@ TypeError: game.questionFromRoom is not a function
     at process._tickCallback (internal/process/next_tick.js:61:11)
 [nodemon] app crashed - waiting for file changes before starting...
 
-* Long terme
+** TODO Bug header already sent arrive de temps en temps :
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+0|www    |     at ServerResponse.setHeader (_http_outgoing.js:469:11)
+0|www    |     at ServerResponse.header (/home/panglesd/class-panic/node_modules/express/lib/response.js:767:10)
+0|www    |     at ServerResponse.send (/home/panglesd/class-panic/node_modules/express/lib/response.js:170:12)
+0|www    |     at done (/home/panglesd/class-panic/node_modules/express/lib/response.js:1004:10)
+0|www    |     at tryHandleCache (/home/panglesd/class-panic/node_modules/ejs/lib/ejs.js:257:5)
+0|www    |     at View.exports.renderFile [as engine] (/home/panglesd/class-panic/node_modules/ejs/lib/ejs.js:480:10)
+0|www    |     at View.render (/home/panglesd/class-panic/node_modules/express/lib/view.js:135:8)
+0|www    |     at tryRender (/home/panglesd/class-panic/node_modules/express/lib/application.js:640:10)
+0|www    |     at Function.render (/home/panglesd/class-panic/node_modules/express/lib/application.js:592:3)
+0|www    |     at ServerResponse.render (/home/panglesd/class-panic/node_modules/express/lib/response.js:1008:7)
 
-** TODO Gérer les statistiques
-Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
+
+* Long terme
 
 ** TODO On peut ouvrir et fermer des salles.
 
