@@ -62,10 +62,11 @@ module.exports = function (server, sessionMiddleware) {
 	});
     }
     
-    /*    function sendStats(room) {
-	  game.getStatsFromRoom(room.id, function (err, stats) {
-	  io.of("/admin").to(room.id).emit("newStats", stats)
-	  }); */
+    function sendStats(socket, room, callback) {
+	game.getStatsFromRoom(room.id, function (err, stats) {
+	    io.of("/admin").to(room.id).emit("newStats", stats)
+	});
+    }
     function sendOwnedStats(room) {
 	game.getStatsFromOwnedRoomID(room.id, function (err, stats) {
 	    io.of("/admin").to(room.id).emit("newStats", stats)
@@ -201,10 +202,20 @@ module.exports = function (server, sessionMiddleware) {
 		
 		socket.on('revealResults', function () {
 		    //	    console.log("should emit to", socket.room.id, "the correction");
-		    game.getStatsFromRoomID(socket.room.id, function (r,e) {
-			io.of("/student").to(socket.room.id).emit("correction", e);
-			room.setStatusForRoomID(socket.room.id, "revealed", function () {});
-		    });	    
+		    room.getStatus(socket.room, function (err, status) {
+			if(status != "revealed") {
+			    game.getStatsFromRoomID(socket.room.id, function (r,e) {
+				io.of("/student").to(socket.room.id).emit("correction", e);
+				room.setStatusForRoomID(socket.room.id, "revealed", function () {});
+				game.getStatsFromOwnedRoomID(/*socket.request.session.user, */socket.room.id, (err, res) => { console.log(res); });
+				game.logStats(socket.room.id, (err) => {console.log(err);});
+//				e.forEach((personnalStat) => {
+//				    console.log(personnalStat);
+//				});
+					  
+			    });
+			}
+		    });
 		});
 		
 		/******************************************/
