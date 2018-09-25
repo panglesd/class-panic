@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" href="/stylesheets/style_main.css">
+  </head>
+  <body>
+    <div id="main_wrapper">
+      <h1>Class Panic</h1>
+      <nav>
+	<ul>
+	  <a href="<%= config.PATH %>/room"><li  <%= active == "salles" ? "class=selected" : "" %>>Mes cours</li></a>
+	  <a href="<%= config.PATH %>/room"><li  <%= active == "join" ? "class=selected" : "" %>>Rejoindre un cours</li></a>
+	  <%- user.isAdmin ? '<a href="'+ config.PATH +'/manage/room"><li>Administrer</li>' : "" %></a>
+<!--	  <li><a href="<%= config.PATH %>/user">Mon compte</a></li>-->
+	  <a id="leave" href="<%= config.PATH %>/logout"><li>Se d&eacute;connecter</li></a>
+      </nav>
+      <div class="wrapper" id="connect_wrapper">
+	  <div class="msg">
+	    <ul>
+	      <% if(typeof msgs == 'object' && msgs) {
+		 msgs.forEach(function (msg) { %>
+	      <li> <%= msg %> </li>
+	      <% });} %>
+	    </ul>
+	  </div>

@@ -1,0 +1,20 @@
+<%- include('student_header', {active:"salles"}); -%>
+
+<h2>Mes cours :</h2>
+<ul class="room">
+  <% coursesList.forEach(function(course) { %>
+  <a class="room" href="<%= config.PATH %>/course/<%= course.id %>">
+    <li class="room">
+      <span class="froom"><%= course.name %></span>
+      <ul>
+	<li>Prof : <%= course.owner %></li>
+      </ul>
+<!--      <div>
+	Rejoindre
+      </div> -->
+    </li>
+  </a>
+  <% });%>
+</ul>
+
+<%- include('student_footer'); -%>

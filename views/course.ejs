@@ -1,0 +1,21 @@
+<%- include('student_header', {active:"salles"}); -%>
+
+<h2>Se connecter à une salle</h2>
+<ul class="room">
+  <% roomList.forEach(function(room) { %>
+  <a class="room" href="<%= config.PATH %>/room/<%= room.id %>">
+    <li class="room">
+      <span class="froom"><%= room.name %></span>
+      <ul>
+	<li>Nombre de participants : <%= room.number %></li>
+	<li>Administrateur: <%=room.owner %></li>
+      </ul>
+      <div>
+	Rejoindre
+      </div>
+    </li>
+  </a>
+  <% });%>
+</ul>
+
+<%- include('student_footer'); -%>
