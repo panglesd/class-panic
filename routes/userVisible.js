@@ -3,6 +3,7 @@ var router = express.Router();
 
 // Require controller modules.
 var room_controller = require('../controllers/roomController');
+var course_controller = require('../controllers/courseController');
 var set_controller = require('../controllers/setController');
 var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
@@ -37,6 +38,13 @@ router.use(function (req, res, next) {
 
 // GET request for showing room list.
 router.get('/room', room_controller.room_list);
+
+
+// GET request for showing courses list.
+router.get('/course', course_controller.courses_list);
+
+// GET request for showing a course.
+//router.get('/course/:id', course_controller.course);
 
 
 

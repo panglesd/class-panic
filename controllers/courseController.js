@@ -1,4 +1,5 @@
 var User = require('../models/user');
+var Course = require('../models/course');
 var Room = require('../models/room');
 var Set = require('../models/set');
 var config = require('../configuration');
@@ -10,9 +11,9 @@ var async = require('async');
 /*         Fonctions render pour les rooms                   */
 /*************************************************************/
 
-// Render rooms.ejs
+// Render courses.ejs
 
-renderRooms = function(user, msgs, res) {
+renderCourses = function(user, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -23,8 +24,8 @@ renderRooms = function(user, msgs, res) {
 	    msgs : function(callback) {
 		callback(null, msgs);
 	    },
-	    roomList : function (callback) {
-		Room.list(callback);
+	    courseList : function (callback) {
+		Course.subscribedCourses(user,callback);
 	    }
 	},
 	function (err, results) {
@@ -95,8 +96,8 @@ renderManageRooms = function(user, msgs, res) {
 
 // Afficher la liste des rooms afin d'y participer
 
-exports.room_list = function(req, res) {
-    renderRooms(req.session.user, [], res);
+exports.courses_list = function(req, res) {
+    renderCourses(req.session.user, [], res);
 };
 
 

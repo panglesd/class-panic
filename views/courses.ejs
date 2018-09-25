@@ -2,12 +2,12 @@
 
 <h2>Mes cours :</h2>
 <ul class="room">
-  <% coursesList.forEach(function(course) { %>
+  <% courseList.forEach(function(course) { %>
   <a class="room" href="<%= config.PATH %>/course/<%= course.id %>">
     <li class="room">
       <span class="froom"><%= course.name %></span>
       <ul>
-	<li>Prof : <%= course.owner %></li>
+	<li>Responsable : <%= course.fullName %></li>
       </ul>
 <!--      <div>
 	Rejoindre
