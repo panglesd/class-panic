@@ -7,6 +7,7 @@ var set_controller = require('../controllers/setController');
 var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
 var login_controller = require('../controllers/loginController');
+var course_controller = require('../controllers/courseController');
 
 var config = require("../configuration");
 
@@ -29,26 +30,49 @@ router.use(function (req, res, next) {
 /*************************************************************/
 
    /**********************************************************/
+   /*              Managing courses                          */
+   /**********************************************************/
+
+// POST request for deleting a course.
+//router.post('/manage/course/:id/delete', course_controller.course_delete_post);
+//router.get('/manage/room/:id/delete', (req,res) => {res.redirect('../');});
+
+// POST request for modifying a room.
+//router.post('/manage/course/:id/update', course_controller.course_update_post);
+//router.get('/manage/course/:id/update', (req,res) => {res.redirect('./');});
+
+// POST request for creating a room.
+//router.post('/manage/course/create', course_controller.course_create_post);
+//router.get('/manage/course/create', (req,res) => {res.redirect('./');});
+
+// GET request for managing a particular room.
+router.get('/manage/course/:idCourse', course_controller.course_manage);
+
+// GET request for the main managing room page.
+router.get('/manage/course', course_controller.course_manage_all);
+
+
+   /**********************************************************/
    /*              Managing rooms                            */
    /**********************************************************/
 
 // POST request for deleting a room.
-router.post('/manage/room/:id/delete', room_controller.room_delete_post);
-router.get('/manage/room/:id/delete', (req,res) => {res.redirect('../');});
+router.post('/manage/course/:idCourse/room/:id/delete', room_controller.room_delete_post);
+router.get('/manage/course/:idCourse/room/:id/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a room.
-router.post('/manage/room/:id/update', room_controller.room_update_post);
-router.get('/manage/room/:id/update', (req,res) => {res.redirect('./');});
+router.post('/manage/course/:idCourse/room/:id/update', room_controller.room_update_post);
+router.get('/manage/course/:idCourse/room/:id/update', (req,res) => {res.redirect('./');});
 
 // POST request for creating a room.
-router.post('/manage/room/create', room_controller.room_create_post);
-router.get('/manage/room/create', (req,res) => {res.redirect('./');});
+router.post('/manage/course/:idCourse/room/create', room_controller.room_create_post);
+router.get('/manage/course/:idCourse/room/create', (req,res) => {res.redirect('./');});
 
 // GET request for managing a particular room.
-router.get('/manage/room/:id', room_controller.room_manage);
+router.get('/manage/course/:idCourse/room/:id', room_controller.room_manage);
 
 // GET request for the main managing room page.
-router.get('/manage/room', room_controller.room_manage_all);
+//router.get('/manage/course/:idCourse/room', room_controller.room_manage_all);
 
    /**********************************************************/
    /*              Managing sets of questions                */

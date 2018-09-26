@@ -1,0 +1,41 @@
+<%- include('admin_header', {active:"salles"}); -%>
+
+<h2> Vos cours</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class="room">
+    <% courseOwnedList.forEach(function(cours) { %>
+	<a class="room" href="<%= config.PATH %>/manage/course/<%= cours.id %>">
+	    <li class="room">
+		<span class="froom"><%= cours.name %></span>
+		<ul>		
+<!--		     <li>Associé au set : <%= //room.nameSet %></li>  -->
+		    <li>Commentaire : <%=cours.commentaire %></li>
+		     </ul>
+		<div>
+		    <ul>
+<!-- 			<a class="room" href="<%= config.PATH %>/manage/room/<%= //room.id %>"><li> Modifier </li></a> -->
+<!--			<a class="room" href="<%= config.PATH %>/admin/<%= //room.id %>"><li> Détails du cours </li></a> -->
+		    </ul>
+		</div>
+	    </li>
+	</a>
+    <% });%>
+    <li class="room">
+	<span class="froom">Créer un nouveau cours</span>
+	<div>
+	<form id="formNewRoom" action="<%= config.PATH %>/manage/course/create" method="post">
+	    <input placeholder="Nom du cours" name="name">
+<!--	    <select name="questionSet">
+		<% //setOwnedList.forEach( function (set) { %>
+		    <option value="<%=//set.id%>">
+			<%=//set.name %>
+		    </option>
+		<% //}); %>
+	    </select> -->
+	</form>
+	    <ul> <li> <span onclick="document.querySelector('#formNewRoom').submit()" style="cursor:pointer">Créer</span> </li> </ul>
+	</div>
+    </li>
+</ul>
+
+<%- include('admin_footer'); -%>

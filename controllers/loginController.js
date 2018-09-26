@@ -58,7 +58,7 @@ exports.login_post = function(req, res) {
 	    res.render('login', {config: config, msgs: ["Connexion impossible, vérifiez vos identifiants"]});
 	else {
 	    req.session.user=user;
-	    res.redirect(config.PATH+"/room");
+	    res.redirect(config.PATH+"/course");
 	}
     });    
 };

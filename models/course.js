@@ -9,13 +9,16 @@ var Question = require("./question");
 
 // By ID
 
-exports.getByID = function(roomID, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
+exports.getByID = function(courseID, callback) {
+    bdd.query("SELECT * FROM `courses` WHERE `id` = ?", [courseID], function (err, resu) {
 	callback(err, resu[0])});
 };
 
-exports.getOwnedByID = function(user, roomID, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [roomID, user.id], function (err, resu) {
+exports.getOwnedByID = function(user, courseID, callback) {
+    query = "SELECT * FROM `courses` WHERE `id` = ? AND `ownerID` = ?";
+    console.log(query, courseID, user.id);
+    bdd.query(query, [courseID, user.id], function (err, resu) {
+	console.log(err, resu);
 	callback(err, resu[0])});
 };
 
@@ -33,21 +36,27 @@ exports.subscribedCourses = function (user, callback) {
 }
 
 exports.ownedList = function (user, callback) {
-    bdd.query('SELECT `rooms`.id as id,`rooms`.`name` as name,`id_currentQuestion`, `questionSet`, `rooms`.`ownerID` as ownerID, `status`, `setDeQuestion`.name as nameSet FROM (rooms INNER JOIN setDeQuestion ON `rooms`.questionSet = `setDeQuestion`.`id`) WHERE `rooms`.`ownerID` = ?', [user.id], function(err, rows) {
+    bdd.query('SELECT * FROM courses WHERE `ownerID` = ?', [user.id], function(err, rows) {
 	callback(err, rows);
     });
 }
 
 // By Name
 
-exports.getByName= function (room, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) { callback(rows[0]) });
+exports.getByName= function (courseName, callback) {
+    bdd.query("SELECT * FROM `courses` WHERE `name` = ?", [courseName], function (err, rows) { callback(rows[0]) });
+}
+
+exports.students = function(user, courseID, callback) {
+    query = "SELECT * FROM subscription INNER JOIN users ON userID= users.id WHERE coursID = ? ORDER BY fullName";
+    bdd.query(query, [courseID], callback);
+    
 }
 
 /***********************************************************************/
 /*       Gestion CRUD des rooms                                        */
 /***********************************************************************/
-
+/*
 // Create
 
 exports.create = function (user, newRoom, callback) {
@@ -76,11 +85,11 @@ exports.delete = function (user, room, callback) {
 exports.update = function (user, room, newRoom, callback) {
     bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ? WHERE `id` = ? AND `ownerID` = ?', [newRoom.name, newRoom.questionSet, room.id, user.id], callback)
 }
-
+*/
 /***********************************************************************/
 /*       Statuts et appartenance                                       */
 /***********************************************************************/
-
+/*
 exports.getStatus = function (room, callback) {
     bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);})
 }
@@ -96,5 +105,5 @@ exports.setStatusForRoomID = function (roomID, status, callback) {
 	callback();
     });
 }
-
+*/
 module.export = []

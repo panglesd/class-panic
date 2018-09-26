@@ -1,4 +1,4 @@
-bdd = require("./bdd");
+var bdd = require("./bdd");
 var async = require('async');
 
 var Question = require("./question");
@@ -50,6 +50,12 @@ exports.list = function (callback) {
 
 exports.ownedList = function (user, callback) {
     bdd.query('SELECT `rooms`.id as id,`rooms`.`name` as name,`id_currentQuestion`, `questionSet`, `rooms`.`ownerID` as ownerID, `status`, `setDeQuestion`.name as nameSet FROM (rooms INNER JOIN setDeQuestion ON `rooms`.questionSet = `setDeQuestion`.`id`) WHERE `rooms`.`ownerID` = ?', [user.id], function(err, rows) {
+	callback(err, rows);
+    });
+}
+
+exports.getFromOwnedCourse = function (user, courseID, callback) {
+    bdd.query('SELECT * FROM rooms WHERE `ownerID` = ? AND `courseID` = ?', [user.id, courseID], function(err, rows) {
 	callback(err, rows);
     });
 }

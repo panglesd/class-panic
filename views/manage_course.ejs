@@ -1,0 +1,71 @@
+<%- include('admin_header', {active : "salles"}); -%>
+
+<h2>Votre cours <%= course.name %> :</h2>
+
+<form action="<%= config.PATH %>/manage/course/<%=course.id%>/update" method="post">
+    Name : <input name="name" value="<%= course.name %>"> <br>
+    Commentaires : <input  type="textarea" name="name" value="<%= course.commentaire %>"> <br>
+    <input type="submit" value="Modifier">
+</form>
+
+<h2>Vos salle(s) de classe :</h2>
+<ul class="room">
+    <% roomOwnedList.forEach(function(room) { %>
+	    <li class="room">
+		<span class="froom"><%= room.name %></span>
+		<ul>		
+		     <li>Type de salle : <%= "Salle de cours" %></li>
+		     <li>Associé au set : <%= setOwnedList.find((set) => {return set.id==room.questionSet}).name %></li>
+		     </ul>
+		<div>
+		    <ul>
+ 			<a class="room" href="<%= config.PATH %>/manage/course/<%= course.id %>/room/<%= room.id %>"><li> Modifier </li></a>
+			<a class="room" href="<%= config.PATH %>/admin/<%= room.id %>"><li> Rentrer dans la salle </li></a>
+		    </ul>
+		</div>
+	    </li>
+
+    <% });%>
+    <li class="room">
+	<span class="froom">Créer une nouvelle salle de classe</span>
+	<div>
+	<form id="formNewRoom" action="<%= config.PATH %>/manage/room/create" method="post">
+	    <input placeholder="Nom de la room" name="name">
+	    <select name="questionSet">
+		<% setOwnedList.forEach( function (set) { %>
+		    <option value="<%=set.id%>">
+			<%=set.name %>
+		    </option>
+		<% }); %>
+	    </select>
+	</form>
+	    <ul> <li> <span onclick="document.querySelector('#formNewRoom').submit()" style="cursor:pointer">Créer</span> </li> </ul>
+	</div>
+    </li>
+</ul>
+<h2>Les étudiants de ce cours :</h2>
+<ul class="room">
+    <% students.forEach(function(student) { %>
+	<li class="room">
+	   <%= student.fullName %>
+		<ul>
+ 		    <a><li> Retirer du cours </li></a>
+ 		    <a><li> Voir ses stats du cours </li></a>
+		</ul>
+	</li>
+    <% }); %>
+    <li class="room">
+	Inscrire de nouveaux étudiants
+    </li>
+</ul>
+<!--
+-->
+<h2>Ou le supprimer</h2>
+
+<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer le cours <%=course.name%> ?');" action="<%= config.PATH %>/manage/course/<%=course.id%>/delete" method="post">
+    Irréversible : <input type="submit" value="Supprimer le cours <%= course.name%>">
+</form>
+
+<a style="display:block; margin:40px;" href="<%= config.PATH %>/manage/course"> Retourner à la liste des cours </a>
+
+<%- include('admin_footer'); -%>

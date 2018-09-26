@@ -26,7 +26,7 @@ renderCourses = function(user, msgs, res) {
 	    },
 	    courseList : function (callback) {
 		Course.subscribedCourses(user,callback);
-	    }
+	    }          
 	},
 	function (err, results) {
 //	    console.log(results);
@@ -37,34 +37,40 @@ renderCourses = function(user, msgs, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderRoomManage = function (user, roomID, msgs, res) {
-    Room.getOwnedByID(user, roomID, function (err, thisRoom) {
+renderCourseManage = function (user, courseID, msgs, res) {
+    Course.getOwnedByID(user, courseID, function (err, course) {
 	async.parallel(
 	    {
-		title : function(callback) { callback(null, "ClassPanic: Administrer "+thisRoom.name)},
+		title : function(callback) { callback(null, "ClassPanic: Administrer "+course.name)},
 		config : function(callback) { callback(null, config) },	
 		user : function (callback) {
 		    callback(null, user);
 		},
-		room :  function (callback) {
-		    callback(null, thisRoom);
+		course :  function (callback) {
+		    callback(null, course);
 		},
 		msgs : function(callback) {
 		    callback(null, msgs);
 		},
-	    	setOwnedList :  function (callback) {
+		roomOwnedList :  function (callback) {
+		    Room.getFromOwnedCourse(user, courseID, callback);
+		},
+		students :  function (callback) {
+		    Course.students(user, courseID, (err, res) => {callback(err, res)});
+		},
+		setOwnedList :  function (callback) {
 		    Set.setOwnedList(user, callback);
 		}
 	    },
 	    function (err, results) {
-		res.render('manage_room', results);
+		res.render('manage_course', results);
 	    });
     });
 };
 
 // Render manage_rooms.ejs
 
-renderManageRooms = function(user, msgs, res) {
+renderManageCourses = function(user, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -72,21 +78,21 @@ renderManageRooms = function(user, msgs, res) {
 	    user : function (callback) {
 		callback(null, user);
 	    },
-	    roomList : function (callback) {
-		Room.list(callback);
-	    },
+/*	    courseList : function (callback) {
+		Course.list(callback);
+	    },*/
 	    msgs : function(callback) {
 		callback(null, msgs);
 	    },
-	    roomOwnedList :  function (callback) {
-		Room.ownedList(user, callback);
-	    },
-	    setOwnedList :  function (callback) {
-		Set.setOwnedList(user, callback);
+	    courseOwnedList :  function (callback) {
+		Course.ownedList(user, callback);
 	    }
+/*	    setOwnedList :  function (callback) {
+		Set.setOwnedList(user, callback);
+	    }*/
 	},
 	function (err, results) {
-	    res.render('manage_rooms', results)
+	    res.render('manage_courses', results)
 	});
 };
 
@@ -97,20 +103,21 @@ renderManageRooms = function(user, msgs, res) {
 // Afficher la liste des rooms afin d'y participer
 
 exports.courses_list = function(req, res) {
+    console.log("yo");
     renderCourses(req.session.user, [], res);
 };
 
 
 // Afficher le détails d'une room pour la modifier
 
-exports.room_manage = function (req, res) {
-    renderRoomManage(req.session.user, req.params.id, [], res);
+exports.course_manage = function (req, res) {
+    renderCourseManage(req.session.user, req.params.idCourse, [], res);
 };
 
 // Afficher la liste des rooms afin de les manager
 
-exports.room_manage_all = function(req, res) {
-    renderManageRooms(req.session.user, [], res);
+exports.course_manage_all = function(req, res) {
+    renderManageCourses(req.session.user, [], res);
 };
 
 

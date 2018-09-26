@@ -1,6 +1,6 @@
 <%- include('student_header', {active:"salles"}); -%>
 
-<h2>Se connecter à une scéance de question :</h2>
+<h2>Se connecter à une salle</h2>
 <ul class="room">
   <% roomList.forEach(function(room) { %>
   <a class="room" href="<%= config.PATH %>/room/<%= room.id %>">
@@ -17,8 +17,5 @@
   </a>
   <% });%>
 </ul>
-
-<h2> Se connecter au chat de ce cours </h2>
-
 
 <%- include('student_footer'); -%>

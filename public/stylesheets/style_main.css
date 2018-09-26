@@ -38,11 +38,12 @@ html {
     background:url("/images/blackboard-wallpaper3.jpg")  no-repeat center fixed;
     background-size:cover;
     min-height: 100%;
-    color:white;
+/*    color:white;*/
+    color:rgb(220,220,220);
 }
 
 h1, h2 {
-    color:white;
+/*    color:white;*/
     font-size:1.5em;
     margin:10px;
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
@@ -106,7 +107,8 @@ h1 {
 }
 
 a {
-    color:white;
+    /*    color:white;*/
+    color:rgb(220,220,220);
 }
 
 body {
@@ -203,7 +205,8 @@ input[type=text] {
     margin: 8px 0;
     box-sizing: border-box;
     background:black;
-    color:white;
+    color:rgb(220,220,220);
+    /*    color:white;*/
 }
 
 input {
@@ -212,12 +215,14 @@ input {
 }
 input[type=submit]  {
     background-color: black;
-    color:white;
+    color:rgb(220,220,220);
+    /*    color:white;*/
     margin:15px;
 }
 input[type=button] {
     background-color: black;
-    color:white;
+    color:rgb(220,220,220);
+    /*    color:white;*/
     margin:15px;
 }
 table input[type=submit]{
