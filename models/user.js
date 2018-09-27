@@ -15,6 +15,28 @@ exports.userList = function (callback) {
     });
 }
 
+exports.userListByFilter = function (filter, callback) {
+    query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion FROM users WHERE 1+1 '+
+	(filter.name ? " AND fullName LIKE ?" : "") +
+	(filter.n_etu ? " AND studentNumber = ?" : "") +
+	(filter.promotion ? " AND promotion = ?" : "") +
+	(filter.institution ? " AND institution = ?" : "") ;
+    param = []
+    if(filter.name)
+	param.push("%"+filter.name+"%");
+    if(filter.n_etu)
+	param.push(filter.n_etu);
+    if(filter.promotion)
+	param.push(filter.promotion);
+    if(filter.institution)
+	param.push(filter.institution);
+    bdd.query(query, param, function(err, rows) {
+	console.log(this.sql);
+	console.log(err, rows);
+	callback(err, rows);
+    });
+}
+
 /***********************************************************************/
 /*       Getters pour les users : individu                             */
 /***********************************************************************/

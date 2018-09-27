@@ -1,0 +1,57 @@
+<%- include('admin_header', {active : "salles"}); -%>
+
+
+<h2>Inscrire des élèves au cours <%= course.name %> :</h2>
+<form id="searchForm">
+    <p>
+	<label>Nom :</label><br>
+	<input type="text" id="name" name="name">
+    </p>
+    <p>
+	<label>Numéro(s) d'étudiant :</label><br>
+	<input type="text" name="n_etu" id="n_etu">
+    </p>
+    <p>
+	<label>Promotion</label><br>
+	<select name="promotion" id="promotion">
+	    <option value="2018">2018/2019</option>
+	</select>
+    </p>
+    <p>
+	<label>Institution</label><br>
+	<select name="institution" id="institution">
+	    <option value="IUT">IUT sénard</option>
+	    <option value="FAC">FAC de Créteil</option>
+	</select>
+    </p>
+    <p>
+	<input type="button" id="searchButton" value="Rechercher">
+    </p>
+</form>
+
+<div id="wrapper-student-list">
+
+</div>
+
+<script>
+ var server = "<%= server %>";
+</script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/subscription.js"></script>
+
+<script>
+ function callSearch() {
+     name = document.querySelector("#name").value;
+     n_etu = document.querySelector("#n_etu").value;
+     promotion = document.querySelector("#promotion").value;
+     institution = document.querySelector("#institution").value;
+     searchStudent(name, n_etu, promotion, institution);
+ }
+ document.querySelector("#searchButton").addEventListener("click", callSearch);
+ document.querySelector("#name").addEventListener("keyup", callSearch);
+ document.querySelector("#searchButton").addEventListener("click", callSearch);
+ document.querySelector("#searchButton").addEventListener("click", callSearch);
+ 
+</script>
+
+<%- include('admin_footer'); -%>

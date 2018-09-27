@@ -310,6 +310,25 @@ module.exports = function (server, sessionMiddleware) {
 	}
     });
     
+    /**************************************************************************/
+    /*                 Fonction pour le management de questions en direct     */
+    /**************************************************************************/
+    
+    io.of('/users').on('connection', function(socket) {
+	if(socket.request.session) {
+	    if(socket.request.session.user) {
+
+		socket.on('getUser', function (filter) {
+		    console.log(filter);
+		    User.userListByFilter(filter, (err, results) => {
+			socket.emit("users", results);
+		    });
+
+		});
+	    }
+	}
+    });
+    
     return io;
 };
 

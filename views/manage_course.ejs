@@ -26,22 +26,26 @@
 	    </li>
 
     <% });%>
-    <li class="room">
-	<span class="froom">Créer une nouvelle salle de classe</span>
-	<div>
-	<form id="formNewRoom" action="<%= config.PATH %>/manage/room/create" method="post">
-	    <input placeholder="Nom de la room" name="name">
-	    <select name="questionSet">
-		<% setOwnedList.forEach( function (set) { %>
-		    <option value="<%=set.id%>">
-			<%=set.name %>
-		    </option>
-		<% }); %>
-	    </select>
-	</form>
-	    <ul> <li> <span onclick="document.querySelector('#formNewRoom').submit()" style="cursor:pointer">Créer</span> </li> </ul>
-	</div>
-    </li>
+    <a class="room">
+	<li style="cursor:pointer; text-align:center;" class="room">
+	    <span class="froom">+</span>
+	    <!--	<span class="froom">Créer une nouvelle salle de classe</span>
+	    <div>
+		<form id="formNewRoom" action="<%= config.PATH %>/manage/room/create" method="post">
+		    <input placeholder="Nom de la room" name="name">
+		    <select name="questionSet">
+			<% setOwnedList.forEach( function (set) { %>
+			    <option value="<%=set.id%>">
+				<%=set.name %>
+			    </option>
+			<% }); %>
+		    </select>
+		</form>
+		<ul> <li> <span onclick="document.querySelector('#formNewRoom').submit()" style="cursor:pointer">Créer</span> </li> </ul>
+	    </div>
+	    -->
+	</li>
+    </a>
 </ul>
 <h2>Les étudiants de ce cours :</h2>
 <ul class="room">
@@ -54,6 +58,8 @@
 		</ul>
 	</li>
     <% }); %>
+    <script src="/socket.io/socket.io.js">
+    </script>
     <li class="room">
 	Inscrire de nouveaux étudiants
     </li>
