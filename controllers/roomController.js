@@ -151,7 +151,7 @@ exports.room_delete_post = function(req, res) {
 //Update
 
 exports.room_update_post = function(req, res) {
-    Room.update(req.session.user, req.params, req.body, function (id) {
+    Room.update(req.session.user, req.params, req.body, function (err, id) {
 	if(err)
 	    renderRoomManage(req.session.user, req.params.id, ["Impossible de modifier la room"], res);
 	else
