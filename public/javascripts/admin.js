@@ -49,7 +49,7 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketAdmin.on('newStats', function (newStats) {
-//    console.log(newStats);
+    console.log(newStats);
     ul = document.createElement("ul")
     ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
@@ -58,8 +58,10 @@ socketAdmin.on('newStats', function (newStats) {
 	li.id = stat.id;
 	color = newStats.correctAnswer == stat.response ? "green" : ( stat.response != -1 ? "red" : "white");
 	if(stat.response == -1)
-	    stat.response = "?";
-	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+stat.pseudo+' : <span>'+stat.response+'</span></div>'
+	    stat.response2 = "?";
+	else 
+	    stat.response2 = document.querySelector("#r"+stat.response).innerHTML;
+	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+'</span></div>'
 	ul.appendChild(li);
     });
     document.querySelector("#stats ul").innerHTML = ul.innerHTML;
