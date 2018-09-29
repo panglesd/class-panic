@@ -65,7 +65,7 @@ exports.getStatsFromOwnedRoomID = function (roomID, callback) {
     async.parallel(
 	{
 	    namedStats : function (callback) {
-		bdd.query("SELECT * FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {console.log(row); callback(err, row)});
+		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {/*console.log(row);*/ callback(err, row)});
 	    },
 	    correctAnswer : function (callback) {
 		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
