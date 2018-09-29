@@ -1,5 +1,6 @@
 var user = require('../models/user');
 var room = require('../models/room');
+var Course = require('../models/course');
 var set = require('../models/set');
 var game = require('../models/game');
 var async = require('async');
@@ -78,83 +79,79 @@ module.exports = function (server, sessionMiddleware) {
     /**************************************************************************/
     
     io.of("/student").on('connection', function (socket) {
-	if(socket.request.session) {
-	    if(socket.request.session.user) {
+	//		console.log("socket.request.session.user is ",socket.request.session.user);
+	/******************************************/
+	/*  Middleware de socket                  */
+	/******************************************/
+	
+	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
+	
+	socket.use(function (packet, next) {
+	    //	    console.log("packet is", packet);
+	    if(packet[0]=="chooseRoom")
+		next();
+	    if(socket.room)
+		next();
+	});
+	
+	/******************************************/
+	/*  Quelqu'un a choisi une room           */
+	/******************************************/
+	
+	socket.on('chooseRoom', function (newRoom) {
+	    if (socket.room)
+		socket.leave(socket.room.id);
+	    room.getByID(parseInt(newRoom), function (err, res) {
+		socket.room = res;
+		socket.join(newRoom);
 		//		console.log("socket.request.session.user is ",socket.request.session.user);
-		/******************************************/
-		/*  Middleware de socket                  */
-		/******************************************/
-		
-		// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
-		
-		socket.use(function (packet, next) {
-		    //	    console.log("packet is", packet);
-		    if(packet[0]=="chooseRoom")
-			next();
-		    if(socket.room)
-			next();
-		});
-		
-		/******************************************/
-		/*  Quelqu'un a choisi une room           */
-		/******************************************/
-		
-		socket.on('chooseRoom', function (newRoom) {
-		    if (socket.room)
-			socket.leave(socket.room.id);
-		    room.getByID(parseInt(newRoom), function (err, res) {
-			socket.room = res;
-			socket.join(newRoom);
-			//		console.log("socket.request.session.user is ",socket.request.session.user);
-			game.enterRoom(socket.request.session.user, socket.room, function (err) {
-			    sendOwnedStats(socket.room);
-			    sendRoomQuestion(socket, function () {
-				room.getStatus(socket.room, function (err, status) {
-				    if(status == "revealed") {
-					game.getStatsFromRoomID(socket.room.id, function (r,e) {
-					    io.of("/student").to(socket.room.id).emit("correction", e);
-					});
-				    }
+		game.enterRoom(socket.request.session.user, socket.room, function (err) {
+		    sendOwnedStats(socket.room);
+		    sendRoomQuestion(socket, function () {
+			room.getStatus(socket.room, function (err, status) {
+			    if(status == "revealed") {
+				game.getStatsFromRoomID(socket.room.id, function (r,e) {
+				    io.of("/student").to(socket.room.id).emit("correction", e);
 				});
-			    });
+			    }
 			});
 		    });
 		});
-		
-		/******************************************/
-		/*  On me demande la question             */
-		/******************************************/
-		
-		socket.on('sendQuestionPlease', function () {
-//		    console.log(socket.room);
-		    sendRoomQuestion(socket,function() {});
-		});
-		
-		/******************************************/
-		/*  On m'envoie une reponse               */
-		/******************************************/
-		
-		socket.on('chosenAnswer', function (answer) {
-//		    console.log(answer);
-		    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
-			sendOwnedStats(socket.room)
-		    });
-		});
-		
-		/******************************************/
-		/*  On quitte la salle                    */
-		/******************************************/
-		
-		socket.on('disconnect', function (reason) {
-		    if(socket.room) {
-			game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
-			    if (err) throw err;
-			    sendOwnedStats(socket.room);
-			});
-		    }
+	    });
+	});
+	
+	/******************************************/
+	/*  On me demande la question             */
+	/******************************************/
+	
+	socket.on('sendQuestionPlease', function () {
+	    //		    console.log(socket.room);
+	    sendRoomQuestion(socket,function() {});
+	});
+	
+	/******************************************/
+	/*  On m'envoie une reponse               */
+	/******************************************/
+	
+	socket.on('chosenAnswer', function (answer) {
+	    //		    console.log(answer);
+	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
+		sendOwnedStats(socket.room)
+	    });
+	});
+	
+	/******************************************/
+	/*  On quitte la salle                    */
+	/******************************************/
+	
+	socket.on('disconnect', function (reason) {
+	    if(socket.room) {
+		game.leaveRoom(socket.request.session.user, socket.room,  function (err) {
+		    if (err) throw err;
+		    sendOwnedStats(socket.room);
 		});
 	    }
-	}
+	});
     });
     
     /**************************************************************************/
@@ -163,132 +160,127 @@ module.exports = function (server, sessionMiddleware) {
     
     io.of('/admin').on('connection', function(socket) {
 	
-	if(socket.request.session) {
-	    if(socket.request.session.user) {
-		
-		/******************************************/
-		/*  Middlesware de socket                 */
-		/******************************************/
-		
-		// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
-		
-		socket.use(function (packet, next) {
-		    //	    console.log("packet is", packet);
-		    if(packet[0]=="chooseRoom")
-			next();
-		    if(socket.room)
-			next();
-		});
-		
-		/******************************************/
-		/*  On a choisi la room a administrer     */
-		/******************************************/
-		
-		socket.on('chooseRoom', function (newRoom) {
-		    if (socket.room)
-			socket.leave(socket.room.id);
-		    //	    console.log(socket.request.session);
-		    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
-			socket.room = res;
-			socket.join(socket.room.id);
-			sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
-			sendOwnedStats(socket.room);
+	/******************************************/
+	/*  Middlesware de socket                 */
+	/******************************************/
+	
+	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
+	
+	socket.use(function (packet, next) {
+	    //	    console.log("packet is", packet);
+	    if(packet[0]=="chooseRoom")
+		next();
+	    if(socket.room)
+		next();
+	});
+	
+	/******************************************/
+	/*  On a choisi la room a administrer     */
+	/******************************************/
+	
+	socket.on('chooseRoom', function (newRoom) {
+	    if (socket.room)
+		socket.leave(socket.room.id);
+	    //	    console.log(socket.request.session);
+	    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
+		socket.room = res;
+		socket.join(socket.room.id);
+		sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
+		sendOwnedStats(socket.room);
+	    });
+	});
+	
+	/******************************************/
+	/*  On souhaite diffuser les resultats    */
+	/******************************************/
+	
+	socket.on('revealResults', function () {
+	    //	    console.log("should emit to", socket.room.id, "the correction");
+	    room.getStatus(socket.room, function (err, status) {
+		if(status != "revealed") {
+		    game.getStatsFromRoomID(socket.room.id, function (r,e) {
+			io.of("/student").to(socket.room.id).emit("correction", e);
+			room.setStatusForRoomID(socket.room.id, "revealed", function () {});
+			game.getStatsFromOwnedRoomID(/*socket.request.session.user, */socket.room.id, (err, res) => { console.log(res); });
+			game.logStats(socket.room.id, (err) => {console.log(err);});
+			//				e.forEach((personnalStat) => {
+			//				    console.log(personnalStat);
+			//				});
+			
 		    });
-		});
-		
-		/******************************************/
-		/*  On souhaite diffuser les resultats    */
-		/******************************************/
-		
-		socket.on('revealResults', function () {
-		    //	    console.log("should emit to", socket.room.id, "the correction");
-		    room.getStatus(socket.room, function (err, status) {
-			if(status != "revealed") {
-			    game.getStatsFromRoomID(socket.room.id, function (r,e) {
-				io.of("/student").to(socket.room.id).emit("correction", e);
-				room.setStatusForRoomID(socket.room.id, "revealed", function () {});
-				game.getStatsFromOwnedRoomID(/*socket.request.session.user, */socket.room.id, (err, res) => { console.log(res); });
-				game.logStats(socket.room.id, (err) => {console.log(err);});
-//				e.forEach((personnalStat) => {
-//				    console.log(personnalStat);
-//				});
-					  
-			    });
-			}
-		    });
-		});
-		
-		/******************************************/
-		/*  On souhaite aller direct à une question*/
-		/******************************************/
-		
-		socket.on('changeToQuestion', function (i) {
-		    //	    console.log("on souhaite changer à la question", i)
-		    game.setQuestionFromRoomID(socket.room.id, parseInt(i), function () {
-			room.setStatusForRoomID(socket.room.id, "pending", function () {
-			    sendOwnedStats(socket.room);
-			    broadcastRoomQuestion(socket.room, function (err) {if(err) throw err});
-			    sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
-			})
-		    });
-		});
-		
-		/******************************************/
-		/*  On souhaite changer le set            */
-		/******************************************/
-		
-		socket.on('changeSet', function (set) {
-		    //TO BE IMPLEMENTED
-		});
-		
-		/******************************************/
-		/*  Un admin me demande la question       */
-		/******************************************/
-		
-		socket.on('sendQuestionPlease', function () {
-//		    console.log(socket.room);
-		    sendRoomOwnedQuestion(socket.request.session.user, socket, function() {});
-		});
-		
-		/******************************************/
-		/*  On souhaite passer à la question suivante */
-		/******************************************/
-		
-		socket.on('changeQuestionPlease', function (nextQuestion) {
-		    game.nextQuestionFromRoomID(socket.room.id, function (err) {
-			room.setStatusForRoomID(socket.room.id, "pending", function () {
-			    broadcastRoomQuestion(socket.room, function () {});
-			    sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
-			    sendOwnedStats(socket.room);
-			});
-		    });
+		}
+	    });
+	});
+	
+	/******************************************/
+	/*  On souhaite aller direct à une question*/
+	/******************************************/
+	
+	socket.on('changeToQuestion', function (i) {
+	    //	    console.log("on souhaite changer à la question", i)
+	    game.setQuestionFromRoomID(socket.room.id, parseInt(i), function () {
+		room.setStatusForRoomID(socket.room.id, "pending", function () {
+		    sendOwnedStats(socket.room);
+		    broadcastRoomQuestion(socket.room, function (err) {if(err) throw err});
+		    sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
 		})
-
-		/******************************************/
-		/*  On souhaite une question custom       */
-		/******************************************/
-		
-		socket.on('customQuestion', function (customQuestion) {
-		    //		    console.log(customQuestion);
-		    delete(customQuestion.id);
-		    game.setQuestion(socket.room.id, customQuestion, function () {
-			broadcastRoomQuestion(socket.room, function(err, res) {});
-			sendOwnedStats(socket.room);
-		    });
+	    });
+	});
+	
+	/******************************************/
+	/*  On souhaite changer le set            */
+	/******************************************/
+	
+	socket.on('changeSet', function (set) {
+	    //TO BE IMPLEMENTED
+	});
+	
+	/******************************************/
+	/*  Un admin me demande la question       */
+	/******************************************/
+	
+	socket.on('sendQuestionPlease', function () {
+	    //		    console.log(socket.room);
+	    sendRoomOwnedQuestion(socket.request.session.user, socket, function() {});
+	});
+	
+	/******************************************/
+	/*  On souhaite passer à la question suivante */
+	/******************************************/
+	
+	socket.on('changeQuestionPlease', function (nextQuestion) {
+	    game.nextQuestionFromRoomID(socket.room.id, function (err) {
+		room.setStatusForRoomID(socket.room.id, "pending", function () {
+		    broadcastRoomQuestion(socket.room, function () {});
+		    sendRoomOwnedQuestion(socket.request.session.user, socket, function () {});
+		    sendOwnedStats(socket.room);
 		});
-
-		/******************************************/
-		/*  On souhaite revenir aux questions du set*/
-		/******************************************/
-		
-/*		socket.on('backToSet', function () {
-//		    console.log("backToSet");
-		    game.backToSet(socket.room.id, function(err, res) {
-			broadcastRoomQuestion(socket.room, function(err,res) {})
-		    });
-		});*/
-	    }
-	}
+	    });
+	})
+	
+	/******************************************/
+	/*  On souhaite une question custom       */
+	/******************************************/
+	
+	socket.on('customQuestion', function (customQuestion) {
+	    //		    console.log(customQuestion);
+	    delete(customQuestion.id);
+	    game.setQuestion(socket.room.id, customQuestion, function () {
+		broadcastRoomQuestion(socket.room, function(err, res) {});
+		sendOwnedStats(socket.room);
+	    });
+	});
+	
+	/******************************************/
+	/*  On souhaite revenir aux questions du set*/
+	/******************************************/
+	
+	/*		socket.on('backToSet', function () {
+	//		    console.log("backToSet");
+	game.backToSet(socket.room.id, function(err, res) {
+	broadcastRoomQuestion(socket.room, function(err,res) {})
+	});
+	});*/
     });
     
     /**************************************************************************/
@@ -297,38 +289,95 @@ module.exports = function (server, sessionMiddleware) {
     
     
     io.of('/manage').on('connection', function(socket) {
-	if(socket.request.session) {
-	    if(socket.request.session.user) {
-		socket.on('new order', function (newOrder) {
-		    if(socket.request.session) {
-			set.reOrder(socket.request.session.user, newOrder);
-		    }
-		    else {
-		    }
-		});
+	socket.on('new order', function (newOrder) {
+	    if(socket.request.session) {
+		set.reOrder(socket.request.session.user, newOrder);
 	    }
-	}
+	    else {
+	    }
+	});
     });
     
     /**************************************************************************/
-    /*                 Fonction pour le management de questions en direct     */
+    /*                 Fonction pour l'inscription de students à un cours     */
     /**************************************************************************/
     
     io.of('/users').on('connection', function(socket) {
-	if(socket.request.session) {
-	    if(socket.request.session.user) {
+	
+	/******************************************/
+	/*  Middleware de socket                  */
+	/******************************************/
+	
+	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
+	
+	socket.use(function (packet, next) {
+	    //	    console.log("packet is", packet);
+	    if(packet[0]=="chooseCourse")
+		next();
+	    else if(socket.course)
+		next();
+	    else
+		console.log("refused");
+	});
+	
+	
+	socket.on("chooseCourse", function(courseID) {
+	    //	    console.log(socket.request.session);
+	    Course.getOwnedByID(socket.request.session.user, parseInt(courseID), function (err, res) {
+		socket.course = res;
+	    });
+	});
 
-		socket.on('getUser', function (filter) {
-		    console.log(filter);
-		    User.userListByFilter(filter, (err, results) => {
-			socket.emit("users", results);
-		    });
-
-		});
-	    }
-	}
+	socket.on('getUser', function (filter) {
+	    console.log(filter);
+	    socket.filter = filter;
+	    socket.filter.courseID = socket.course.id;
+	    User.userListByFilter(filter, (err, results) => {
+		socket.emit("users", results);
+	    });
+	});
+	
+	socket.on('subscribeList', function (studentList) {
+	    console.log("studentList is", studentList);
+	    async.forEach(studentList,
+			  (studentID, callback) => {
+			      console.log("I am going to register ", studentID);
+			      Course.subscribeStudent(studentID, socket.course.id, callback);
+			  },
+			  (err, results) => {
+			      socket.filter.courseID = socket.course.id;
+			      User.userListByFilter(socket.filter, (err, results) => {
+				  socket.emit("users", results);
+			      });
+			  });
+	});
+	socket.on('unSubscribeList', function (studentList) {
+	    console.log("studentList is", studentList);
+	    async.forEach(studentList,
+			  (studentID, callback) => {
+			      console.log("I am going to unregister ", studentID);
+			      Course.unSubscribeStudent(studentID, socket.course.id, callback);
+			  },
+			  (err, results) => {
+			      socket.filter.courseID = socket.course.id;
+			      User.userListByFilter(socket.filter, (err, results) => {
+				  socket.emit("users", results);
+			      });
+			  });
+	});
+	//		    studentList.forEach((studentID) => {
+	//			Course.registerStudent(studentID, socket.course.id, function(err) {
+	//			    
+	//			}
+	
+	//		    }
+	//		    User.userListByFilter(filter, (err, results) => {
+	//			socket.emit("users", results);
+	//		    });
     });
     
     return io;
+    
 };
 
+		      

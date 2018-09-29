@@ -235,3 +235,7 @@ table input[type=submit]{
 }
 
 
+#wrapper-student-list .selected-for-subscription {
+    border: 3px solid red;
+
+}

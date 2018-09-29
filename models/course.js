@@ -4,7 +4,7 @@ var async = require('async');
 var Question = require("./question");
 
 /***********************************************************************/
-/*       Getters pour les rooms : individu                             */
+/*       Getters pour les cours                                        */
 /***********************************************************************/
 
 // By ID
@@ -23,13 +23,13 @@ exports.getOwnedByID = function(user, courseID, callback) {
 };
 
 /***********************************************************************/
-/*       Getters pour les rooms : listes                               */
+/*       Getters pour les cours : suite                                */
 /***********************************************************************/
 
 // By ID
 
 exports.subscribedCourses = function (user, callback) {
-    query = "SELECT * FROM courses INNER JOIN subscription ON coursID = `courses`.`id` INNER JOIN users ON `courses`.`ownerID` = `users`.`id` WHERE userID = ?";
+    query = "SELECT * FROM courses INNER JOIN subscription ON courseID = `courses`.`id` INNER JOIN users ON `courses`.`ownerID` = `users`.`id` WHERE userID = ?";
     bdd.query(query, [user.id], function(err, rows) {
 	callback(err, rows);
     })
@@ -48,10 +48,30 @@ exports.getByName= function (courseName, callback) {
 }
 
 exports.students = function(user, courseID, callback) {
-    query = "SELECT * FROM subscription INNER JOIN users ON userID= users.id WHERE coursID = ? ORDER BY fullName";
+    query = "SELECT * FROM subscription INNER JOIN users ON userID= users.id WHERE courseID = ? ORDER BY fullName";
     bdd.query(query, [courseID], callback);
-    
 }
+
+
+
+/***********************************************************************/
+/*       Gestion des inscriptions                                      */
+/***********************************************************************/
+
+exports.students = function(user, courseID, callback) {
+    query = "SELECT * FROM subscription INNER JOIN users ON userID= users.id WHERE courseID = ? ORDER BY fullName";
+    bdd.query(query, [courseID], callback);
+}
+
+exports.subscribeStudent = function(studentID, courseID, callback) {
+    query = "INSERT INTO subscription(courseID, userID) VALUES (?,?) ON DUPLICATE KEY UPDATE courseID = courseID";
+    bdd.query(query, [courseID, studentID], (err, res) => {console.log(err, res);callback(err, res)});
+}
+exports.unSubscribeStudent = function(studentID, courseID, callback) {
+    query = "DELETE FROM subscription WHERE courseID = ? AND userID = ?";
+    bdd.query(query, [courseID, studentID], (err, res) => {console.log(err, res);callback(err, res)});
+}
+
 
 /***********************************************************************/
 /*       Gestion CRUD des rooms                                        */

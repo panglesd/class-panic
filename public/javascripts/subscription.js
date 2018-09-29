@@ -1,14 +1,27 @@
 var socket = io.connect(server+'/users');
 
+/*********************************************************************/
+/*                 Actions à effectuer à toute connection            */
+/*********************************************************************/
+
+// On informe le serveur dans quel room on est
+socket.on('connect', () => {
+    socket.emit("chooseCourse", courseID);
+    callSearch();
+});
+
+
 socket.on("users", (list) => {
     console.log(list) ;
     wrap = document.querySelector("#wrapper-student-list");
     ul = document.createElement("ul");
     list.forEach((student) => {
 	li = document.createElement("li");
-	li.textContent = student.fullName+" ("+student.studentNumber+")" + "\
- eleve de "+student.institution+"\\n promotion "+student.promotion+"/"+(student.promotion+1);
+	li.textContent = student.fullName+" ("+student.studentNumber+"), " + "eleve de "+student.institution+", promotion "+student.promotion+"/"+(student.promotion+1);
+	if (student.courseID)
+	    li.style.color="red";
 	li.id = student.id;
+	li.onclick = (event) => {event.target.classList.toggle("selected-for-subscription");};
 	li.classList.add("room");
 	ul.appendChild(li);
     });
@@ -17,6 +30,13 @@ socket.on("users", (list) => {
     
 });
 
+function callSearch() {
+     name = document.querySelector("#name").value;
+     n_etu = document.querySelector("#n_etu").value;
+     promotion = document.querySelector("#promotion").value;
+     institution = document.querySelector("#institution").value;
+     searchStudent(name, n_etu, promotion, institution);
+ }
 function searchStudent(name, n_etu, promotion, institution) {
     search = {
 	name:name,
@@ -27,3 +47,31 @@ function searchStudent(name, n_etu, promotion, institution) {
     socket.emit("getUser", search);
 
 }
+
+function subscribeStudent() {
+    let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
+    let arr = Array.from(l);
+    console.log("arr is", arr);
+    socket.emit("subscribeList", arr.map((e) => { return parseInt(e.id)}));
+    // Prevenir l'utilisateur de l'inscription
+}
+function unSubscribeStudent() {
+    let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
+    let arr = Array.from(l);
+    console.log("arr is", arr);
+    socket.emit("unSubscribeList", arr.map((e) => { return parseInt(e.id)}));
+    // Prevenir l'utilisateur de l'inscription
+}
+
+
+function selectAll() {
+    Array.from(document.querySelectorAll("#wrapper-student-list li")).forEach((li) => {
+	li.classList.add("selected-for-subscription");
+    });
+}
+function unSelectAll() {
+    Array.from(document.querySelectorAll("#wrapper-student-list li")).forEach((li) => {
+	li.classList.remove("selected-for-subscription");
+    });
+}
+    

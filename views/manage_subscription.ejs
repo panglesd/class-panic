@@ -25,7 +25,10 @@
 	</select>
     </p>
     <p>
-	<input type="button" id="searchButton" value="Rechercher">
+	<input type="button" id="selectAll" value="Tout selectionner">
+	<input type="button" id="unSelectAll" value="Tout deselectionner">
+	<input type="button" id="subscribe" value="Inscrire la selection">
+	<input type="button" id="unsubscribe" value="Desinscrire la selection">
     </p>
 </form>
 
@@ -35,6 +38,7 @@
 
 <script>
  var server = "<%= server %>";
+ var courseID = <%= course.id %>;
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/subscription.js"></script>
@@ -47,11 +51,15 @@
      institution = document.querySelector("#institution").value;
      searchStudent(name, n_etu, promotion, institution);
  }
- document.querySelector("#searchButton").addEventListener("click", callSearch);
- document.querySelector("#name").addEventListener("keyup", callSearch);
- document.querySelector("#searchButton").addEventListener("click", callSearch);
- document.querySelector("#searchButton").addEventListener("click", callSearch);
- 
+ document.querySelector("#n_etu").addEventListener("change", callSearch);
+ document.querySelector("#name").addEventListener("input", callSearch);
+ document.querySelector("#promotion").addEventListener("change", callSearch);
+ document.querySelector("#institution").addEventListener("change", callSearch);
+ document.querySelector("#selectAll").addEventListener("click", selectAll);
+ document.querySelector("#unSelectAll").addEventListener("click", unSelectAll);
+ document.querySelector("#subscribe").addEventListener("click", subscribeStudent);
+ document.querySelector("#unsubscribe").addEventListener("click", unSubscribeStudent);
+ callSearch();
 </script>
 
 <%- include('admin_footer'); -%>

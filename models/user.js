@@ -16,12 +16,15 @@ exports.userList = function (callback) {
 }
 
 exports.userListByFilter = function (filter, callback) {
-    query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion FROM users WHERE 1+1 '+
+    console.log("filter is", filter)
+    query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID FROM '+
+	( "users LEFT OUTER JOIN (SELECT * FROM subscription WHERE `courseID` = ? ) subs ON `users`.`id` = `subs`.`userID`")+
+	' WHERE 1=1 '+
 	(filter.name ? " AND fullName LIKE ?" : "") +
 	(filter.n_etu ? " AND studentNumber = ?" : "") +
 	(filter.promotion ? " AND promotion = ?" : "") +
 	(filter.institution ? " AND institution = ?" : "") ;
-    param = []
+    param = [filter.courseID ? filter.courseID : -1]
     if(filter.name)
 	param.push("%"+filter.name+"%");
     if(filter.n_etu)
