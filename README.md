@@ -31,8 +31,9 @@ cp credentials.js.example credentials.js
 emacs credentials.js
 ```
 ### choose configuration
-- Choose port, route and admin password in configuration.js
+- Choose port, route and the password to create admin accounts, in configuration.js:
 ```shell
+cp configuration.js.example configuration.js
 emacs configuration.js
 ```
 
