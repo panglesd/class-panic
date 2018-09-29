@@ -56,13 +56,14 @@ renderCourseManage = function (user, courseID, msgs, res) {
 		    Room.getFromOwnedCourse(user, courseID, callback);
 		},
 		students :  function (callback) {
-		    Course.students(user, courseID, (err, res) => {callback(err, res)});
+		    Course.students(user, courseID, (err, res) => {if(err) console.log(err); callback(err, res)});
 		},
 		setOwnedList :  function (callback) {
 		    Set.setOwnedList(user, callback);
 		}
 	    },
 	    function (err, results) {
+		console.log(results);
 		res.render('manage_course', results);
 	    });
     });

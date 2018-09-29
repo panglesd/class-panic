@@ -59,8 +59,12 @@ exports.students = function(user, courseID, callback) {
 /***********************************************************************/
 
 exports.students = function(user, courseID, callback) {
-    query = "SELECT * FROM subscription INNER JOIN users ON userID= users.id WHERE courseID = ? ORDER BY fullName";
-    bdd.query(query, [courseID], callback);
+    query = "SELECT * FROM subscription INNER JOIN users ON userID = users.id WHERE courseID = ? ORDER BY fullName";
+    console.log(query, courseID);
+    bdd.query(query, [courseID], (err, res) => {
+	console.log('this sql', this.sql);
+	callback(err, res);
+    });
 }
 
 exports.subscribeStudent = function(studentID, courseID, callback) {

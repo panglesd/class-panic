@@ -129,7 +129,7 @@ router.post('/admin/:id', game_controller.room_admin);
 /*         Routes for testing                                */
 /*************************************************************/
 
-router.get('/manage/course/:idCourse/subscribeUser/', course_controller.subscribe_list);
+router.get('/manage/course/:idCourse/subscribeStudent/', course_controller.subscribe_list);
 
 
 module.exports = router;

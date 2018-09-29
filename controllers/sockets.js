@@ -345,6 +345,8 @@ module.exports = function (server, sessionMiddleware) {
 			      Course.subscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
+			      if(!socket.filter)
+				  socket.filter={};
 			      socket.filter.courseID = socket.course.id;
 			      User.userListByFilter(socket.filter, (err, results) => {
 				  socket.emit("users", results);
@@ -359,6 +361,8 @@ module.exports = function (server, sessionMiddleware) {
 			      Course.unSubscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
+			      if(!socket.filter)
+				  socket.filter={};
 			      socket.filter.courseID = socket.course.id;
 			      User.userListByFilter(socket.filter, (err, results) => {
 				  socket.emit("users", results);
