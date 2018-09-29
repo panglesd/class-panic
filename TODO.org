@@ -97,6 +97,8 @@ Au final je n'ai pas utilisé flex
 ** TODO Gérer les statistiques
 Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
 
+** DONE Github key
+
 
 * BUGs
 
