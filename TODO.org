@@ -92,7 +92,8 @@ Au final je n'ai pas utilisé flex
 ** TODO Empecher les noms vides
 ** DONE style css pour souligner dans quelle page nous sommes dans le menu...
    CLOSED: [2018-09-19 mer. 14:31]
-** TODO mettre configuration.js en configuration.js.example et mettre à jour le README en accord avec cela
+** DONE mettre configuration.js en configuration.js.example et mettre à jour le README en accord avec cela
+   CLOSED: [2018-09-29 sam. 12:42]
 ** TODO Gérer les statistiques
 Tout doit être loggé dans une table stats. Affichage des résultats dans la page "mon compte"
 
@@ -137,9 +138,6 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 ** TODO Rajouter la possibilité de poser une question à la volée...
 ** TODO Faire une appli android et Iphone
 ** TODO Créer des rêgles différentes, avec des timers par exemple, des champs de texte...
-** TODO Réfléchir à supprimer de la base de donée la table 'poll' et la coder en dur dans les rooms des sockets. 
-Avantages : moins d'accès à la bdd. Désavantage : pas de possibilités de lancer plusieur instances du serveur nodeJS (ce n'est déja pas possible...)
-
 
 ** TODO Possibilité d'ajouter des images dans une question...
 
