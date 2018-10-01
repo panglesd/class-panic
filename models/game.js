@@ -86,7 +86,7 @@ exports.logStats = function (roomID, callback) {
 		    query = "INSERT INTO `stats`(`userID`, `roomID`, `roomName`, `setID`, `setName`, `correct`, `questionType`, `question`) VALUES (?,?,?,?,?,?,?,?)";
 		    bdd.query(query,[oneStat.id, room.id, JSON.stringify(room), set.id, JSON.stringify(set), oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), /*"fromSet"*/ "set", room.question], (err, res) => {callback(err, res)})
 		}, (err) => {
-		    console.log(err);
+//		    console.log(err);
 		    callback();
 		});
 	    });

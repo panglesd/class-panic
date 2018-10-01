@@ -16,9 +16,9 @@ exports.getByID = function(courseID, callback) {
 
 exports.getOwnedByID = function(user, courseID, callback) {
     query = "SELECT * FROM `courses` WHERE `id` = ? AND `ownerID` = ?";
-    console.log(query, courseID, user.id);
+//    console.log(query, courseID, user.id);
     bdd.query(query, [courseID, user.id], function (err, resu) {
-	console.log(err, resu);
+//	console.log(err, resu);
 	callback(err, resu[0])});
 };
 
@@ -60,20 +60,20 @@ exports.students = function(user, courseID, callback) {
 
 exports.students = function(user, courseID, callback) {
     query = "SELECT * FROM subscription INNER JOIN users ON userID = users.id WHERE courseID = ? ORDER BY fullName";
-    console.log(query, courseID);
+//    console.log(query, courseID);
     bdd.query(query, [courseID], (err, res) => {
-	console.log('this sql', this.sql);
+//	console.log('this sql', this.sql);
 	callback(err, res);
     });
 }
 
 exports.subscribeStudent = function(studentID, courseID, callback) {
     query = "INSERT INTO subscription(courseID, userID) VALUES (?,?) ON DUPLICATE KEY UPDATE courseID = courseID";
-    bdd.query(query, [courseID, studentID], (err, res) => {console.log(err, res);callback(err, res)});
+    bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res)});
 }
 exports.unSubscribeStudent = function(studentID, courseID, callback) {
     query = "DELETE FROM subscription WHERE courseID = ? AND userID = ?";
-    bdd.query(query, [courseID, studentID], (err, res) => {console.log(err, res);callback(err, res)});
+    bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res)});
 }
 
 

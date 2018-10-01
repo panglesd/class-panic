@@ -16,7 +16,7 @@ exports.userList = function (callback) {
 }
 
 exports.userListByFilter = function (filter, callback) {
-    console.log("filter is", filter)
+//    console.log("filter is", filter)
     query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID FROM '+
 	( "users LEFT OUTER JOIN (SELECT * FROM subscription WHERE `courseID` = ? ) subs ON `users`.`id` = `subs`.`userID`")+
 	' WHERE 1=1 '+
@@ -34,8 +34,8 @@ exports.userListByFilter = function (filter, callback) {
     if(filter.institution)
 	param.push(filter.institution);
     bdd.query(query, param, function(err, rows) {
-	console.log(this.sql);
-	console.log(err, rows);
+//	console.log(this.sql);
+//	console.log(err, rows);
 	callback(err, rows);
     });
 }

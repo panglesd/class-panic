@@ -201,7 +201,7 @@ module.exports = function (server, sessionMiddleware) {
 		    game.getStatsFromRoomID(socket.room.id, function (r,e) {
 			io.of("/student").to(socket.room.id).emit("correction", e);
 			room.setStatusForRoomID(socket.room.id, "revealed", function () {});
-			game.getStatsFromOwnedRoomID(/*socket.request.session.user, */socket.room.id, (err, res) => { console.log(res); });
+			game.getStatsFromOwnedRoomID(/*socket.request.session.user, */socket.room.id, (err, res) => { /*console.log(res);*/ });
 			game.logStats(socket.room.id, (err) => {console.log(err);});
 			//				e.forEach((personnalStat) => {
 			//				    console.log(personnalStat);
@@ -329,7 +329,7 @@ module.exports = function (server, sessionMiddleware) {
 	});
 
 	socket.on('getUser', function (filter) {
-	    console.log(filter);
+//	    console.log(filter);
 	    socket.filter = filter;
 	    socket.filter.courseID = socket.course.id;
 	    User.userListByFilter(filter, (err, results) => {
@@ -338,10 +338,10 @@ module.exports = function (server, sessionMiddleware) {
 	});
 	
 	socket.on('subscribeList', function (studentList) {
-	    console.log("studentList is", studentList);
+//	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
-			      console.log("I am going to register ", studentID);
+//			      console.log("I am going to register ", studentID);
 			      Course.subscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
@@ -354,10 +354,10 @@ module.exports = function (server, sessionMiddleware) {
 			  });
 	});
 	socket.on('unSubscribeList', function (studentList) {
-	    console.log("studentList is", studentList);
+//	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
-			      console.log("I am going to unregister ", studentID);
+//			      console.log("I am going to unregister ", studentID);
 			      Course.unSubscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
