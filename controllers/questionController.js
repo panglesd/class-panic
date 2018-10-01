@@ -53,13 +53,13 @@ renderManageQuestion = function(user, questionID, setID, msgs, res) {
 // Pour commencer à créer une question
 
 exports.question_create_get = function(req, res) {
-    renderManageQuestion(req.session.user, undefined, req.params.idSet, [], res);
+    renderManageQuestion(req.session.user, undefined, req.params.idSet, req.msgs, res);
 };
 
 // Pour commencer à modifier une question 
 
 exports.question_update_get = function(req, res) {
-    renderManageQuestion(req.session.user, req.params.id, req.params.idSet, [], res);
+    renderManageQuestion(req.session.user, req.params.id, req.params.idSet, req.msgs, res);
 };
 
 
@@ -73,10 +73,14 @@ exports.question_create_post = function(req, res) {
     Question.questionCreate(req.session.user, req.body, req.params.idSet, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ;
 	req.params.id = req.params.idSet; // HORRIBLE HACK
-	if(err)
-	    SetController.set_manage_msgs(req, res, ["Impossible d'ajouter la question !"]);
-	else
-	    SetController.set_manage_msgs(req, res, ["Question ajoutée !"]);	
+	if(err) {
+	    req.msgs.push("Impossible d'ajouter la question !");
+	    SetController.set_manage_msgs(req, res, req.msgs);
+	}
+	else {
+	    req.msgs.push("Question ajoutée !");
+	    SetController.set_manage_msgs(req, res, req.msgs);
+	}
     });
 };
 
@@ -86,10 +90,14 @@ exports.question_update_post = function(req, res) {
     Question.questionUpdate(req.session.user, req.params, req.body, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
 	req.params.id = req.params.idSet; // HORRIBLE HACK
-	if(err)
-	    SetController.set_manage_msgs(req, res, ["Impossible de mettre à jour la question !"]);
-	else
-	    SetController.set_manage_msgs(req, res, ["Question mise à jour !"]);
+	if(err) {
+	    req.msgs.push("Impossible de mettre à jour la question !");
+	    SetController.set_manage_msgs(req, res, req.msgs);
+	}
+	else {
+	    req.msgs.push("Question mise à jour !");
+	    SetController.set_manage_msgs(req, res, req.msgs);
+	}
     });
 };
 
@@ -99,10 +107,14 @@ exports.question_delete_post = function(req, res) {
     Question.questionDelete(req.session.user, parseInt(req.params.id),  function(err, id) {
 //	console.log(err);
 	req.params.id = req.params.idSet; // HORRIBLE HACK
-	if(err)
-	    SetController.set_manage_msgs(req, res, ["Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !"]);
-	else
-	    SetController.set_manage_msgs(req, res, ["Question supprimée !"]);
-//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
+	if(err) {
+	    req.msgs.push("Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !");
+	    SetController.set_manage_msgs(req, res, req.msgs);
+	}
+	else {
+	    req.msgs.push("Question supprimée !");
+	    SetController.set_manage_msgs(req, res, req.msgs);
+	    //	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
+	}
     });
 };

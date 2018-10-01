@@ -88,37 +88,18 @@ exports.create = function (user, newCourse, callback) {
 	callback(err, rows);
     });
 }
-/*
+
 // Delete
 
-exports.delete = function (user, room, callback) {
-    bdd.query('DELETE FROM `rooms` WHERE `id` = ? AND `ownerID` = ?', [room, user.id], callback)
+exports.delete = function (user, courseID, callback) {
+    bdd.query('DELETE FROM `courses` WHERE `id` = ? AND `ownerID` = ?', [courseID, user.id], callback)
 }
 
 //Update
 
-exports.update = function (user, room, newRoom, callback) {
-    bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ? WHERE `id` = ? AND `ownerID` = ?', [newRoom.name, newRoom.questionSet, room.id, user.id], callback)
-}
-*/
-/***********************************************************************/
-/*       Statuts et appartenance                                       */
-/***********************************************************************/
-/*
-exports.getStatus = function (room, callback) {
-    bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);})
+exports.update = function (user, courseID, newCourse, callback) {
+    bdd.query('UPDATE `courses` SET `name`= ?, `commentaire` = ? WHERE `id` = ? AND `ownerID` = ?', [newCourse.name, newCourse.commentaire, courseID, user.id], callback)
 }
 
-exports.isOwnedBy= function (room, user, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, row) {
-	callback(row[0].ownerID==user.pseudo);
-    });
-}
 
-exports.setStatusForRoomID = function (roomID, status, callback) {
-    bdd.query("UPDATE `rooms` SET `status` = ? WHERE `id` = ?", [status, roomID], function (err, rows) {
-	callback();
-    });
-}
-*/
 module.export = []

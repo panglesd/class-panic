@@ -17,7 +17,7 @@
 
 <h2>Ou la supprimer</h2>
 
-<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="<%= config.PATH %>/manage/room/<%=room.id%>/delete" method="post">
+<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="<%= config.PATH %>/manage/course/<%= room.courseID %>/room/<%=room.id%>/delete" method="post">
     Irréversible : <input type="submit" value="Supprimer la salle <%= room.name%>">
 </form>
 

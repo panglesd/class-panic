@@ -34,12 +34,12 @@ router.use(function (req, res, next) {
    /**********************************************************/
 
 // POST request for deleting a course.
-//router.post('/manage/course/:id/delete', course_controller.course_delete_post);
-//router.get('/manage/room/:id/delete', (req,res) => {res.redirect('../');});
+router.post('/manage/course/:idCourse/delete', course_controller.course_delete_post);
+router.get('/manage/room/:idCourse/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a course.
-//router.post('/manage/course/:id/update', course_controller.course_update_post);
-//router.get('/manage/course/:id/update', (req,res) => {res.redirect('./');});
+router.post('/manage/course/:idCourse/update', course_controller.course_update_post);
+router.get('/manage/course/:idCourse/update', (req,res) => {res.redirect('./');});
 
 // POST request for creating a course.
 router.post('/manage/course/create', course_controller.course_create_post);
@@ -66,7 +66,7 @@ router.get('/manage/course/:idCourse/room/:id/update', (req,res) => {res.redirec
 
 // POST request for creating a room.
 router.post('/manage/course/:idCourse/room/create', room_controller.room_create_post);
-router.get('/manage/course/:idCourse/room/create', (req,res) => {res.redirect('./');});
+router.get('/manage/course/:idCourse/room/create', (req,res) => {res.redirect('../');});
 
 // GET request for managing a particular room.
 router.get('/manage/course/:idCourse/room/:id', room_controller.room_manage);
