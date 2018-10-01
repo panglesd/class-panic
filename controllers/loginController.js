@@ -9,18 +9,12 @@ var config = require("./../configuration");
 // Afficher la page de login
 
 exports.login_get = function(req, res) {
-    if(req.session.user){
-	res.redirect(config.PATH+"/room");
-    }
     res.render('login', {config: config, msgs: req.msgs});
 };
 
 // Afficher la page d'inscription
 
 exports.sign_in_get = function(req, res) {
-    if(req.session.user){
-	res.redirect(config.PATH+"/room");
-    }
     res.render('signin', {config: config, msgs: req.msgs});
 };
 
