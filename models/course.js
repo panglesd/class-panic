@@ -78,26 +78,17 @@ exports.unSubscribeStudent = function(studentID, courseID, callback) {
 
 
 /***********************************************************************/
-/*       Gestion CRUD des rooms                                        */
+/*       Gestion CRUD des courses                                      */
 /***********************************************************************/
-/*
+
 // Create
 
-exports.create = function (user, newRoom, callback) {
-    Question.getFirstOfOwnedSet(user, newRoom.questionSet, function (err, question) {
-	if(err)
-	    callback(err, null)
-	else {
-	    if(question) 
-		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`) VALUES (?, ?, ?, ?, "pending", ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question)], function(err, rows) {
-		    callback(err, rows);
-		});
-	    else 
-		callback(err);
-	}
+exports.create = function (user, newCourse, callback) {
+    bdd.query('INSERT INTO `courses`(`name`, `ownerID`, `commentaire`) VALUES (?, ?, ?)', [newCourse.name, user.id, newCourse.commentaire], function(err, rows) {
+	callback(err, rows);
     });
 }
-
+/*
 // Delete
 
 exports.delete = function (user, room, callback) {

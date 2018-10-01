@@ -159,24 +159,27 @@ exports.subscribe_list = function(req, res) {
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 /*************************************************************/
-/*         Controlleurs POST pour modifier les rooms         */
+/*         Controlleurs POST pour modifier les courses       */
 /*************************************************************/
 
 // Create
 
-exports.room_create_post = function(req, res) {
-    if(req.body.questionSet) {
-	Room.create(req.session.user, req.body, function (err,r) {
+exports.course_create_post = function(req, res) {
+    if(req.body.name) {
+	Course.create(req.session.user, req.body, function (err,r) {
 	    //	    res.redirect(config.PATH+'/manage/room');
 	    //	    console.log(req.body);
-	    if(err)
-		renderManageRooms(req.session.user, ["Impossible de créer la room !"], res);
+	    if(err) {
+		console.log(err);
+		renderManageCourses(req.session.user, ["Impossible de créer le cours !"], res);
+	    }
 	    else
-		renderManageRooms(req.session.user, ["Room  créée !"], res);
+		renderManageCourses(req.session.user, ["Cours  créée !"], res);
+		// Le mieux serait de rediriger avec un message
 	});
     }
     else {
-	renderManageRooms(req.session.user, ["Impossible de créer la room : merci de spécifier un set valide à associer"], res);
+	renderManageCourses(req.session.user, ["Impossible de créer le course, insultez Paul-Elliot pour vous en plaindre"], res);
 //	res.redirect(config.PATH+'/manage/room');
     }
 };

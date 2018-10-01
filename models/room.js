@@ -72,13 +72,13 @@ exports.getByName= function (room, callback) {
 
 // Create
 
-exports.create = function (user, newRoom, callback) {
+exports.create = function (user, newRoom, courseID, callback) {
     Question.getFirstOfOwnedSet(user, newRoom.questionSet, function (err, question) {
 	if(err)
 	    callback(err, null)
 	else {
 	    if(question) 
-		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`) VALUES (?, ?, ?, ?, "pending", ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question)], function(err, rows) {
+		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`) VALUES (?, ?, ?, ?, "pending", ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question), courseID], function(err, rows) {
 		    callback(err, rows);
 		});
 	    else 

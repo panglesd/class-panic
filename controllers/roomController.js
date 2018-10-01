@@ -1,4 +1,5 @@
 var User = require('../models/user');
+var Course = require('../models/course');
 var Room = require('../models/room');
 var Set = require('../models/set');
 var config = require('../configuration');
@@ -48,6 +49,9 @@ renderRoomManage = function (user, roomID, msgs, res) {
 		room :  function (callback) {
 		    callback(null, thisRoom);
 		},
+		course : function(callback) {
+		    Course.getByID(thisRoom.courseID, callback)
+		},
 		msgs : function(callback) {
 		    callback(null, msgs);
 		},
@@ -63,7 +67,7 @@ renderRoomManage = function (user, roomID, msgs, res) {
 
 // Render manage_rooms.ejs
 
-renderManageRooms = function(user, msgs, res) {
+/*renderManageRooms = function(user, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -87,7 +91,7 @@ renderManageRooms = function(user, msgs, res) {
 	function (err, results) {
 	    res.render('manage_rooms', results)
 	});
-};
+};*/
 
 /*************************************************************/
 /*         Controlleurs GET pour les rooms                   */
@@ -102,7 +106,8 @@ exports.room_list = function(req, res) {
 
 // Afficher le détails d'une room pour la modifier
 
-exports.room_manage = function (req, res) {
+exports.room_manage = function (req, res, msg) {
+    console.log(msg);
     renderRoomManage(req.session.user, req.params.id, [], res);
 };
 
@@ -120,8 +125,8 @@ exports.room_manage_all = function(req, res) {
 // Create
 
 exports.room_create_post = function(req, res) {
-    if(req.body.questionSet) {
-	Room.create(req.session.user, req.body, function (err,r) {
+    if(req.body.questionSet) { 
+	Room.create(req.session.user, req.body, parseInt(req.params.idCourse), function (err,r) { // HACK DEGEU
 	    //	    res.redirect(config.PATH+'/manage/room');
 	    //	    console.log(req.body);
 	    if(err)
