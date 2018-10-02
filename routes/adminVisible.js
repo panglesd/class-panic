@@ -51,6 +51,8 @@ router.get('/manage/course/:idCourse', course_controller.course_manage);
 // GET request for the main managing course page.
 router.get('/manage/course', course_controller.course_manage_all);
 
+// GET request for subscribing students to a course.
+router.get('/manage/course/:idCourse/subscribeStudent/', course_controller.subscribe_list);
 
    /**********************************************************/
    /*              Managing rooms                            */
@@ -121,15 +123,14 @@ router.get('/manage/set/:idSet/question/:id/update', question_controller.questio
 /*************************************************************/
 
 // GET request for admining a room.
-router.get('/admin/:id', game_controller.room_admin);
+router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 // POST request for admining a room.
-router.post('/admin/:id', game_controller.room_admin);
+router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 /*************************************************************/
 /*         Routes for testing                                */
 /*************************************************************/
 
-router.get('/manage/course/:idCourse/subscribeStudent/', course_controller.subscribe_list);
 
 
 module.exports = router;

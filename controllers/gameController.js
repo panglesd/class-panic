@@ -1,5 +1,6 @@
 var user = require('../models/user');
 var Room = require('../models/room');
+var Course = require('../models/course');
 var Set = require('../models/set');
 var Question = require('../models/question');
 var async = require('async');
@@ -12,6 +13,9 @@ exports.room_enter = function(req, res) {
 	{
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
+	    },
+	    course: function(callback) {
+		Course.getByID(req.params.idCourse, callback);
 	    },
 	    config : function(callback) { /*console.log(config);*/ callback(null, config) },	
 	    room : function (callback) {

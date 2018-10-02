@@ -34,6 +34,32 @@ renderCourses = function(user, msgs, res) {
 	});
 }
 
+// Render course.ejs
+
+renderCourse = function(user, courseID, msgs, res) {
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
+	    config : function(callback) { callback(null, config) },	
+	    user : function (callback) {
+		callback(null, user);
+	    },
+	    roomList : function(callback) {
+		Room.listOfCourse(courseID, callback);
+	    },
+	    course : function(callback) {
+		Course.getByID(courseID, callback);
+	    },
+	    msgs : function(callback) {
+		callback(null, msgs);
+	    }
+	},
+	function (err, results) {
+//	    console.log(results);
+	    res.render('course', results)
+	});
+}
+
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
@@ -56,7 +82,7 @@ renderCourseManage = function (user, courseID, msgs, res) {
 		    Room.getFromOwnedCourse(user, courseID, callback);
 		},
 		students :  function (callback) {
-		    Course.students(user, courseID, (err, res) => {if(err) /*console.log(err);*/ callback(err, res)});
+		    Course.students(user, courseID, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
 		},
 		setOwnedList :  function (callback) {
 		    Set.setOwnedList(user, callback);
@@ -101,12 +127,19 @@ renderManageCourses = function(user, msgs, res) {
 /*         Controlleurs GET pour les rooms                   */
 /*************************************************************/
 
+// User Space
+
 // Afficher la liste des cours
 
 exports.courses_list = function(req, res) {
     renderCourses(req.session.user, req.msgs, res);
 };
 
+exports.course = function(req, res) {
+    renderCourse(req.session.user, req.params.idCourse, req.msgs, res);
+}
+
+// Admin Space
 
 // Afficher le détails d'une room pour la modifier
 
@@ -119,6 +152,12 @@ exports.course_manage = function (req, res) {
 exports.course_manage_all = function(req, res) {
     renderManageCourses(req.session.user, [], res);
 };
+
+
+
+/*************************************************************/
+/*         Controlleurs GET pour la souscription             */
+/*************************************************************/
 
 exports.subscribe_list = function(req, res) {
     Course.getOwnedByID(req.session.user, req.params.idCourse, function (err, course) {

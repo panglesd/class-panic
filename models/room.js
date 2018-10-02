@@ -47,6 +47,29 @@ exports.list = function (callback) {
 	);
     });
 }
+exports.listOfCourse = function (courseID, callback) {
+    bdd.query('SELECT * FROM rooms WHERE courseID = ?', [courseID], function(err, rows) {
+	if(err) throw err;
+	console.log(this.sql);
+	async.parallel(
+	    rows.map(
+		function (room) {
+		    return function (callback) {
+			bdd.query('SELECT COUNT(*) as number FROM poll WHERE `roomID` = ?', [room.id], function(err, ans) {
+			    bdd.query('SELECT pseudo as owner FROM users WHERE `id` = ?', [room.ownerID], function(err, ans1) {
+				room.number = ans[0].number;
+				room.owner = ans1[0].owner;
+				callback();
+			    });
+			});
+		    };
+		}),
+	    function (err, res) {
+		callback(err, rows);
+	    }
+	);
+    });
+}
 
 exports.ownedList = function (user, callback) {
     bdd.query('SELECT `rooms`.id as id,`rooms`.`name` as name,`id_currentQuestion`, `questionSet`, `rooms`.`ownerID` as ownerID, `status`, `setDeQuestion`.name as nameSet FROM (rooms INNER JOIN setDeQuestion ON `rooms`.questionSet = `setDeQuestion`.`id`) WHERE `rooms`.`ownerID` = ?', [user.id], function(err, rows) {

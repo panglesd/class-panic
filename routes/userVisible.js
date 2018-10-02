@@ -47,7 +47,7 @@ router.get('/course', course_controller.courses_list);
 //router.get('/subscribe', course_controller.courses_subscribe);
 
 // GET request for showing a course.
-//router.get('/course/:id', course_controller.course);
+router.get('/course/:idCourse', course_controller.course);
 
 
 
@@ -56,9 +56,9 @@ router.get('/course', course_controller.courses_list);
 router.post('/room', room_controller.room_list);
 
 // GET request for entering a room.
-router.get('/room/:id', game_controller.room_enter);
+router.get('/course/:idCourse/room/:id', game_controller.room_enter);
 // POST request for entering a room.
-router.post('/room/:id', game_controller.room_enter);
+router.post('/course/:idCourse/room/:id', game_controller.room_enter);
 
 
 module.exports = router;
