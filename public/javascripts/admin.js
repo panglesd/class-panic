@@ -62,6 +62,7 @@ socketAdmin.on('newStats', function (newStats) {
 	else 
 	    stat.response2 = document.querySelector("#r"+stat.response).innerHTML;
 	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+'</span></div>'
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
     });
     document.querySelector("#stats ul").innerHTML = ul.innerHTML;

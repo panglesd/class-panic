@@ -17,7 +17,9 @@ socket.on('connect', () => {
 
 socket.on('newQuestion', function (reponse) {
 //    console.log(reponse);
-    document.querySelector("#question").textContent=reponse.enonce;
+    enonce = document.querySelector("#question");
+    enonce.textContent=reponse.enonce;
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
     wrapper = document.querySelector("#wrapperAnswer");
     while (wrapper.firstChild) {
 	wrapper.removeChild(wrapper.firstChild);
@@ -32,6 +34,7 @@ socket.on('newQuestion', function (reponse) {
 		chooseAnswer(index);
 	    });
 	elem.textContent = rep.reponse;
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	wrapper.appendChild(elem);
     });
 });

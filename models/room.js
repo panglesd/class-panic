@@ -56,7 +56,7 @@ exports.listOfCourse = function (courseID, callback) {
 		function (room) {
 		    return function (callback) {
 			bdd.query('SELECT COUNT(*) as number FROM poll WHERE `roomID` = ?', [room.id], function(err, ans) {
-			    bdd.query('SELECT pseudo as owner FROM users WHERE `id` = ?', [room.ownerID], function(err, ans1) {
+			    bdd.query('SELECT fullName as owner FROM users WHERE `id` = ?', [room.ownerID], function(err, ans1) {
 				room.number = ans[0].number;
 				room.owner = ans1[0].owner;
 				callback();
