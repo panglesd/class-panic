@@ -17,14 +17,22 @@
 	    </a>
 	</li>
     <% });%>
-    <li class="room">
-	<span class="froom">Créer un nouveau set</span>
-	<div>
-	<form id="formNewSet" action="<%= config.PATH %>/manage/set/create" method="post">
-	    <input placeholder="Nom du set" name="name">
-	</form>
-	    <ul> <li> <span style="cursor:pointer" onclick="document.querySelector('#formNewSet').submit()">Créer</span> </li> </ul>
-	</div>
-    </li>
+    <a class="room" onclick="document.querySelector('#win').classList.toggle('shown');window.scrollTo(0,0)">
+	<li style="cursor:pointer; text-align:center;" class="room">
+	    <span class="froom">+</span>
+	</li>
+    </a>
 </ul>
+<div class="window" id="win">
+    <h2> Créer un nouveau cours</h2>
+    <form action="<%= config.PATH %>/manage/set/create" method="post" id="formNewSet">
+	<p>
+	    <input type='text' name="name" placeholder='Nom du nouveau set'>
+	</p>
+	<p>
+	    <input type='submit' value='Créer le set'>
+	    <input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'>
+	</p>
+    </form>
+</div>
 <%- include('admin_footer'); -%>
