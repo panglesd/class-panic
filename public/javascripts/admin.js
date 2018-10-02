@@ -2,6 +2,7 @@
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketAdmin = io.connect(server+'/admin');
 var isAdmin = true;
+var currentQuestionOf;
 
 /*********************************************************************/
 /*                 Actions à effectuer à toute connection            */
@@ -49,7 +50,6 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketAdmin.on('newStats', function (newStats) {
-    console.log(newStats);
     ul = document.createElement("ul")
     ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
@@ -60,7 +60,7 @@ socketAdmin.on('newStats', function (newStats) {
 	if(stat.response == -1)
 	    stat.response2 = "?";
 	else 
-	    stat.response2 = document.querySelector("#r"+stat.response).innerHTML;
+	    stat.response2 = currentQuestionOf.reponses[stat.response].reponse;
 	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+'</span></div>'
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
@@ -71,9 +71,9 @@ socketAdmin.on('newStats', function (newStats) {
 /*********************************************************************/
 /*                 lorsque l'on reçoit une nouvelle question (admin) */
 /*********************************************************************/
-
 socketAdmin.on('newQuestion', function (reponse) {
-//    console.log("fromAdminnewQuestion", reponse);
+    console.log("fromAdminnewQuestion", reponse);
+    currentQuestionOf=reponse;
     if(temp=document.querySelector("li.inactiveQuestion")) {
 	if(reponse.id)
 	    temp.classList.remove("inactiveQuestion")
@@ -94,7 +94,8 @@ socketAdmin.on('newQuestion', function (reponse) {
 	document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
 	document.querySelector("#customQuestion").onclick = backToSetQuestion;
     }*/
-    document.querySelector("#question").contentEditable = false;
+    document.querySelector("#question").contentEditable = "false";
+    socketAdmin.emit("sendStatsPlease");
 });
 
 /*********************************************************************/
@@ -104,7 +105,7 @@ socketAdmin.on('newQuestion', function (reponse) {
 backToSetQuestion = function (event) {
     document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
     document.querySelector("#customQuestion").onclick = customQuestion;
-//    document.querySelector("#question").contentEditable = false;
+    document.querySelector("#question").contentEditable = false;
     sendOwnedQuestionPlease();
 //    socketAdmin.emit("backToSet");
 }
@@ -154,3 +155,42 @@ customQuestion = function(event) {
     document.querySelector("#customQuestion").onclick = backToSetQuestion;
     
 }
+
+
+function removeTypeset(elem) {
+    var HTML = MathJax.HTML, jax = MathJax.Hub.getAllJax(elem);
+    for (var i = 0, m = jax.length; i < m; i++) {
+	var script = jax[i].SourceElement(), tex = jax[i].originalText;
+	if (script.type.match(/display/)) {tex = "\\["+tex+"\\]"} else {tex = "\\("+tex+"\\)"}
+	jax[i].Remove();
+	var preview = script.previousSibling;
+	if (preview && preview.className === "MathJax_Preview") {
+	    preview.parentNode.removeChild(preview);
+	}
+	preview = document.createTextNode(tex);
+	script.parentNode.insertBefore(preview,script);
+	script.parentNode.removeChild(script);
+    }
+}
+
+function modifyQuestion() {
+    if(document.querySelector("#question").contentEditable=="false") {
+	question = document.querySelector("#question");
+	question.contentEditable=true;
+	MathJax.Hub.Queue(() => {removeTypeset(question)});
+	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse) => {
+	    MathJax.Hub.Queue(() => {removeTypeset(reponse)});
+	});
+	MathJax.Hub.Queue(() => {
+	    document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse) => {
+		console.log(reponse);
+		reponse.innerHTML = "<span contentEditable='true'>"+reponse.innerHTML +"</span>";
+		reponse.innerHTML+="<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button>"
+	    });
+	    document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+	    document.querySelector("#customQuestion").onclick = backToSetQuestion;
+	    document.querySelector("#wrapperAnswer").innerHTML+="<div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
+	});
+    }
+}
+

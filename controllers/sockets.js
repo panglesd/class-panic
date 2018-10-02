@@ -186,7 +186,7 @@ module.exports = function (server, sessionMiddleware) {
 		socket.room = res;
 		socket.join(socket.room.id);
 		sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
-		sendOwnedStats(socket.room);
+//		sendOwnedStats(socket.room);
 	    });
 	});
 	
@@ -242,6 +242,15 @@ module.exports = function (server, sessionMiddleware) {
 	socket.on('sendQuestionPlease', function () {
 	    //		    console.log(socket.room);
 	    sendRoomOwnedQuestion(socket.request.session.user, socket, function() {});
+	});
+	
+	/******************************************/
+	/*  Un admin me demande les stats         */
+	/******************************************/
+	
+	socket.on('sendStatsPlease', function () {
+	    //		    console.log(socket.room);
+	    sendOwnedStats(socket.room)
 	});
 	
 	/******************************************/
