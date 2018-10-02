@@ -75,11 +75,11 @@ exports.question_create_post = function(req, res) {
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
 	    req.msgs.push("Impossible d'ajouter la question !");
-	    SetController.set_manage_msgs(req, res, req.msgs);
+	    SetController.set_manage(req, res);
 	}
 	else {
 	    req.msgs.push("Question ajoutée !");
-	    SetController.set_manage_msgs(req, res, req.msgs);
+	    SetController.set_manage(req, res);
 	}
     });
 };
@@ -92,11 +92,11 @@ exports.question_update_post = function(req, res) {
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
 	    req.msgs.push("Impossible de mettre à jour la question !");
-	    SetController.set_manage_msgs(req, res, req.msgs);
+	    SetController.set_manage(req, res);
 	}
 	else {
 	    req.msgs.push("Question mise à jour !");
-	    SetController.set_manage_msgs(req, res, req.msgs);
+	    SetController.set_manage(req, res);
 	}
     });
 };
@@ -109,11 +109,11 @@ exports.question_delete_post = function(req, res) {
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
 	    req.msgs.push("Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !");
-	    SetController.set_manage_msgs(req, res, req.msgs);
+	    SetController.set_manage(req, res);
 	}
 	else {
 	    req.msgs.push("Question supprimée !");
-	    SetController.set_manage_msgs(req, res, req.msgs);
+	    SetController.set_manage(req, res);
 	    //	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
 	}
     });
