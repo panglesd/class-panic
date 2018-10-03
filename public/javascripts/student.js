@@ -1,6 +1,41 @@
 //var socket = io.connect('http://192.168.0.12:3000/');
 var socket = io.connect(server+"/student");
 //var socket = io.connect('http://localhost:3000/');
+var currentQuestionOfStudent;
+var md = new markdownit({
+    html:         false,        // Enable HTML tags in source
+    xhtmlOut:     false,        // Use '/' to close single tags (<br />)
+    breaks:       false,        // Convert '\n' in paragraphs into <br>
+    langPrefix:   'language-',  // CSS language prefix for fenced blocks
+    linkify:      true,         // autoconvert URL-like texts to links
+    linkTarget:   '',           // set target to open link in
+    
+    // Enable some language-neutral replacements + quotes beautification
+    typographer:  false,
+    
+    // Double + single quotes replacement pairs, when typographer enabled,
+    // and smartquotes on. Set doubles to '«»' for Russian, '„“' for German.
+    quotes: '“”‘’',
+    
+    // Highlighter function. Should return escaped HTML,
+    // or '' if input not changed
+    highlight: function (str, lang) {
+	if (lang && hljs.getLanguage(lang)) {
+	    try {
+		return hljs.highlight(lang, str).value;
+	    } catch (__) {}
+	}
+	
+	try {
+	    return hljs.highlightAuto(str).value;
+	} catch (__) {}
+	
+	return ''; // use external default escaping
+    }
+});
+
+md.use(markdownitMathjax());
+
 
 /*********************************************************************/
 /*                 Actions à effectuer à toute connection            */
@@ -16,7 +51,8 @@ socket.on('connect', () => {
 /*********************************************************************/
 
 socket.on('newQuestion', function (reponse) {
-//    console.log(reponse);
+    //    console.log(reponse);
+    currentQuestionOfStudent=reponse;
     enonce = document.querySelector("#question");
     enonce.textContent=reponse.enonce;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
@@ -37,6 +73,13 @@ socket.on('newQuestion', function (reponse) {
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	wrapper.appendChild(elem);
     });
+    descr = document.querySelector("#description");
+    if(reponse.description)
+	descr.style.visibility="visible";
+    else
+	descr.style.visibility="hidden";
+    descr.innerHTML = md.render(reponse.description);
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
 });
 
 /*********************************************************************/

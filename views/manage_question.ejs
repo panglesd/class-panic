@@ -6,12 +6,26 @@
     <ul class="room" id="listeQue">
 	<li class="room">
 	    <span class="froom">Énoncé :</span>
-	    <textarea name="enonce" style="width:100%;height:200px;"><%= question.enonce %></textarea>
+	    <textarea name="enonce" style="width:100%;height:50px;" placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\)"><%= question.enonce %></textarea>
+	</li>
+	<li class="room">
+	    <label>
+		<span class="froom">Description plus détaillée :</span><br>
+		<textarea name="description" style="width:100%;height:200px;" placeholder="Ceci sera interpreté comme du markdown. Par exemple, il est possible de mettre du code en utilisant:
+
+```ocaml
+ let id = fun a -> a in 
+   id id
+```
+
+Utiliser $...$ pour mettre des maths.
+"><%= question.description %></textarea>
+	    </label>
 	</li>
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
 		<span class="froom"> Réponse <%= i %> :</span>
-		<textarea class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
+		<textarea placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\)" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
 		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
 	    </li>
 	    <% i++;
@@ -37,7 +51,7 @@
      c=document.querySelector("#ajoutrep");
      d = document.querySelectorAll(".reponse");
      n=d.length;
-     b.innerHTML="<span class=\"froom\"> Réponse "+(n)+" :</span><textarea class=\"nreponse\" name=\""+n+"\" id=\""+n+"\" style=\"width:100%\"></textarea><div><ul><li style=\"display:inline-block; margin-left:20px;\"><a class=\"room\" onclick=\"removeElement(this)\">Enlever cette réponse</a></li><li style=\"display:inline-block; margin-left:20px;\" onclick=\"setTrue(this)\">Choisir comme réponse correcte</li></ul></div>";
+     b.innerHTML="<span class=\"froom\"> Réponse "+(n)+" :</span><textarea placeholder=\"Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\)\" class=\"nreponse\" name=\""+n+"\" id=\""+n+"\" style=\"width:100%\"></textarea><div><ul><li style=\"display:inline-block; margin-left:20px;\"><a class=\"room\" onclick=\"removeElement(this)\">Enlever cette réponse</a></li><li style=\"display:inline-block; margin-left:20px;\" onclick=\"setTrue(this)\">Choisir comme réponse correcte</li></ul></div>";
 //     b.style="background-color:rgba(75,0,0,0.5)";
      b.classList.add("reponse");
      a.insertBefore(b,c);

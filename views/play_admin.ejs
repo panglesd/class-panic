@@ -7,14 +7,45 @@
     <link rel="stylesheet" href="/stylesheets/play_student.css">
     <link rel="stylesheet" href="/stylesheets/play_admin.css">
     <script type="text/javascript" async
-	    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+	    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js">
+      MathJax.Hub.Config({
+      jax: ["input/TeX","input/MathML","input/AsciiMath","output/CommonHTML"],
+      extensions: ["tex2jax.js","mml2jax.js","asciimath2jax.js","MathMenu.js","MathZoom.js","AssistiveMML.js", "a11y/accessibility-menu.js"],
+      TeX: {
+      extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+      },
+      tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+      }
+      });
+          
     </script>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.2/markdown-it.js"></script>
+    <script src="/javascripts/markdown-it-mathjax.js"></script>
+    <script src="/javascripts/highlight.pack.js"></script>
+    
+    <link rel="stylesheet" href="/stylesheets/highlight/atelier-forest-dark.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap-lessed.css">
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/bootstrap/3.2.0/css/bootstrap.css"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/8.4.2/markdown-it.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://highlightjs.org/static/demo/styles/default.css"> 
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/highlight.js/9.1.0/styles/github.min.css">
+    -->
+
+    
   </head>
   <body>
       <div id="answerContainer">
 	<div id="question" onclick="chooseAnswer(-1)"></div>
+	<div id="description">
+	</div>
 	<div id="wrapperAnswer">
-	</div> 
+	</div>
 	  <div id="leave"><a href="<%= config.PATH %>/manage/course/<%= room.courseID %>">Quitter la salle</a></div>
       </div>
       <div id="controlPanel">

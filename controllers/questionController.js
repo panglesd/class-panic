@@ -32,6 +32,7 @@ renderManageQuestion = function(user, questionID, setID, msgs, res) {
 				     reponse: "",
 				     validity: false
 				 }],
+				 correct:0,
 				 enonce: ""
 			     })
 	    },
