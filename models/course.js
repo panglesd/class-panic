@@ -31,6 +31,7 @@ exports.getOwnedByID = function(user, courseID, callback) {
 exports.subscribedCourses = function (user, callback) {
     query = "SELECT * FROM courses INNER JOIN subscription ON courseID = `courses`.`id` INNER JOIN users ON `courses`.`ownerID` = `users`.`id` WHERE userID = ?";
     bdd.query(query, [user.id], function(err, rows) {
+	console.log(rows);
 	callback(err, rows);
     })
 }

@@ -3,7 +3,7 @@
 <h2>Mes cours :</h2>
 <ul class="room">
   <% courseList.forEach(function(course) { %>
-  <a class="room" href="<%= config.PATH %>/course/<%= course.id %>">
+  <a class="room" href="<%= config.PATH %>/course/<%= course.courseID %>">
     <li class="room">
       <span class="froom"><%= course.name %></span>
       <ul>
