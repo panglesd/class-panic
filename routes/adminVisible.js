@@ -8,6 +8,7 @@ var question_controller = require('../controllers/questionController');
 var game_controller = require('../controllers/gameController');
 var login_controller = require('../controllers/loginController');
 var course_controller = require('../controllers/courseController');
+var stats_controller = require('../controllers/statsController');
 
 var config = require("../configuration");
 
@@ -22,8 +23,6 @@ router.use(function (req, res, next) {
 	res.redirect(config.PATH);
     }
 });
-
-
 
 /*************************************************************/
 /*         Routes for managing                               */
@@ -131,6 +130,6 @@ router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
 /*         Routes for testing                                */
 /*************************************************************/
 
-
+router.get('/manage/course/stats/user/:userID', stats_controller.stats);
 
 module.exports = router;
