@@ -25,7 +25,7 @@ exports.getOwnedByID = function(user, roomID, callback) {
 
 // By ID
 
-exports.list = function (callback) {
+/*exports.list = function (callback) {
     bdd.query('SELECT * FROM rooms', function(err, rows) {
 	if(err) throw err;
 	async.parallel(
@@ -46,11 +46,11 @@ exports.list = function (callback) {
 	    }
 	);
     });
-}
+}*/
 exports.listOfCourse = function (courseID, callback) {
     bdd.query('SELECT * FROM rooms WHERE courseID = ?', [courseID], function(err, rows) {
 	if(err) throw err;
-	console.log(this.sql);
+//	console.log(this.sql);
 	async.parallel(
 	    rows.map(
 		function (room) {

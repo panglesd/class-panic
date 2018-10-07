@@ -78,7 +78,10 @@ socket.on('newQuestion', function (reponse) {
 	descr.style.visibility="visible";
     else
 	descr.style.visibility="hidden";
-    descr.innerHTML = md.render(reponse.description);
+    if(reponse.description)
+	descr.innerHTML = md.render(reponse.description);
+    else
+	descr.innerHTML = reponse.description;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
 });
 

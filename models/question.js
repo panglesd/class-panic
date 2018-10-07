@@ -11,6 +11,12 @@ exports.questionList = function (callback) {
     bdd.query("SELECT * FROM `questions`", callback);
 }
 
+// List of all owned questions
+
+exports.ownedList = function (user, callback) {
+    bdd.query("SELECT * FROM `questions` WHERE owner = ?", [user.id], (err, res) => {callback(err,res)});
+}
+
 // List by set ID
 
 exports.listBySetID = function (setID, callback) {

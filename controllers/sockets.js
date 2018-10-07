@@ -1,4 +1,5 @@
 var user = require('../models/user');
+var Stats = require('../models/stats');
 var room = require('../models/room');
 var Course = require('../models/course');
 var set = require('../models/set');
@@ -202,7 +203,7 @@ module.exports = function (server, sessionMiddleware) {
 			io.of("/student").to(socket.room.id).emit("correction", e);
 			room.setStatusForRoomID(socket.room.id, "revealed", function () {});
 			game.getStatsFromOwnedRoomID(/*socket.request.session.user, */socket.room.id, (err, res) => { /*console.log(res);*/ });
-			game.logStats(socket.room.id, (err) => {console.log(err);});
+			Stats.logStats(socket.room.id, (err) => {console.log(err);});
 			//				e.forEach((personnalStat) => {
 			//				    console.log(personnalStat);
 			//				});
@@ -387,6 +388,32 @@ module.exports = function (server, sessionMiddleware) {
 	//		    User.userListByFilter(filter, (err, results) => {
 	//			socket.emit("users", results);
 	//		    });
+    });
+
+    /**************************************************************************/
+    /*                 Fonction pour les statistiques                         */
+    /**************************************************************************/
+    
+    io.of('/stats').on('connection', function(socket) {
+	
+	/******************************************/
+	/*  Middleware de socket                  */
+	/******************************************/
+	
+ 	//rien
+
+	/******************************************/
+	/*  Fonction getStats                     */
+	/******************************************/
+
+	// !!!!!!!!! A voir si ça n'est pas mieux de faire ça côté client !
+	
+	socket.on("stats", function(filter) {
+	    //	    console.log(socket.request.session);
+	    Stats.getStats(socket.request.session.user, filter, function (err, res) {
+		socket.emit("newStats", filter, res);
+	    });
+	});
     });
     
     return io;

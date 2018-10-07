@@ -75,28 +75,6 @@ exports.getStatsFromOwnedRoomID = function (roomID, callback) {
 }
 
 /***********************************************************************/
-/*       Logger les statistiques d'une room                            */
-/***********************************************************************/
-
-exports.logStats = function (roomID, callback) {
-    exports.getStatsFromOwnedRoomID(roomID, (err, stats) => {
-	Room.getByID(roomID, (err, room) => {
-	    Set.setGet(room.questionSet, (err, set) => {
-		async.forEach(stats.namedStats, (oneStat, callback) => {
-		    query = "INSERT INTO `stats`(`userID`, `roomID`, `roomName`, `setID`, `setName`, `correct`, `questionType`, `question`) VALUES (?,?,?,?,?,?,?,?)";
-		    bdd.query(query,[oneStat.id, room.id, JSON.stringify(room), set.id, JSON.stringify(set), oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), /*"fromSet"*/ "set", room.question], (err, res) => {callback(err, res)})
-		}, (err) => {
-//		    console.log(err);
-		    callback();
-		});
-	    });
-	});
-    });
-    
-			  
-}
-
-/***********************************************************************/
 /*       Passer à la question suivante d'une room                      */
 /***********************************************************************/
 

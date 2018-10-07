@@ -130,6 +130,6 @@ router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
 /*         Routes for testing                                */
 /*************************************************************/
 
-router.get('/manage/course/stats/user/:userID', stats_controller.stats);
+router.get('/manage/stats/', stats_controller.stats);
 
 module.exports = router;
