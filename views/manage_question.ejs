@@ -26,7 +26,7 @@ Utiliser $...$ pour mettre des maths.
 	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
 		<span class="froom"> Réponse <%= i %> :</span>
 		<textarea placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\)" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
-		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
+		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li><li>Ajouter un champs texte</li></ul></div>
 	    </li>
 	    <% i++;
 	    }); %>
