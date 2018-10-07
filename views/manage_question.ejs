@@ -6,7 +6,7 @@
     <ul class="room" id="listeQue">
 	<li class="room">
 	    <span class="froom">Énoncé :</span>
-	    <textarea name="enonce" style="width:100%;height:50px;" placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\)"><%= question.enonce %></textarea>
+	    <textarea name="enonce" style="width:100%;height:50px;" placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"><%= question.enonce %></textarea>
 	</li>
 	<li class="room">
 	    <label>
@@ -25,7 +25,7 @@ Utiliser $...$ pour mettre des maths.
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
 		<span class="froom"> Réponse <%= i %> :</span>
-		<textarea placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\)" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
+		<textarea placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
 		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li><li>Ajouter un champs texte</li></ul></div>
 	    </li>
 	    <% i++;
