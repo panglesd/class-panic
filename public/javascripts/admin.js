@@ -51,6 +51,7 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketAdmin.on('newStats', function (newStats) {
+    console.log(newStats);
     ul = document.createElement("ul")
     ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
@@ -62,7 +63,7 @@ socketAdmin.on('newStats', function (newStats) {
 	    stat.response2 = "?";
 	else 
 	    stat.response2 = currentQuestionOfAdmin.reponses[stat.response].reponse;
-	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+'</span></div>'
+	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+' '+stat.responseText+'</span></div>'
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
     });
@@ -116,7 +117,9 @@ addReponse = function (event) {
     n = document.createElement("div");
     n.classList.add("reponse");
     n.classList.add("notSelected");
-    n.innerHTML = "<span contenteditable=\"true\">Réponse éditable</span><button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
+    n.innerHTML = "<span contenteditable=\"true\">Réponse éditable</span>"
+    n.innerHTML+="<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
+    n.innerHTML += "<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
     document.querySelector("#plus").parentNode.insertBefore(n,document.querySelector("#plus"));
 }
 
@@ -129,7 +132,11 @@ sendReponse = function() {
     newQuestion.reponses = [];
     i=0;
     document.querySelectorAll("#wrapperAnswer div span").forEach(function(span) {
-	newQuestion.reponses.push({reponse:span.textContent, validity:false});
+	newQuestion.reponses.push({
+	    reponse:span.textContent,
+	    validity:false,
+	    texted: span.nextSibling.value == "true" ? true : false
+	});
 	if(span.parentNode.classList.contains("juste"))
 	    newQuestion.correct = i;
 	i++;
@@ -153,43 +160,40 @@ chooseAsCorrect = function (elem) {
 customQuestion = function(event) {
     document.querySelector("#question").contentEditable = true;//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
     document.querySelector("#question").innerHTML = "Question éditable";//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
-    document.querySelector("#wrapperAnswer").innerHTML = "<div class=\"reponse notSelected juste\" id=\"r0\"><span contentEditable=\"true\">Réponse éditable</span> <button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
+    innerHTML = "<div class=\"reponse notSelected juste\" id=\"r0\"><span contentEditable=\"true\">Réponse éditable</span>"
+    innerHTML += "<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
+    document.querySelector("#wrapperAnswer").innerHTML = innerHTML + "<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
     document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
     document.querySelector("#customQuestion").onclick = backToSetQuestion;
-    
+    document.querySelector("#description").innerHTML="<textarea id='newDescr' style='width:100%;height:200px'></textarea>";
 }
 
-
-/*function removeTypeset(elem) {
-    var HTML = MathJax.HTML, jax = MathJax.Hub.getAllJax(elem);
-    for (var i = 0, m = jax.length; i < m; i++) {
-	var script = jax[i].SourceElement(), tex = jax[i].originalText;
-	if (script.type.match(/display/)) {tex = "\\["+tex+"\\]"} else {tex = "\\("+tex+"\\)"}
-	jax[i].Remove();
-	var preview = script.previousSibling;
-	if (preview && preview.className === "MathJax_Preview") {
-	    preview.parentNode.removeChild(preview);
-	}
-	preview = document.createTextNode(tex);
-	script.parentNode.insertBefore(preview,script);
-	script.parentNode.removeChild(script);
-    }
+function addTextarea(elem) {
+    elem.value = elem.value == "false" ? "true" : "false";
+    elem.classList.toggle("texted");
+    console.log("elem.textContent", elem.textContent);
+    if(elem.textContent=="Ajouter un textarea")
+	elem.textContent="Enlever le textarea";
+    else
+	elem.textContent="Ajouter un textarea"
 }
-*/
+
 function modifyQuestion() {
     if(document.querySelector("#question").contentEditable=="false") {
 	question = document.querySelector("#question");
 	question.contentEditable=true;
-//	MathJax.Hub.Queue(() => {removeTypeset(question)});
 	question.textContent=currentQuestionOfAdmin.enonce;
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse,index) => {
-	    //	    MathJax.Hub.Queue(() => {removeTypeset(reponse)});
 	    reponse.textContent = currentQuestionOfAdmin.reponses[index].reponse;
+	    reponse.innerHTML = "<span contentEditable='true'>"+reponse.innerHTML +"</span>";
+	    if(currentQuestionOfAdmin.reponses[index].texted)
+		reponse.innerHTML+="<button value=\"true\" class=\"texted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
+	    else
+		reponse.innerHTML+="<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
+	    reponse.innerHTML+="<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button>"
 	});
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse) => {
 	    console.log(reponse);
-	    reponse.innerHTML = "<span contentEditable='true'>"+reponse.innerHTML +"</span>";
-	    reponse.innerHTML+="<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button>"
 	});
 	descr = document.querySelector("#description");
 	descr.style.visibility="visible";

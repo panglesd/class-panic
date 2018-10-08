@@ -30,9 +30,9 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 	    if(room.status=="pending") {
 		bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
 		    if(answ[0].count>0) 
-			bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?", [newAnswer, room.id, user.pseudo], callback);
+			bdd.query("UPDATE `poll` SET `response`= ?, `responseText` = ? WHERE `roomID`= ? AND `pseudo`= ?", [newAnswer.n, newAnswer.text, room.id, user.pseudo], callback);
 		    else {
-			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)", [user.pseudo, newAnswer, room.id], callback);
+			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`responseText`,`roomID`) VALUES (?, ?, ?, ?)", [user.pseudo, newAnswer.n, newAnswer.text, room.id], callback);
 		    }
 		});
 	    }
@@ -65,7 +65,7 @@ exports.getStatsFromOwnedRoomID = function (roomID, callback) {
     async.parallel(
 	{
 	    namedStats : function (callback) {
-		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {/*console.log(row);*/ callback(err, row)});
+		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`, `poll`.`responseText`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {/*console.log(row);*/ callback(err, row)});
 	    },
 	    correctAnswer : function (callback) {
 		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});

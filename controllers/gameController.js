@@ -46,7 +46,7 @@ exports.room_admin = function(req, res) {
 		Question.listByRoomID(req.params.id, function (e,b) {callback(e,b)});
 	    },
 	    roomList : function (callback) {
-		Room.list(callback);
+		Room.listOfCourse(req.params.idCourse, callback);
 	    },
 	    roomOwnedList :  function (callback) {
 		Room.ownedList(req.session.user, function (r) { callback(null, r) });

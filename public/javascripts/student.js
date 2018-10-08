@@ -50,8 +50,10 @@ socket.on('connect', () => {
 /*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
+var sem = false;
+
 socket.on('newQuestion', function (reponse) {
-    //    console.log(reponse);
+    console.log(reponse);
     currentQuestionOfStudent=reponse;
     enonce = document.querySelector("#question");
     enonce.textContent=reponse.enonce;
@@ -67,9 +69,19 @@ socket.on('newQuestion', function (reponse) {
 	elem.id = "r"+index;
 	if(typeof isAdmin == "undefined")
 	    elem.addEventListener("click", function (ev) {
-		chooseAnswer(index);
+		chooseAnswer(index, event.currentTarget);
 	    });
 	elem.textContent = rep.reponse;
+	if(rep.texted) {
+	    textarea = document.createElement("textarea");
+	    textarea.style.width="100%"
+	    textarea.style.display="block"
+	    textarea.addEventListener("input", (ev) => {
+		console.log("updateed");
+		chooseAnswer(index, event.currentTarget.parentNode);
+	    });
+	    elem.appendChild(textarea);
+	}
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	wrapper.appendChild(elem);
     });
@@ -93,7 +105,8 @@ socket.on('correction', function (correction) {
 //    console.log(correction);
     document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
     //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
-    document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
+    if(document.querySelector("#r"+correction.correctAnswer))
+	document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
     var total = 0;
     correction.anonStats.forEach(function (v) { total += v.count });
     total=Math.max(total,1);
@@ -123,12 +136,16 @@ for(var vari=0;vari<reponses.length;vari++) {
     reponses[vari].addEventListener("click",chooseAnswer);
 };
 
-function chooseAnswer(i) {
-    socket.emit("chosenAnswer", i);
-    var reponses=document.querySelectorAll(".reponse");
-    reponses.forEach(function (rep) {
-	rep.classList.replace('selected', 'notSelected');
-    });
+function chooseAnswer(i, elem) {
+    answer = {};
+    answer.n = i;
+    textarea =  elem.querySelector("textarea")
+    answer.text = textarea ? textarea.value : "";
+    socket.emit("chosenAnswer", answer);
+    var reponse=document.querySelector(".reponse.selected");
+    if(reponse) {
+	reponse.classList.replace('selected', 'notSelected');
+    };
     if(i>-1) {
 	a = document.querySelector("#r"+i);
 	a.classList.replace("notSelected", "selected");

@@ -71,7 +71,23 @@ exports.question_update_get = function(req, res) {
 // Create
 
 exports.question_create_post = function(req, res) {
-    Question.questionCreate(req.session.user, req.body, req.params.idSet, function(err, info) {
+    question = {
+	enonce : req.body.enonce,
+	correct : req.body.correct,
+	description : req.body.description
+    }
+    reponse = [];
+    i=0;
+    while(req.body[i]) {
+	reponse[i]= {
+	    reponse: req.body[i] ,
+	    validity: false,
+	    texted:req.body["text-"+i]=="true" ? true : false
+	};
+	i++;
+    }
+
+    Question.questionCreate(req.session.user, question, reponse, req.params.idSet, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ;
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
@@ -88,7 +104,25 @@ exports.question_create_post = function(req, res) {
 // Update
 
 exports.question_update_post = function(req, res) {
-    Question.questionUpdate(req.session.user, req.params, req.body, function(err, info) {
+    question = {
+	enonce : req.body.enonce,
+	correct : req.body.correct,
+	description : req.body.description
+    }
+    i=0
+    reponse = [];
+    while(req.body[i]) {
+	reponse[i]= {
+	    reponse: req.body[i] ,
+	    validity: false,
+	    texted:req.body["text-"+i]=="true" ? true : false
+	};
+	i++;
+    }
+    console.log("req.body", req.body);
+    console.log("question", question);
+    console.log("reponse", reponse);
+    Question.questionUpdate(req.session.user, parseInt(req.params.id), question, reponse, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
