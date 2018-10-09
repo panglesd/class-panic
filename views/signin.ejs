@@ -21,16 +21,36 @@
 	  <form method="post" action="<%= config.PATH %>/user/create">
 	    <table>
 	      <tr>
-		<td>Pseudo :</td><td><input type="text" name="pseudo"></td>
+		<td>Pseudo :</td><td><input  placeholder="Pseudo" type="text" name="pseudo"></td>
 	      </tr>
 	      <tr>
-		<td>Password :</td><td><input type="password" name="password"></td>
+		<td>Password :</td><td><input  placeholder="Password" type="password" name="password"></td>
 	      </tr>
 	      <tr>
-		<td>Nom complet :</td><td><input type="text" name="nomComplet"></td>
+		<td>Nom complet :</td><td><input placeholder="Nom complet" type="text" name="nomComplet"></td>
 	      </tr>
 	      <tr>
-		<td>Email :</td><td><input type="text" name="email"></td>
+		<td>Email :</td><td><input placeholder="Email" type="email" name="email"></td>
+	      </tr>
+	      <tr>
+		<td>Numéro d'étudiant :</td><td><input placeholder="Numéro d'étudiant" type="text" name="n_etu"></td>
+	      </tr>
+	      <tr>
+		  <td>Promotion :</td>
+		  <td>
+		      <select name="promotion" id="promotion">
+			  <option value="2018">2018/2019</option>
+		      </select>
+		  </td>
+	      </tr>
+	      <tr>
+		  <td>Institution :</td>
+		  <td>
+		      <select name="institution" id="institution">
+			  <option value="IUT">IUT sénard</option>
+			  <option value="FAC">FAC de Créteil</option>
+		      </select>
+		  </td>
 	      </tr>
 	      <tr>
 		<td>Mot de passe pour être admin :</td><td><input type="password" name="adminPassword"></td>

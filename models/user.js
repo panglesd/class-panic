@@ -59,8 +59,9 @@ exports.userByID = function (userID, callback) {
 
 exports.create = function (user, callback) {
     bcrypt.hash(user.password, saltRounds, function(err, hash) {
-	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`) VALUES (?, ?, ?, ?, ?)', [user.pseudo, hash, user.email, user.nomComplet, user.adminPassword == config.ADMINPASSWD ], function(err, rows) {
-//	    console.log(rows);
+	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`, `promotion`, `studentNumber`, `institution`) VALUES (?, ?, ?, ?, ?,?,?,?)', [user.pseudo, hash, user.email, user.nomComplet, user.adminPassword == config.ADMINPASSWD, user.promotion, user.n_etu, user.institution ], function(err, rows) {
+	    //	    console.log(rows);
+	    console.log(err);
 	    callback(err,rows);
 	});
     });
