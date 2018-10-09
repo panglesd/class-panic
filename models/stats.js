@@ -10,6 +10,8 @@ exports. getStats = function (user, filter, callback) {
 	', correct' +
 	', courseID' +
 	', customQuestion' +
+	', response' +
+	', responseText' +
 	', email' +
 	', fullName' +
 	', institution' +
@@ -76,8 +78,9 @@ exports.logStats = function (roomID,  callback) {
 	    Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		async.forEach(stats.namedStats, (oneStat, callback) => {
 		    console.log("blocID2", blocID);
-		    query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `responseText`) VALUES (?,?,?,?)";
-		    bdd.query(query,[oneStat.id, oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), blocID, oneStat.responseText], (err, res) => {callback(err, res)})
+		    console.log("oneStat", oneStat);
+		    query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `responseText`) VALUES (?,?,?,?,?)";
+		    bdd.query(query,[oneStat.id, oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), blocID, oneStat.response, oneStat.responseText], (err, res) => {callback(err, res)})
 		}, (err) => {
 		    console.log(err);
 		    callback();

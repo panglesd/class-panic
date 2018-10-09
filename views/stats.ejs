@@ -123,6 +123,10 @@
      wrapper.innerHTML = "<table>";
      res.forEach((data) => {
 	 data.enonce = JSON.parse(data.customQuestion).enonce
+	 if(data.response>-1)
+	     data.responseText = JSON.parse(data.customQuestion).reponses[data.response].reponse + " " + data.responseText
+	 else
+	     data.responseText = "Non répondu"
      });
      /*
      res.forEach((data) => {
@@ -144,6 +148,8 @@
 	 columns:[ //Define Table Columns
 		   {title:"Eleve", field:"fullName"},
 		   {title:"Enonce", field:"enonce"},
+//		   {title:"Réponse", field:"responseText"},
+		   {title:"Réponse perso", field:"responseText"},
 		   {title:"Justesse", field:"correct"},
 		   {title:"Instance de Question", field:"blocID"},
 		   {title:"Question", field:"questionID"},
