@@ -119,9 +119,6 @@ exports.question_update_post = function(req, res) {
 	};
 	i++;
     }
-    console.log("req.body", req.body);
-    console.log("question", question);
-    console.log("reponse", reponse);
     Question.questionUpdate(req.session.user, parseInt(req.params.id), question, reponse, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
 	req.params.id = req.params.idSet; // HORRIBLE HACK

@@ -37,7 +37,7 @@ exports.stats = (req, res) => {
 	    }
 	},
 	function (err, results) {
-	    console.log(results);
+//	    console.log(results);
 	    res.render('stats', results)
 	});
 }

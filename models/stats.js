@@ -54,7 +54,8 @@ exports. getStats = function (user, filter, callback) {
 
     bdd.query(query, param, function(err, rows) {
 //	console.log(this.sql);
-	console.log(err, rows);
+//	console.log(err, rows);
+	console.log(err);
 	callback(err, rows);
     });
 
@@ -70,15 +71,11 @@ exports.logStats = function (roomID,  callback) {
 	query = "INSERT INTO `statsBloc`(`setID`, `roomID`, `questionID`, `courseID`, `customQuestion`) VALUES (?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
 	params = [        room.questionSet , roomID ,  room.id_currentQuestion, room.courseID, room.question ];
 	bdd.query(query, params, (err, res) => {
-	    console.log(err, res);
+	    console.log(err);
+//	    console.log(err, res);
 	    blocID = res[1][0].blocID;
-	    console.log(res[0]);
-	    console.log(res[1]);
-	    console.log("blocID1", blocID);
 	    Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		async.forEach(stats.namedStats, (oneStat, callback) => {
-		    console.log("blocID2", blocID);
-		    console.log("oneStat", oneStat);
 		    query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `responseText`) VALUES (?,?,?,?,?)";
 		    bdd.query(query,[oneStat.id, oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), blocID, oneStat.response, oneStat.responseText], (err, res) => {callback(err, res)})
 		}, (err) => {

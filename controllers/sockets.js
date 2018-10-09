@@ -135,7 +135,7 @@ module.exports = function (server, sessionMiddleware) {
 	/******************************************/
 	
 	socket.on('chosenAnswer', function (answer) {
-	    console.log(answer);
+//	    console.log(answer);
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		sendOwnedStats(socket.room)
 	    });
