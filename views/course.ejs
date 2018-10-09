@@ -3,7 +3,7 @@
 <h2>Se connecter à une scéance de question :</h2>
 <ul class="room">
   <% roomList.forEach(function(room) { %>
-  <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/room/<%= room.id %>">
+  <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%= subscription.isTDMan ? "admin" : "room"%>/<%= room.id %>">
     <li class="room">
       <span class="froom"><%= room.name %></span>
       <ul>

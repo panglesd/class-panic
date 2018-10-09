@@ -36,6 +36,14 @@ exports.subscribedCourses = function (user, callback) {
     })
 }
 
+exports.getSubscription = function (user, courseID, callback) {
+    query = "SELECT * FROM courses INNER JOIN subscription ON courseID = `courses`.`id` INNER JOIN users ON `courses`.`ownerID` = `users`.`id` WHERE userID = ? AND courseID = ?";
+    bdd.query(query, [user.id, courseID], function(err, rows) {
+//	console.log(rows);
+	callback(err, rows[0]);
+    })
+}
+
 exports.ownedList = function (user, callback) {
     bdd.query('SELECT * FROM courses WHERE `ownerID` = ?', [user.id], function(err, rows) {
 	callback(err, rows);

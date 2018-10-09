@@ -50,6 +50,9 @@ renderCourse = function(user, courseID, msgs, res) {
 	    course : function(callback) {
 		Course.getByID(courseID, callback);
 	    },
+	    subscription: function(callback) {
+		Course.getSubscription(user, courseID, callback);
+	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
 	    }
