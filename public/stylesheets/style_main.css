@@ -41,7 +41,9 @@ html {
 /*    color:white;*/
     color:rgb(220,220,220);
 }
-
+h1 {
+    border-bottom: aliceblue 1px solid;
+}
 h1, h2 {
 /*    color:white;*/
     font-size:1.5em;
@@ -101,7 +103,7 @@ li.reponse.true {
 
 .go {
     height:30px;;
-margin:5px;
+    margin:5px;
 }
 h1 {
     font-size: 7em;
@@ -118,9 +120,10 @@ a {
 
 body {
     text-align:center;
-    margin-left: 10%;
-    margin-right:10%;
-/*    border:solid 1px red;*/
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 0%;
+    /*    border:solid 1px red;*/
 }
 table, td {
     margin:10px;
@@ -138,7 +141,7 @@ table {
     width: 100%;
     text-align: left;
     border-collapse: collapse;
-margin:5px;
+    margin:5px;
 }
 
 /*table td, table th {
@@ -155,8 +158,8 @@ table tfoot .links {
     text-align: right;
 }
 #main_wrapper {
-        background-color:rgba(0, 0, 0, 0.5);
-
+    background-color:rgba(0, 0, 0, 0.5);
+    padding:1px;
     
 }
 
@@ -189,18 +192,21 @@ td {
 
 nav ul li {
     display: inline-block;
-    background-color:rgba(0, 0, 0, 0.5);
-    padding-left: 5%;
-    padding-right: 5%;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    border: 1px solid rgba(0,0,0,0.5);    
+    background-color:rgba(55,63,44, 0.5);
+    padding-left: 3%;
+    padding-right: 3%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+/*    border: 1px solid rgba(0,0,0,0.5);*/
+    border : 1px dashed rgba(123,124,88,1);
+    border-radius:3px;
 }
 
 nav ul li:hover {
     border: 1px solid rgba(255,255,255,0.5);    
 }
 nav ul li.selected {
+    background-color:rgba(55,63,99, 0.5);
     border: 1px solid rgb(123,124,12);
     color: rgb(123,124,12);
     font-weight: bold;
@@ -261,3 +267,6 @@ table input[type=submit]{
 }
 
 
+p {
+    margin:5px;
+}
