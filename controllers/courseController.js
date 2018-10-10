@@ -13,7 +13,7 @@ var async = require('async');
 
 // Render courses.ejs
 
-renderCourses = function(user, msgs, res) {
+renderCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -36,7 +36,7 @@ renderCourses = function(user, msgs, res) {
 
 // Render course.ejs
 
-renderCourse = function(user, course, msgs, res) {
+renderCourse = function(user, course, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -46,6 +46,9 @@ renderCourse = function(user, course, msgs, res) {
 	    },
 	    roomList : function(callback) {
 		Room.listOfCourse(courseID, callback);
+	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
 	    },
 	    course : function(callback) {
 		callback(null, course);
@@ -63,7 +66,7 @@ renderCourse = function(user, course, msgs, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderCourseManage = function (user, course, msgs, res) {
+renderCourseManage = function (user, course, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Administrer "+course.name)},
@@ -76,6 +79,9 @@ renderCourseManage = function (user, course, msgs, res) {
 	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
+	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
 	    },
 	    roomOwnedList :  function (callback) {
 		Room.getFromOwnedCourse(user, course.id, callback);
@@ -92,7 +98,7 @@ renderCourseManage = function (user, course, msgs, res) {
 
 // Render manage_courses.ejs
 
-renderManageCourses = function(user, msgs, res) {
+renderManageCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -127,11 +133,11 @@ renderManageCourses = function(user, msgs, res) {
 // Afficher la liste des cours
 
 exports.courses_list = function(req, res) {
-    renderCourses(req.session.user, req.msgs, res);
+    renderCourses(req.session.user, req.msgs, req, res);
 };
 
 exports.course = function(req, res) {
-    renderCourse(req.session.user, req.course, req.msgs, res);
+    renderCourse(req.session.user, req.course, req.msgs, req, res);
 }
 
 // Admin Space
@@ -139,13 +145,13 @@ exports.course = function(req, res) {
 // Afficher le détails d'une room pour la modifier
 
 exports.course_manage = function (req, res) {
-    renderCourseManage(req.session.user, req.course, req.msgs, res);
+    renderCourseManage(req.session.user, req.course, req.msgs, req, res);
 };
 
 // Afficher la liste des rooms afin de les manager
 
 exports.course_manage_all = function(req, res) {
-    renderManageCourses(req.session.user, req.msgs, res);
+    renderManageCourses(req.session.user, req.msgs, req, res);
 };
 
 
@@ -196,15 +202,15 @@ exports.course_create_post = function(req, res) {
 	    //	    console.log(req.body);
 	    if(err) {
 //		console.log(err);
-		renderManageCourses(req.session.user, ["Impossible de créer le cours !"], res);
+		renderManageCourses(req.session.user, ["Impossible de créer le cours !"], req, res);
 	    }
 	    else
-		renderManageCourses(req.session.user, ["Cours  créée !"], res);
+		renderManageCourses(req.session.user, ["Cours  créée !"], req, res);
 		// Le mieux serait de rediriger avec un message
 	});
     }
     else {
-	renderManageCourses(req.session.user, ["Impossible de créer le course, insultez Paul-Elliot pour vous en plaindre"], res);
+	renderManageCourses(req.session.user, ["Impossible de créer le course, insultez Paul-Elliot pour vous en plaindre"], req, res);
 //	res.redirect(config.PATH+'/manage/room');
     }
 };
