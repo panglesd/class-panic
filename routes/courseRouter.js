@@ -74,7 +74,7 @@ router.get('/:courseID', course_controller.course_manage);
 // GET request for subscribing students to a course.
 router.get('/:courseID/subscription/', course_controller.subscribe_list);
 
-router.get('/manage/course/:idCourse/stats/', stats_controller.stats);
+router.get('/:courseID/stats/', stats_controller.stats);
 
 /*************************************************************/
 /*          Rooms                                            */

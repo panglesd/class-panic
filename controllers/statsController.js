@@ -21,7 +21,7 @@ exports.stats = (req, res) => {
 		callback(null, req.msgs);
 	    },
 	    course : function(callback) {
-		Course.getByID(req.params.idCourse, callback)
+		callback(null, req.course);
 	    },
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
