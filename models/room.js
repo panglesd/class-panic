@@ -96,7 +96,7 @@ exports.getByName= function (room, callback) {
 // Create
 
 exports.create = function (user, newRoom, courseID, callback) {
-    Question.getFirstOfOwnedSet(user, newRoom.questionSet, function (err, question) {
+    Question.getFirstOfSet(newRoom.questionSet, function (err, question) {
 	if(err) {
 	    console.log(err);
 	    callback(err, null)

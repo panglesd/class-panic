@@ -83,6 +83,20 @@ exports.getFirstOfOwnedSet = function (user, setID, callback) {
     });
 }
 
+exports.getFirstOfSet = function (setID, callback) {
+    bdd.query('SELECT * from `questions` WHERE indexSet = 0 AND class = ?', [setID], function (err, rows) {
+	if(err)
+	    callback(err, null)
+	else if (rows.length == 0)
+	    callback("Set associé vide");
+	else {
+	    q = rows[0];
+	    q.reponses = JSON.parse(q.reponses);
+	    callback(err, q);
+	}
+    });
+}
+
 /***********************************************************************/
 /*       Gestion CRUD des questions                                    */
 /***********************************************************************/

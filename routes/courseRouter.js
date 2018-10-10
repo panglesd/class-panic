@@ -25,6 +25,12 @@ var setRouter = require('./setRouter');
 
 
 
+router.use('/create', function (req, res, next) {
+    if(req.session.user.isAdmin)
+	next();
+    else
+	res.redirect(config.PATH);
+});
 // POST request for creating a course.
 router.post('/create', course_controller.course_create_post);
 router.get('/create', (req,res) => {res.redirect('./');});
@@ -37,19 +43,27 @@ router.get('/', course_controller.course_manage_all);
 /*************************************************************/
 
 router.use('/:courseID/', function (req, res, next) {
-    if(req.params.courseID) {
-	Course.getByID(parseInt(req.params.courseID), (err, course) => {
-	    if(!err) {
-		req.course = course;
-		next();
-	    }
-	    else {
-		res.redirect(config.PATH);
-	    }
-	});
-    }
-    else
-	next();
+    Course.getByID(parseInt(req.params.courseID), (err, course) => {
+	console.log(parseInt(req.params.courseID));
+	if(!err) {
+	    User.getSubscription(req.session.user, course, (err, subscription) => {
+		if(subscription) {
+		    req.subscription = subscription;
+		    req.course = course;
+		    console.log(subscription)
+		    if(req.subscription.isTDMan)
+			next();
+		    else
+			res.redirect(config.PATH);
+		}
+		else
+		    res.redirect(config.PATH);
+	    });
+	}
+	else {
+	    res.redirect(config.PATH);
+	}
+    });
 });
 
 router.get('/:courseID/log', (req, res) => {console.log(req.course)})
@@ -60,10 +74,22 @@ router.get('/:courseID/log', (req, res) => {console.log(req.course)})
    /**********************************************************/
 
 // POST request for deleting a course.
+/*router.use('/:courseID/delete', function (req, res, next) {
+    if(req.session.user.isAdmin)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/:courseID/delete', course_controller.course_delete_post);
 router.get('/:courseID/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a course.
+/*router.use('/:courseID/update', function (req, res, next) {
+    if(req.subscription.canCourseUpdate)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/:courseID/update', course_controller.course_update_post);
 router.get('/:courseID/update', (req,res) => {res.redirect('./');});
 
@@ -71,6 +97,12 @@ router.get('/:courseID/update', (req,res) => {res.redirect('./');});
 router.get('/:courseID', course_controller.course_manage);
 
 
+/*router.use('/:courseID/subscription', function (req, res, next) {
+    if(req.subscription.canCourseSubscribe)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 // GET request for subscribing students to a course.
 router.get('/:courseID/subscription/', course_controller.subscribe_list);
 

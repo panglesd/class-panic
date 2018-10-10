@@ -21,6 +21,12 @@ var async = require('async');
 
 var questionRouter = require('./questionRouter');
 
+/*router.use('/create', function (req, res, next) {
+    if(req.subscription.canSetCreate)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 // POST request for creating a set.
 router.post('/create', set_controller.set_create_post);
 router.get('/create', (req,res) => {res.redirect('./');});
@@ -54,11 +60,23 @@ router.get('/:setID/log', (req, res) => {console.log(req.set)})
    /*              Managing sets of questions                */
    /**********************************************************/
 
+/*router.use('/:setID/delete', function (req, res, next) {
+    if(req.subscription.canSetDelete)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 // POST request for deleting a set.
 router.post('/:setID/delete', set_controller.set_delete_post);
 router.get('/:setID/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a set.
+/*router.use('/:setID/update', function (req, res, next) {
+    if(req.subscription.canSetUpdate)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/:setID/update', set_controller.set_update_post);
 router.get('/:setID/update', (req,res) => {res.redirect('./');});
 

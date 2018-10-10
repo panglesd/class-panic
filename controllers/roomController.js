@@ -90,6 +90,7 @@ renderManageRooms = function(user, course, msgs, res) {
 	    }
 	},
 	function (err, results) {
+	    console.log(results);
 	    res.render('manage_rooms', results)
 	});
 };
@@ -126,57 +127,80 @@ exports.room_manage_all = function(req, res) {
 // Create
 
 exports.room_create_post = function(req, res) {
-    if(req.body.questionSet) { 
-	Room.create(req.session.user, req.body, req.course.id, function (err,r) { // HACK DEGEU
-	    //	    res.redirect(config.PATH+'/manage/room');
-	    //	    console.log(req.body);
-	    if(err) {
-		req.msgs.push("Impossible de créer la room !");
-		courseController.course_manage(req,res);
-	    }
-	    else {
-		req.msgs.push("Room  créée !");
-		courseController.course_manage(req,res);
-	    }
-	});
+    if(req.subscription.canRoomCreate) {
+	if(req.body.questionSet) { 
+	    Room.create(req.session.user, req.body, req.course.id, function (err,r) { // HACK DEGEU
+		//	    res.redirect(config.PATH+'/manage/room');
+		//	    console.log(req.body);
+		if(err) {
+		    console.log("err is", err)
+		    req.msgs.push("Impossible de créer la room !");
+		    courseController.course_manage(req,res);
+		}
+		else {
+		    req.msgs.push("Room  créée !");
+		    courseController.course_manage(req,res);
+		}
+	    });
+	}
+	else {
+	    req.msgs.push("Impossible de créer la room : merci de spécifier un set valide à associer");
+	    renderManageRooms(req.session.user, req.course, req.msgs, res);
+	    //	res.redirect(config.PATH+'/manage/room');
+	}
     }
     else {
-	renderManageRooms(req.session.user, ["Impossible de créer la room : merci de spécifier un set valide à associer"], res);
-//	res.redirect(config.PATH+'/manage/room');
+	req.msgs.push("Vous n'avez pas la permission de créer une room");
+	renderManageRooms(req.session.user, req.course, req.msgs, res);
+	//	res.redirect(config.PATH+'/manage/room');
     }
 };
 
 //Delete
 
 exports.room_delete_post = function(req, res) {
-    Room.delete(req.session.user, req.room.id, function (err, info) {
-	if(err) {
-	    req.msgs.push("Impossible de supprimer la room");
-	    courseController.course_manage(req,res);
-	}
-	else {
-	    req.msgs.push("Room supprimée");
-	    courseController.course_manage(req,res);
-	    //	res.redirect(config.PATH+"/manage/room");
-	}
-    });
+    if(req.subscription.canRoomDelete) {
+	Room.delete(req.session.user, req.room.id, function (err, info) {
+	    if(err) {
+		req.msgs.push("Impossible de supprimer la room");
+		courseController.course_manage(req,res);
+	    }
+	    else {
+		req.msgs.push("Room supprimée");
+		courseController.course_manage(req,res);
+		//	res.redirect(config.PATH+"/manage/room");
+	    }
+	});
+    }
+    else {
+	req.msgs.push("Vous n'avez pas les droits pour supprimer la room");
+	courseController.course_manage(req,res);
+	//	res.redirect(config.PATH+'/manage/room');
+    }
 };
 
 //Update
 
 exports.room_update_post = function(req, res) {
-    Room.update(req.session.user, req.room, req.body, function (err, id) {
-	if(err) {
-	    req.msgs.push("Impossible de modifier la room");
-	    renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
-	}
-	else {
-	    req.msgs.push("Room updaté");
-	    Room.getByID(req.room.id, (err, roomUpdated) => {
-		req.room=roomUpdated;
+    if(req.subscription.canRoomUpdate) {
+	Room.update(req.session.user, req.room, req.body, function (err, id) {
+	    if(err) {
+		req.msgs.push("Impossible de modifier la room");
 		renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
-	    });
-	    //	res.redirect(config.PATH+'/manage/room/');
-	}
-    });
+	    }
+	    else {
+		req.msgs.push("Room updaté");
+		Room.getByID(req.room.id, (err, roomUpdated) => {
+		    req.room=roomUpdated;
+		    renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+		});
+		//	res.redirect(config.PATH+'/manage/room/');
+	    }
+	});
+    }
+    else {
+	req.msgs.push("Vous n'avez pas le droit de modifier la room");
+	renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+	//	res.redirect(config.PATH+'/manage/room');
+    }
 };

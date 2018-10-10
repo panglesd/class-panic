@@ -14,7 +14,7 @@ exports.setList = function (callback) {
 }
 
 exports.setOwnedList = function (user, courseID, callback) {
-    bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ? AND `courseID` = ?', [user.id, courseID], function(err, rows) {
+    bdd.query('SELECT * FROM setDeQuestion WHERE `courseID` = ?', [courseID], function(err, rows) {
 	callback(err, rows);
     });
 }

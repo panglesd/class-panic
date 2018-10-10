@@ -57,10 +57,14 @@ router.get('/course/:idCourse', course_controller.course);
 // POST request for showing room list.
 router.post('/room', room_controller.room_list);
 
+
+
 // GET request for entering a room.
+router.use('/course/:idCourse/room/:id', (req, res, next) => {
+    
+});
 router.get('/course/:idCourse/room/:id', game_controller.room_enter);
-// POST request for entering a room.
-router.post('/course/:idCourse/room/:id', game_controller.room_enter);
+
 
 
 

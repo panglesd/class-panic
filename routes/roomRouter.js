@@ -23,6 +23,12 @@ var questionRouter = require('./questionRouter');
 
 
 // POST request for creating a room.
+/*router.use('/create', function (req, res, next) {
+    if(req.subscription.canRoomCreate)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/create', room_controller.room_create_post);
 router.get('/create', (req,res) => {res.redirect('../');});
 
@@ -38,7 +44,10 @@ router.use('/:roomID', function (req, res, next) {
 	Room.getByID(req.params.roomID, (err, room) => {
 	    if(!err) {
 		req.room = room;
-		next();
+		if(room.courseID!=req.course.id)
+		    res.redirect(config.PATH);
+		else
+		    next();
 	    }
 	    else {
 		res.redirect(config.PATH);
@@ -51,10 +60,22 @@ router.use('/:roomID', function (req, res, next) {
 
 
 // POST request for deleting a room.
+/*router.use('/:roomID/delete', function (req, res, next) {
+    if(req.subscription.canRoomDelete)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/:roomID/delete', room_controller.room_delete_post);
 router.get('/:roomID/delete', (req,res) => {res.redirect('../');});
 
 // POST request for modifying a room.
+/*router.use('/:roomID/update', function (req, res, next) {
+    if(req.subscription.canRoomUpdate)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/:roomID/update', room_controller.room_update_post);
 router.get('/:roomID/update', (req,res) => {res.redirect('./');});
 

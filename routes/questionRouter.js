@@ -20,6 +20,12 @@ var config = require('../configuration');
 var async = require('async');
 
 // POST request for creating a question.
+router.use('/create', function (req, res, next) {
+    if(req.subscription.canSetUpdate)
+	next();
+    else
+	res.redirect(config.PATH);
+});
 router.get('/create', question_controller.question_create_get);
 router.post('/create', question_controller.question_create_post);
 
@@ -48,6 +54,12 @@ router.use('/:questionID/', function (req, res, next) {
    /**********************************************************/
 
 // POST request for deleting a question.
+/*router.use('/:questionID/delete', function (req, res, next) {
+    if(req.subscription.canSetUpdate)
+	next();
+    else
+	res.redirect(config.PATH);
+});*/
 router.post('/:questionID/delete', question_controller.question_delete_post);
 router.get('/:questionID/delete', (req,res) => {res.redirect('../');});
 
@@ -56,6 +68,12 @@ router.get('/:questionID/', question_controller.question_update_get);
 router.post('/:questionID/', question_controller.question_update_post);
 
 // POST request for modifying a question.
+router.use('/:questionID/update', function (req, res, next) {
+    if(req.subscription.canSetUpdate)
+	next();
+    else
+	res.redirect(config.PATH);
+});
 router.post('/:questionID/update', question_controller.question_update_post);
 router.get('/:questionID/update', question_controller.question_update_get);
 

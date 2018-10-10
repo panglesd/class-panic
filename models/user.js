@@ -101,4 +101,79 @@ exports.userCheck = function(user, passwd, callback) {
 	      });
 };
 
+/***********************************************************************/
+/*       Verification pour la sécurité                                 */
+/***********************************************************************/
+/*
+exports.canEnterRoom = function(user, room, callback) {
+    query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ?"
+    bdd.query(query, [user.id, room.courseID], function (err, res) {
+	if(res) 
+	    callback(err, res[0] ? true : false)
+    });
+}
+
+exports.canAdminRoom = function(user, room, callback) {
+    query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ? AND isTDMan=1"
+    bdd.query(query, [user.id, room.courseID], function (err, res) {
+	if(res) 
+	    callback(err, res[0] ? true : false)
+    });
+}
+
+exports.canSeeCourse = function(user, course, callback) {
+    query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ? AND isTDMan=1"
+    bdd.query(query, [user.id, course.id], function (err, res) {
+	if(res) 
+	    callback(err, res[0] ? true : false)
+    });
+}
+
+exports.canCreateRoom = function(user, room, callback) {
+    query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ? AND isTDMan=1 AND roomCreator=1"
+    bdd.query(query, [user.id, room.id], function (err, res) {
+	if(res) 
+	    callback(err, res[0] ? true : false)
+    });
+}
+*/
+exports.getSubscription = function(user, course, callback) {
+    if(user.id == course.ownerID) {
+	callback(null, {
+	    userID:user.id,
+	    courseID:course.id,
+	    isTDMan:1,
+	    canRoomUpdate:1,
+	    canRoomCreate:1,
+	    canRoomDelete:1,
+	    canSetUpdate:1,
+	    canSetCreate:1,
+	    canSetDelete:1,
+	    canSubscribe:1
+	});
+    }
+    else {
+	query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ?";
+	bdd.query(query, [user.id, course.id], function (err, res) {
+	    if(res)
+		callback(err, res[0]);
+	    else
+		callback(err, null);
+	});
+    }
+}
+
+/*exports.canDo = function(user, filter, callback) {
+    query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ? ";
+    params = {
+    if(filter.tdman) {
+	query += " AND isTDMan=1"
+    }
+    if(filter.roomCreatorAND roomCreator=1"
+    bdd.query(query, [user.id, room.id], function (err, res) {
+	if(res) 
+	    callback(err, res[0] ? true : false)
+    });
+}*/
+
 module.export = []
