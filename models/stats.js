@@ -3,7 +3,7 @@ var Game = require("./game");
 var async = require('async');
 
 
-exports. getStats = function (user, filter, callback) {
+exports. getStats = function (filter, callback) {
 
     query = 'SELECT `stats`.id ' +
 	', blocID' +
@@ -24,13 +24,13 @@ exports. getStats = function (user, filter, callback) {
 	', studentNumber' +
 	', time' +
 	', userID' +
-	' FROM `stats` INNER JOIN `statsBloc` ON `stats`.`blocID` = `statsBloc`.`id` INNER JOIN  `users` ON `users`.id = `stats`.userID WHERE `roomID` IN (SELECT id FROM `rooms` WHERE ownerID = ?) ';
+	' FROM `stats` INNER JOIN `statsBloc` ON `stats`.`blocID` = `statsBloc`.`id` INNER JOIN  `users` ON `users`.id = `stats`.userID WHERE `roomID` IN (SELECT id FROM `rooms` WHERE 1=1) ';
     
-    param = [user.id]
-    if(filter.courseID) {
-	query += " AND `roomID` IN (SELECT id FROM `rooms` WHERE courseID = ?) ";
-	param.push(filter.courseID);
-    }
+    param = []
+    //    if(filter.courseID) {
+    query += " AND `roomID` IN (SELECT id FROM `rooms` WHERE courseID = ?) ";
+    param.push(filter.courseID);
+    //    }
     if(filter.studentID) {
 	query += " AND `userID` = ? ";
 	param.push(filter.studentID);

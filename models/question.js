@@ -42,6 +42,12 @@ exports.listOwnedByRoomID = function (user, id, callback) {
     });
 }
 
+exports.listByCourseID = function (courseID, callback) {
+    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ", [courseID], function(err, qList) {
+	callback(err, qList);
+    });
+}
+
 /***********************************************************************/
 /*       Getters pour les question : individus                         */
 /***********************************************************************/

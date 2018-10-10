@@ -1,75 +1,76 @@
 <%- include('admin_header', {active:"stats"}); -%>
-
-<link href="https://unpkg.com/tabulator-tables@4.0.4/dist/css/tabulator.min.css" rel="stylesheet">
-<script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.0.4/dist/js/tabulator.min.js"></script>
-<style>
-</style>
-<h2> Statistiques </h2>
-<form id="statsForm">
-    <fieldset>
-	<p>
-	    <label>
-		Numéro d'étudiant : <br/>
-		<input id="studentNumber" name="studentNumber" type="text"/>
-	    </label>
-	</p>
-	<p>
-	    <label>
-		Nom : <br/>
-		<input id="studentName" name="studentName" type="text"/>
-	    </label>
-	</p>
-	<p>
-	    Cours :<br/>
-	    <select  id="courseID" name="courseID">
-		<option value ="">Tous les cours</option>
-		<% courseOwnedList.forEach(function(course2) { %>
-		<option <%= course.id == course2.id ? "selected" : "" %> value="<%=course2.id%>"><%= course2.name %></option>
+<% if(subscription.isTDMan) { %>
+    <link href="https://unpkg.com/tabulator-tables@4.0.4/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.0.4/dist/js/tabulator.min.js"></script>
+    <style>
+    </style>
+    <h2> Statistiques </h2>
+    <form id="statsForm">
+	<fieldset>
+	    <p>
+		<label>
+		    Numéro d'étudiant : <br/>
+		    <input id="studentNumber" name="studentNumber" type="text"/>
+		</label>
+	    </p>
+	    <p>
+		<label>
+		    Nom : <br/>
+		    <input id="studentName" name="studentName" type="text"/>
+		</label>
+	    </p>
+	    <p>
+		<!--		Cours :<br/> -->
+		<!-- <select  id="courseID" name="courseID">  -->
+		<!--		    <option selected value="<%= course.id %>"><%=course.name %></option> -->
+		<% courseSubscribedList.forEach(function(course2) { %> 
+		    <!-- <option <%= course.courseID == course2.id ? "selected" : "" %> value="<%=course2.id%>"><%= course2.name %></option> -->
 		<% }); %>
-	    </select>
-	</p>
-	<p>
-	    Salle :<br/>
-	    <select  id="roomID" name="roomID">
-		<option value ="">Toutes les salles</option>
-		<% roomOwnedList.forEach(function(room) { %>
-		<option value="<%=room.id%>"><%= room.name %></option>
-		<% }); %>
-	    </select>
-	</p>
-	<p>
-	    Set :<br/>
-	    <select  id="setID" name="setID">
-		<option value ="">Tous les sets</option>
-		<% setOwnedList.forEach(function(sett) { %>
-		<option value="<%= sett.id%>"><%= sett.name %></option>
-		<% }); %>
-	    </select><br/>
-	</p>
-	<p>
-	    Question :<br/>
-	    <select id="questionID" name="questionID">
-		<option value ="">Toutes les questions</option>
-		<% questionOwnedList.forEach(function(question) { %>
-		<option value="<%= question.id%>"><%= question.enonce %></option>
-		<% }); %>
-	    </select><br/>
-	</p>
-	<p>
-	    Survenu entre <input name="dateBegin" id="dateBegin" type="date"/> et <input name="dateEnd" id="dateEnd" type="date"/><br/>
-	</p>
-    </fieldset>
-</form>
-<div id="wrapper-stats">
-</div>
-<script src="/socket.io/socket.io.js"></script>
-<script>
- var server = "<%= server %>";
- var questions = <%- JSON.stringify(questionOwnedList) %>;
- var courses = <%- JSON.stringify(courseOwnedList) %>;
- var sets = <%- JSON.stringify(setOwnedList) %>;
- var rooms = <%- JSON.stringify(roomOwnedList) %>;
-</script>
-<script src="/javascripts/stats.js"></script>
-
+		<!-- </select> -->
+		<input type="hidden" value="<%= course.id %>" name="courseID" id="courseID">
+	    </p>
+	    <p>
+		Salle :<br/>
+		<select  id="roomID" name="roomID">
+		    <option value ="">Toutes les salles</option>
+		    <% roomOwnedList.forEach(function(room) { %>
+			<option value="<%=room.id%>"><%= room.name %></option>
+		    <% }); %>
+		</select>
+	    </p>
+	    <p>
+		Set :<br/>
+		<select  id="setID" name="setID">
+		    <option value ="">Tous les sets</option>
+		    <% setOwnedList.forEach(function(sett) { %>
+			<option value="<%= sett.id%>"><%= sett.name %></option>
+		    <% }); %>
+		</select><br/>
+	    </p>
+	    <p>
+		Question :<br/>
+		<select id="questionID" name="questionID">
+		    <option value ="">Toutes les questions</option>
+		    <% questionOwnedList.forEach(function(question) { %>
+			<option value="<%= question.id%>"><%= question.enonce %></option>
+		    <% }); %>
+		</select><br/>
+	    </p>
+	    <p>
+		Survenu entre <input name="dateBegin" id="dateBegin" type="date"/> et <input name="dateEnd" id="dateEnd" type="date"/><br/>
+	    </p>
+	</fieldset>
+    </form>
+    <div id="wrapper-stats">
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+     var server = "<%= server %>";
+     var questions = <%- JSON.stringify(questionOwnedList) %>;
+     var courses = <%- JSON.stringify(courseSubscribedList) %>;
+     var sets = <%- JSON.stringify(setOwnedList) %>;
+     var rooms = <%- JSON.stringify(roomOwnedList) %>;
+    </script>
+    <script src="/javascripts/stats.js"></script>
+<% } %>
 <%- include('admin_footer'); -%>

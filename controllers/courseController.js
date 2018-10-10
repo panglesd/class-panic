@@ -165,6 +165,9 @@ exports.subscribe_list = function(req, res) {
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
+	    },
 	    course :  function (callback) {
 		callback(null, req.course);
 	    },

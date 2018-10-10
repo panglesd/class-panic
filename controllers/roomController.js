@@ -13,7 +13,7 @@ var courseController = require("./courseController");
 
 // Render rooms.ejs
 
-renderRooms = function(user, msgs, res) {
+renderRooms = function(user, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -23,6 +23,9 @@ renderRooms = function(user, msgs, res) {
 	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
+	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
 	    },
 	    roomList : function (callback) {
 		Room.list(callback);
@@ -37,7 +40,7 @@ renderRooms = function(user, msgs, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderRoomManage = function (user, course, room, msgs, res) {
+    renderRoomManage = function (user, course, room, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Administrer "+room.name)},
@@ -47,6 +50,9 @@ renderRoomManage = function (user, course, room, msgs, res) {
 	    },
 	    room :  function (callback) {
 		callback(null, room);
+	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
 	    },
 	    course : function(callback) {
 		callback(null, course);
@@ -65,7 +71,7 @@ renderRoomManage = function (user, course, room, msgs, res) {
 
 // Render manage_rooms.ejs
 
-renderManageRooms = function(user, course, msgs, res) {
+    renderManageRooms = function(user, course, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -78,6 +84,9 @@ renderManageRooms = function(user, course, msgs, res) {
 	    },
 	    course : function(callback) {
 		callback(null, course);
+	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
 	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
@@ -102,20 +111,20 @@ renderManageRooms = function(user, course, msgs, res) {
 // Afficher la liste des rooms afin d'y participer
 
 exports.room_list = function(req, res) {
-    renderRooms(req.session.user, req.msgs, res);
+    renderRooms(req.session.user, req.msgs, req, res);
 };
 
 
 // Afficher le détails d'une room pour la modifier
 
 exports.room_manage = function (req, res) {
-    renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+    renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);
 };
 
 // Afficher la liste des rooms afin de les manager
 
 exports.room_manage_all = function(req, res) {
-    renderManageRooms(req.session.user, req.course, req.msgs, res);
+    renderManageRooms(req.session.user, req.course, req.msgs, req, res);
     
 };
 
@@ -145,13 +154,13 @@ exports.room_create_post = function(req, res) {
 	}
 	else {
 	    req.msgs.push("Impossible de créer la room : merci de spécifier un set valide à associer");
-	    renderManageRooms(req.session.user, req.course, req.msgs, res);
+	    renderManageRooms(req.session.user, req.course, req.msgs, req, res);
 	    //	res.redirect(config.PATH+'/manage/room');
 	}
     }
     else {
 	req.msgs.push("Vous n'avez pas la permission de créer une room");
-	renderManageRooms(req.session.user, req.course, req.msgs, res);
+	renderManageRooms(req.session.user, req.course, req.msgs, req, res);
 	//	res.redirect(config.PATH+'/manage/room');
     }
 };
@@ -186,13 +195,13 @@ exports.room_update_post = function(req, res) {
 	Room.update(req.session.user, req.room, req.body, function (err, id) {
 	    if(err) {
 		req.msgs.push("Impossible de modifier la room");
-		renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+		renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);
 	    }
 	    else {
 		req.msgs.push("Room updaté");
 		Room.getByID(req.room.id, (err, roomUpdated) => {
 		    req.room=roomUpdated;
-		    renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+		    renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);
 		});
 		//	res.redirect(config.PATH+'/manage/room/');
 	    }
@@ -200,7 +209,7 @@ exports.room_update_post = function(req, res) {
     }
     else {
 	req.msgs.push("Vous n'avez pas le droit de modifier la room");
-	renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+	renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);
 	//	res.redirect(config.PATH+'/manage/room');
     }
 };

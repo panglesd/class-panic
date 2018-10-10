@@ -17,14 +17,14 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room sortable-list">
     <% questionList.forEach(function(q) { %>
-	<a class="room" href="<%= config.PATH %>/manage/course/<%= course.id %>/set/<%= set.id %>/question/<%= q.id %>"> 
 	    <li class="question" id="q<%= q.id %>">
-		<span class="froom"><%= q.enonce %></span>
-		<div>
-		    Modifier
-		</div>
+		<a class="room" href="<%= config.PATH %>/manage/course/<%= course.id %>/set/<%= set.id %>/question/<%= q.id %>"> 
+		    <span class="froom"><%= q.enonce %></span>
+		    <div>
+			Modifier
+		    </div>
+		</a>
 	    </li>
-	</a>
     <% });%>
     </ul>
     <ul>
@@ -55,6 +55,7 @@
       });
       return tmp;
   }
+  
   Sortable.create(document.querySelector('.sortable-list'), {
       onUpdate: function (event) {
 	  console.log(event);

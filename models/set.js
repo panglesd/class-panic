@@ -25,6 +25,12 @@ exports.setOwnedListAll = function (user, callback) {
     });
 }
 
+exports.listByCourseID = function (courseID, callback) {
+    bdd.query('SELECT * FROM setDeQuestion WHERE `courseID` = ?', [courseID], function(err, rows) {
+	callback(err, rows);
+    });
+}
+
 /***********************************************************************/
 /*       Getters pour les rooms : individu                             */
 /***********************************************************************/
@@ -71,11 +77,11 @@ exports.setUpdate = function (user, set, newSet, callback) {
     });
 }
 
-exports.reOrder = function (user, newOrder, callback) {
+exports.reOrder = function (course, set, newOrder, callback) {
     async.eachOf(
 	newOrder,
 	function(item, key, callback) {
-	    bdd.query("UPDATE `questions` SET `indexSet`= ? WHERE `id` = ? AND `owner` = ?", [key, item, user.id], function (err, row) {
+	    bdd.query("UPDATE `questions` SET `indexSet`= ? WHERE `id` = ? AND `class` = ?", [key, item, set.id], function (err, row) {
 		callback(err, row);
 	    });
 	},
