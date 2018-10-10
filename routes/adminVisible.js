@@ -31,46 +31,12 @@ router.use(function (req, res, next) {
 // POST request for admining a room.
 
 
-router.use("/manage/course", courseRouter);
 
-router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
-
-
-
-// Autorisation de modifier les rooms
-   /**********************************************************/
-   /*              Managing rooms                            */
-   /**********************************************************/
-/*
-
-*/
-
-// Autorisation de modifier ses sets d'un cours
-// Autorisation de modifier les sets d'un cours
-// Autorisation de modifier les inscriptions
-
-
-/*************************************************************/
-/*         Routes for managing                               */
-/*************************************************************/
-
-
-
-
-
-
-/*************************************************************/
-/*         Routes for playing                                */
-/*************************************************************/
-
-// GET request for admining a room.
-router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 
 /*************************************************************/
 /*         Routes for testing                                */
 /*************************************************************/
 
-router.get('/manage/course/:idCourse/stats/', stats_controller.stats);
 
 module.exports = router;

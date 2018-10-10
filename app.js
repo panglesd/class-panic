@@ -53,7 +53,7 @@ app.use(config.PATH, allVisibleRouter);
 
 app.use(config.PATH, userVisibleRouter);
 
-app.use(config.PATH, adminVisibleRouter);
+// app.use(config.PATH, adminVisibleRouter);
 
 
 // catch 404 and forward to error handler

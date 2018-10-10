@@ -11,6 +11,8 @@ var login_controller = require('../controllers/loginController');
 
 var config = require('../configuration');
 
+var courseRouter = require("./courseRouter");
+
 /*************************************************************/
 /*         Middleware de redirection si non loggé            */
 /*************************************************************/
@@ -59,6 +61,19 @@ router.post('/room', room_controller.room_list);
 router.get('/course/:idCourse/room/:id', game_controller.room_enter);
 // POST request for entering a room.
 router.post('/course/:idCourse/room/:id', game_controller.room_enter);
+
+
+
+
+
+
+router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
+
+
+router.use("/manage/course", courseRouter);
+
+// GET request for admining a room.
+router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 
 module.exports = router;
