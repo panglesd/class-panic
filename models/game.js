@@ -20,27 +20,37 @@ exports.questionOwnedFromRoomID = function (user, roomID, callback) {
     bdd.query("SELECT question FROM rooms WHERE id = ? AND ownerID = ?", [roomID, user.id], function(err, row) { callback(err, JSON.parse(row[0].question))})
 }
 
+exports.questionControlledFromRoomID = function (user, roomID, callback) {
+    bdd.query("SELECT question FROM rooms WHERE id = ? AND courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1)", [roomID, user.id], function(err, row) { callback(err, JSON.parse(row[0].question))})
+}
+
 /***********************************************************************/
 /*       Enregistrer la réponse d'un utilisateur dans une room         */
 /***********************************************************************/
 
 exports.registerAnswer = function (user, room, newAnswer, callback) {
     Room.getByID(room.id, function (err, room) {
-	if(user.id!=room.ownerID) {
-	    if(room.status=="pending") {
-		bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
-		    if(answ[0].count>0) 
-			bdd.query("UPDATE `poll` SET `response`= ?, `responseText` = ? WHERE `roomID`= ? AND `pseudo`= ?", [newAnswer.n, newAnswer.text, room.id, user.pseudo], callback);
-		    else {
-			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`responseText`,`roomID`) VALUES (?, ?, ?, ?)", [user.pseudo, newAnswer.n, newAnswer.text, room.id], callback);
-		    }
-		});
+	bdd.query("SELECT * from subscription WHERE userID = ? AND courseID = (SELECT courseID FROM rooms WHERE id = ?)", [user.id, room.id], (err_subs, subs_array) => {
+	    subscription = subs_array[0];
+	    console.log(err_subs);
+	    console.log("subs", subs_array);
+	    console.log(this.sql);
+	    if(!subscription.isTDMan) {
+		if(room.status=="pending") {
+		    bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
+			if(answ[0].count>0) 
+			    bdd.query("UPDATE `poll` SET `response`= ?, `responseText` = ? WHERE `roomID`= ? AND `pseudo`= ?", [newAnswer.n, newAnswer.text, room.id, user.pseudo], callback);
+			else {
+			    bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`responseText`,`roomID`) VALUES (?, ?, ?, ?)", [user.pseudo, newAnswer.n, newAnswer.text, room.id], callback);
+			}
+		    });
+		}
+		else
+		    callback();
 	    }
 	    else
 		callback();
-	}
-	else
-	    callback();
+	});
     });
 }
 
@@ -127,10 +137,16 @@ exports.leaveRoom = function (user, room, callback) {
 // Entrer dans une salle
 
 exports.enterRoom = function (user, room, callback) {
-    if(room.ownerID != user.id) 
-	bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, -1, ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
-    else
-	callback();
+    bdd.query("SELECT * from subscription WHERE userID = ? AND courseID = (SELECT courseID FROM rooms WHERE id = ?)", [user.id, room.id], (err_subs, subs_array) => {
+	console.log(err_subs);
+	subscription = subs_array[0];
+	if(!subscription.isTDMan) {
+//    if(room.ownerID != user.id) 
+	    bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, -1, ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
+	}
+	else
+	    callback();
+    });
 }
 
 /***********************************************************************/

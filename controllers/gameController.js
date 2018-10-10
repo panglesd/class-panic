@@ -40,7 +40,7 @@ exports.room_admin = function(req, res) {
 	    },
 	    config : function(callback) { callback(null, config) },	
 	    room : function (callback) {
-		Room.getOwnedByID(req.session.user, req.params.id, callback)
+		Room.getControllableByID(req.session.user, req.params.id, callback)
 	    },
 	    set : function (callback) {
 		Question.listByRoomID(req.params.id, function (e,b) {callback(e,b)});

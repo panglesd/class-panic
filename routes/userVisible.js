@@ -60,5 +60,7 @@ router.get('/course/:idCourse/room/:id', game_controller.room_enter);
 // POST request for entering a room.
 router.post('/course/:idCourse/room/:id', game_controller.room_enter);
 
+// GET request for admining a room.
+router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 module.exports = router;

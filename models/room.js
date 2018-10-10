@@ -19,6 +19,12 @@ exports.getOwnedByID = function(user, roomID, callback) {
 	callback(err, resu[0])});
 };
 
+exports.getControllableByID = function(user, roomID, callback) {
+    bdd.query("SELECT * FROM `rooms` WHERE `rooms`.courseID IN (SELECT courseID FROM subscription WHERE userID= ?) AND id = ?", [user.id, roomID], function (err, resu) {
+	console.log(err);
+	callback(err, resu[0])});
+};
+
 /***********************************************************************/
 /*       Getters pour les rooms : listes                               */
 /***********************************************************************/

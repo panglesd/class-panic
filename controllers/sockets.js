@@ -48,7 +48,7 @@ module.exports = function (server, sessionMiddleware) {
 	});
     }
     function sendRoomOwnedQuestion(user, socket, callback) {
-	game.questionOwnedFromRoomID(user, socket.room.id, function (err, question) {
+	game.questionControlledFromRoomID(user, socket.room.id, function (err, question) {
 	    socket.emit("newQuestion", question);
 	    callback();
 	});
@@ -183,11 +183,13 @@ module.exports = function (server, sessionMiddleware) {
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    //	    console.log(socket.request.session);
-	    room.getOwnedByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
-		socket.room = res;
-		socket.join(socket.room.id);
-		sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
-//		sendOwnedStats(socket.room);
+	    room.getControllableByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
+		if(res) {
+		    socket.room = res;
+		    socket.join(socket.room.id);
+		    sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
+		    //		sendOwnedStats(socket.room);
+		}
 	    });
 	});
 	
