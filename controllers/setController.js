@@ -13,7 +13,7 @@ var async = require('async');
 
 // render pour manage_sets.ejs
 
-renderManageSets = function(user, courseID, msgs, res) {
+renderManageSets = function(user, course, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
@@ -22,13 +22,13 @@ renderManageSets = function(user, courseID, msgs, res) {
 		callback(null, user);
 	    },
 	    course : function(callback) {
-		Course.getByID(courseID, callback)
+		callback(null, course)
 	    },
 	    msgs: function(callback) {
 		callback(null, msgs)
 	    },
 	    setOwnedList :  function (callback) {
-		Set.setOwnedList(user, courseID, callback);
+		Set.setOwnedList(user, course.id, callback);
 	    }
 	},
 	function (err, results) {
@@ -39,7 +39,7 @@ renderManageSets = function(user, courseID, msgs, res) {
 
 // render pour managet_set.ejs
 
-renderManageSet = function(req, user, courseID, setID, msgs, res) {
+renderManageSet = function(req, user, course, set, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
@@ -51,14 +51,14 @@ renderManageSet = function(req, user, courseID, setID, msgs, res) {
 		callback(null, user);
 	    },
 	    course : function(callback) {
-		Course.getByID(courseID, callback)
+		callback(null, course)
 	    },
 	    questionList : function (callback) {
-		Question.listOwnedBySetID(user, setID, function(a,b) {callback(a,b)});
+		Question.listOwnedBySetID(user, set.id, function(a,b) {callback(a,b)});
 	    },
 	    msgs: function(callback) { callback(null, msgs) },
 	    set : function (callback) {
-		Set.setOwnedGet(user, setID, callback);
+		callback(null, set);
 	    }
 	},
 	function (err, results) {
@@ -73,7 +73,7 @@ renderManageSet = function(req, user, courseID, setID, msgs, res) {
 // Afficher la liste des sets
 
 exports.set_manage_all = function(req, res) {
-    renderManageSets(req.session.user, req.params.idCourse, req.msgs, res);
+    renderManageSets(req.session.user, req.course, req.msgs, res);
 };
 /*exports.set_manage_all_msgs = function(req, res, msgs) {
     renderManageSets(req.session.user, msgs, res);
@@ -82,7 +82,7 @@ exports.set_manage_all = function(req, res) {
 // Afficher le détails d'un set
 
 exports.set_manage = function(req, res) {
-    renderManageSet(req, req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
+    renderManageSet(req, req.session.user, req.course, req.set, req.msgs, res);
 };
 /*exports.set_manage_msgs = function(req, res, msgs) {
     renderManageSet(req, req.session.user, req.params.id, msgs, res);
@@ -95,14 +95,14 @@ exports.set_manage = function(req, res) {
 // Create
 
 exports.set_create_post = function(req, res) {
-    Set.setCreate(req.session.user, req.params.idCourse, req.body, function (err, set) {
+    Set.setCreate(req.session.user, req.course.id, req.body, function (err, set) { //HACK DEGUEU
 	if(err) {
 	    req.msgs.push("Impossible de créer le set !");
-	    renderManageSet(req, req.session.user, req.params.idCourse, set.id, req.msgs, res);
+	    renderManageSet(req, req.session.user, req.course, set, req.msgs, res);
 	}
 	else {
 	    req.msgs.push("Set créé !");
-	    renderManageSet(req, req.session.user,  req.params.idCourse,set.id, req.msgs, res);
+	    renderManageSet(req, req.session.user, req.course, set, req.msgs, res);
 	}
     });
 };
@@ -110,15 +110,15 @@ exports.set_create_post = function(req, res) {
 //Delete
 
 exports.set_delete_post = function(req, res) {
-    Set.setDelete(req.session.user, req.params, function (err, set) {
+    Set.setDelete(req.session.user, req.set, function (err, set) {
 //	console.log(err);
 	if(err) {
 	    req.msgs.push("Impossible de supprimer le set, sans doute est-il utilisé dans une room");
-	    renderManageSets(req.session.user,  req.params.idCourse,req.msgs, res);
+	    renderManageSets(req.session.user, req.course, req.msgs, res);
 	}
 	else {
 	    req.msgs.push("Set supprimé");
-	    renderManageSets(req.session.user,  req.params.idCourse,req.msgs, res);
+	    renderManageSets(req.session.user, req.course, req.msgs, res);
 	}
     });
 };
@@ -126,14 +126,14 @@ exports.set_delete_post = function(req, res) {
 // Update
 
 exports.set_update_post = function(req, res) {
-    Set.setUpdate(req.session.user, req.params, req.body, function (err, set) {
+    Set.setUpdate(req.session.user, req.set, req.body, function (err, set) { //HACK DEGUEU
 	if(err)  {
 	    req.msgs.push("Impossible de modifier le set");
-	    renderManageSets(req.session.user, req.params.idCourse, req.msgs, res);
+	    renderManageSets(req.session.user, req.course, req.msgs, res);
 	}
 	else {
 	    req.msgs.push("Set mis à jour");
-	    renderManageSets(req.session.user, req.params.idCourse, req.msgs, res);
+	    renderManageSets(req.session.user, req.course, req.msgs, res);
 	}
     });
 };

@@ -14,7 +14,7 @@ var async = require('async');
 
 // render de manage_question.ejs
 
-renderManageQuestion = function(user, courseID, questionID, setID, msgs, res) {
+renderManageQuestion = function(user, course, question, set, msgs, res) {
     async.parallel(
 	{
 	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
@@ -22,10 +22,10 @@ renderManageQuestion = function(user, courseID, questionID, setID, msgs, res) {
 	    user: function (callback) {
 		callback(null, user);
 	    },
-	    newQuestion: function(callback) { callback(null, typeof questionID == "undefined")},
+	    newQuestion: function(callback) { callback(null, typeof question == "undefined")},
 	    question: function (callback) {
-		if(typeof questionID != "undefined")
-		    Question.getOwnedByID(user, questionID, function (e,b) {callback(e,b)});
+		if(typeof question != "undefined")
+		    callback(null, question);
 		else
 		    callback(null,
 			     {
@@ -38,11 +38,11 @@ renderManageQuestion = function(user, courseID, questionID, setID, msgs, res) {
 			     })
 	    },
 	    course : function(callback) {
-		Course.getByID(courseID, callback)
+		callback(null, course)
 	    },
 	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")},
 	    set: function (callback) {
-		Set.setOwnedGet(user, setID, function(a,b) {callback(a,b)});
+		callback(null, set)
 	    }
 	},
 	function (err, results) {
@@ -58,13 +58,13 @@ renderManageQuestion = function(user, courseID, questionID, setID, msgs, res) {
 // Pour commencer à créer une question
 
 exports.question_create_get = function(req, res) {
-    renderManageQuestion(req.session.user, req.params.idCourse, undefined, req.params.idSet, req.msgs, res);
+    renderManageQuestion(req.session.user, req.course, undefined, req.set, req.msgs, res);
 };
 
 // Pour commencer à modifier une question 
 
 exports.question_update_get = function(req, res) {
-    renderManageQuestion(req.session.user, req.params.idCourse, req.params.id, req.params.idSet, req.msgs, res);
+    renderManageQuestion(req.session.user, req.course, req.question, req.set, req.msgs, res);
 };
 
 
@@ -91,9 +91,9 @@ exports.question_create_post = function(req, res) {
 	i++;
     }
 
-    Question.questionCreate(req.session.user, question, reponse, req.params.idSet, function(err, info) {
+    Question.questionCreate(req.session.user, question, reponse, req.set.id, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ;
-	req.params.id = req.params.idSet; // HORRIBLE HACK
+//	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
 	    req.msgs.push("Impossible d'ajouter la question !");
 	    SetController.set_manage(req, res);
@@ -123,9 +123,9 @@ exports.question_update_post = function(req, res) {
 	};
 	i++;
     }
-    Question.questionUpdate(req.session.user, parseInt(req.params.id), question, reponse, function(err, info) {
+    Question.questionUpdate(req.session.user, req.question.id, question, reponse, function(err, info) {
 	//	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
-	req.params.id = req.params.idSet; // HORRIBLE HACK
+//	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {
 	    req.msgs.push("Impossible de mettre à jour la question !");
 	    SetController.set_manage(req, res);
@@ -140,7 +140,7 @@ exports.question_update_post = function(req, res) {
 // Delete
 
 exports.question_delete_post = function(req, res) {
-    Question.questionDelete(req.session.user, parseInt(req.params.id),  function(err, id) {
+    Question.questionDelete(req.session.user, req.question.id,  function(err, id) {
 //	console.log(err);
 	req.params.id = req.params.idSet; // HORRIBLE HACK
 	if(err) {

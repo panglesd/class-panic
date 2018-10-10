@@ -36,7 +36,7 @@ renderCourses = function(user, msgs, res) {
 
 // Render course.ejs
 
-renderCourse = function(user, courseID, msgs, res) {
+renderCourse = function(user, course, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
@@ -48,7 +48,7 @@ renderCourse = function(user, courseID, msgs, res) {
 		Room.listOfCourse(courseID, callback);
 	    },
 	    course : function(callback) {
-		Course.getByID(courseID, callback);
+		callback(null, course);
 	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
@@ -63,33 +63,31 @@ renderCourse = function(user, courseID, msgs, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderCourseManage = function (user, courseID, msgs, res) {
-    Course.getOwnedByID(user, courseID, function (err, course) {
-	async.parallel(
-	    {
-		title : function(callback) { callback(null, "ClassPanic: Administrer "+course.name)},
-		config : function(callback) { callback(null, config) },	
-		user : function (callback) {
-		    callback(null, user);
-		},
-		course :  function (callback) {
-		    callback(null, course);
-		},
-		msgs : function(callback) {
-		    callback(null, msgs);
-		},
-		roomOwnedList :  function (callback) {
-		    Room.getFromOwnedCourse(user, courseID, callback);
-		},
-		setOwnedList :  function (callback) {
-		    Set.setOwnedList(user, courseID, callback);
-		}
+renderCourseManage = function (user, course, msgs, res) {
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: Administrer "+course.name)},
+	    config : function(callback) { callback(null, config) },	
+	    user : function (callback) {
+		callback(null, user);
 	    },
-	    function (err, results) {
-//		console.log(results);
-		res.render('manage_course', results);
-	    });
-    });
+	    course :  function (callback) {
+		callback(null, course);
+	    },
+	    msgs : function(callback) {
+		callback(null, msgs);
+	    },
+	    roomOwnedList :  function (callback) {
+		Room.getFromOwnedCourse(user, course.id, callback);
+	    },
+	    setOwnedList :  function (callback) {
+		Set.setOwnedList(user, course.id, callback);
+	    }
+	},
+	function (err, results) {
+	    //		console.log(results);
+	    res.render('manage_course', results);
+	});
 };
 
 // Render manage_courses.ejs
@@ -133,7 +131,7 @@ exports.courses_list = function(req, res) {
 };
 
 exports.course = function(req, res) {
-    renderCourse(req.session.user, req.params.idCourse, req.msgs, res);
+    renderCourse(req.session.user, req.course, req.msgs, res);
 }
 
 // Admin Space
@@ -141,13 +139,13 @@ exports.course = function(req, res) {
 // Afficher le détails d'une room pour la modifier
 
 exports.course_manage = function (req, res) {
-    renderCourseManage(req.session.user, req.params.idCourse, req.msgs, res);
+    renderCourseManage(req.session.user, req.course, req.msgs, res);
 };
 
 // Afficher la liste des rooms afin de les manager
 
 exports.course_manage_all = function(req, res) {
-    renderManageCourses(req.session.user, [], res);
+    renderManageCourses(req.session.user, req.msgs, res);
 };
 
 
@@ -157,31 +155,29 @@ exports.course_manage_all = function(req, res) {
 /*************************************************************/
 
 exports.subscribe_list = function(req, res) {
-    Course.getOwnedByID(req.session.user, req.params.idCourse, function (err, course) {
-	async.parallel(
-	    {
-		title : function(callback) { callback(null, "ClassPanic: ... une salle")},
-		config : function(callback) { callback(null, config) },	
-		server : function(callback) {
-		    callback(null, req.protocol + '://' + req.get('host') );
-		},
-		user : function (callback) {
-		    callback(null, req.session.user);
-		},
-		course :  function (callback) {
-		    callback(null, course);
-		},
-		students :  function (callback) {
-		    Course.students(req.session.user, req.params.idCourse, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
-		},
-		msgs : function(callback) {
-		    callback(null, "");
-		},
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    config : function(callback) { callback(null, config) },	
+	    server : function(callback) {
+		callback(null, req.protocol + '://' + req.get('host') );
 	    },
-	    function (err, results) {
-		res.render('manage_subscription', results);
-	    });
-    });	
+	    user : function (callback) {
+		callback(null, req.session.user);
+	    },
+	    course :  function (callback) {
+		callback(null, req.course);
+	    },
+	    students :  function (callback) {
+		Course.students(req.session.user, req.course.id, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
+	    },
+	    msgs : function(callback) {
+		callback(null, "");
+	    },
+	},
+	function (err, results) {
+	    res.render('manage_subscription', results);
+	});
 }
 
 /*************************************************************/
@@ -213,7 +209,7 @@ exports.course_create_post = function(req, res) {
 //Delete
 
 exports.course_delete_post = function(req, res) {
-    Course.delete(req.session.user, req.params.idCourse, function (err, info) {
+    Course.delete(req.session.user, req.course.id, function (err, info) {
 	if(err) {
 	    req.msgs.push("Impossible de supprimer le cours");
 	    exports.course_manage_all(req, res);
@@ -229,7 +225,7 @@ exports.course_delete_post = function(req, res) {
 //Update
 
 exports.course_update_post = function(req, res) {
-    Course.update(req.session.user, req.params.idCourse, req.body, function (err, id) {
+    Course.update(req.session.user, req.course.id, req.body, function (err, id) {
 	if(err) {
 //	    console.log(err);
 	    req.msgs.push("Impossible de modifier le cours");
@@ -238,7 +234,10 @@ exports.course_update_post = function(req, res) {
 	}
 	else {
 	    req.msgs.push("Cours updaté");
-	    exports.course_manage(req, res);
+	    Course.getByID(req.course.id, (err, courseUpdated) => {
+		req.course = courseUpdated;
+		exports.course_manage(req, res);
+	    });
 	    //	res.redirect(config.PATH+'/manage/room/');
 	}
     });

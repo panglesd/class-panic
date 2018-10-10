@@ -29,7 +29,7 @@ renderRooms = function(user, msgs, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
+	    //	    console.log(results);
 	    res.render('courses', results)
 	});
 }
@@ -37,37 +37,35 @@ renderRooms = function(user, msgs, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderRoomManage = function (user, courseID, roomID, msgs, res) {
-    Room.getOwnedByID(user, roomID, function (err, thisRoom) {
-	async.parallel(
-	    {
-		title : function(callback) { callback(null, "ClassPanic: Administrer "+thisRoom.name)},
-		config : function(callback) { callback(null, config) },	
-		user : function (callback) {
-		    callback(null, user);
-		},
-		room :  function (callback) {
-		    callback(null, thisRoom);
-		},
-		course : function(callback) {
-		    Course.getByID(thisRoom.courseID, callback)
-		},
-		msgs : function(callback) {
-		    callback(null, msgs);
-		},
-	    	setOwnedList :  function (callback) {
-		    Set.setOwnedList(user, courseID, callback);
-		}
+renderRoomManage = function (user, course, room, msgs, res) {
+    async.parallel(
+	{
+	    title : function(callback) { callback(null, "ClassPanic: Administrer "+room.name)},
+	    config : function(callback) { callback(null, config) },	
+	    user : function (callback) {
+		callback(null, user);
 	    },
-	    function (err, results) {
-		res.render('manage_room', results);
-	    });
-    });
+	    room :  function (callback) {
+		callback(null, room);
+	    },
+	    course : function(callback) {
+		callback(null, course);
+	    },
+	    msgs : function(callback) {
+		callback(null, msgs);
+	    },
+	    setOwnedList :  function (callback) {
+		Set.setOwnedList(user, course.id, callback);
+	    }
+	},
+	function (err, results) {
+	    res.render('manage_room', results);
+	});
 };
 
 // Render manage_rooms.ejs
 
-renderManageRooms = function(user, courseID, msgs, res) {
+renderManageRooms = function(user, course, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -76,19 +74,19 @@ renderManageRooms = function(user, courseID, msgs, res) {
 		callback(null, user);
 	    },
 	    roomList : function (callback) {
-		Room.listOfCourse(courseID, callback);
+		Room.listOfCourse(course.id, callback);
 	    },
 	    course : function(callback) {
-		Course.getByID(courseID, callback)
+		callback(null, course);
 	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
 	    },
 	    roomOwnedList :  function (callback) {
-		Room.ownedList(user, callback);
+		Room.listOfCourse(course.id, callback);
 	    },
 	    setOwnedList :  function (callback) {
-		Set.setOwnedList(user, courseID, callback);
+		Set.setOwnedList(user, course.id, callback);
 	    }
 	},
 	function (err, results) {
@@ -110,13 +108,13 @@ exports.room_list = function(req, res) {
 // Afficher le détails d'une room pour la modifier
 
 exports.room_manage = function (req, res) {
-    renderRoomManage(req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
+    renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
 };
 
 // Afficher la liste des rooms afin de les manager
 
 exports.room_manage_all = function(req, res) {
-    renderManageRooms(req.session.user, req.params.idCourse, req.msgs, res);
+    renderManageRooms(req.session.user, req.course, req.msgs, res);
     
 };
 
@@ -129,7 +127,7 @@ exports.room_manage_all = function(req, res) {
 
 exports.room_create_post = function(req, res) {
     if(req.body.questionSet) { 
-	Room.create(req.session.user, req.body, parseInt(req.params.idCourse), function (err,r) { // HACK DEGEU
+	Room.create(req.session.user, req.body, req.course.id, function (err,r) { // HACK DEGEU
 	    //	    res.redirect(config.PATH+'/manage/room');
 	    //	    console.log(req.body);
 	    if(err) {
@@ -151,7 +149,7 @@ exports.room_create_post = function(req, res) {
 //Delete
 
 exports.room_delete_post = function(req, res) {
-    Room.delete(req.session.user, req.params.id, function (err, info) {
+    Room.delete(req.session.user, req.room.id, function (err, info) {
 	if(err) {
 	    req.msgs.push("Impossible de supprimer la room");
 	    courseController.course_manage(req,res);
@@ -167,14 +165,17 @@ exports.room_delete_post = function(req, res) {
 //Update
 
 exports.room_update_post = function(req, res) {
-    Room.update(req.session.user, req.params, req.body, function (err, id) {
+    Room.update(req.session.user, req.room, req.body, function (err, id) {
 	if(err) {
 	    req.msgs.push("Impossible de modifier la room");
-	    renderRoomManage(req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
+	    renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
 	}
 	else {
 	    req.msgs.push("Room updaté");
-	    renderRoomManage(req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
+	    Room.getByID(req.room.id, (err, roomUpdated) => {
+		req.room=roomUpdated;
+		renderRoomManage(req.session.user, req.course, req.room, req.msgs, res);
+	    });
 	    //	res.redirect(config.PATH+'/manage/room/');
 	}
     });
