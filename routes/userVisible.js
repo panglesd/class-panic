@@ -66,11 +66,11 @@ router.post('/course/:idCourse/room/:id', game_controller.room_enter);
 
 
 
+router.use("/manage/course", courseRouter);
 
 router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 
-router.use("/manage/course", courseRouter);
 
 // GET request for admining a room.
 router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
