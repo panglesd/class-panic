@@ -55,7 +55,7 @@ socketStats.on("newStats", (filter, res) => {
     table.setData(res);
     
 });
-
+update();
 document.querySelector("#statsForm").addEventListener('change', (ev) => {
     update();
 });

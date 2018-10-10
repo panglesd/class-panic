@@ -13,7 +13,13 @@ exports.setList = function (callback) {
     });
 }
 
-exports.setOwnedList = function (user, callback) {
+exports.setOwnedList = function (user, courseID, callback) {
+    bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ? AND `courseID` = ?', [user.id, courseID], function(err, rows) {
+	callback(err, rows);
+    });
+}
+
+exports.setOwnedListAll = function (user, callback) {
     bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ?', [user.id], function(err, rows) {
 	callback(err, rows);
     });
@@ -43,8 +49,8 @@ exports.setOwnedGet = function (user, setID, callback) {
 
 // Create
 
-exports.setCreate = function (user, set, callback) {
-    bdd.query("INSERT INTO `setDeQuestion`(`name`, `owner`) VALUES (?, ?); SELECT * FROM `setDeQuestion` WHERE `id` = LAST_INSERT_ID();", [set.name , user.id], function(err, rows) {
+exports.setCreate = function (user, courseID, set, callback) {
+    bdd.query("INSERT INTO `setDeQuestion`(`name`, `owner`, `courseID`) VALUES (?, ?, ?); SELECT * FROM `setDeQuestion` WHERE `id` = LAST_INSERT_ID();", [set.name , user.id, courseID], function(err, rows) {
 	callback(err, rows[1][0]);
     });
 }

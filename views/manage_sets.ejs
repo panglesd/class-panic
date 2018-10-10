@@ -4,18 +4,18 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
     <% setOwnedList.forEach(function(set) { %>
-	<li class="room">
-	    <a class="room" href="<%= config.PATH %>/manage/set/<%= set.id %>">
+	<a class="room" href="<%= config.PATH %>/manage/course/<%= course.id %>/set/<%= set.id %>">
+	    <li class="room">
 		<span class="froom"><%= set.name %></span>
 		<!--	      <ul>		
 		     <li>Nombre de participants : <%=// room.number %></li>
 		     <li>Administrateur: <%=// room.owner %></li>
 		     </ul>-->
-		<div>
+<!--		<div>
 		    <ul> <li> Voir / Modifier </li> </ul>
-		</div>
-	    </a>
-	</li>
+		</div> -->
+	    </li>
+	</a>
     <% });%>
     <a class="room" onclick="document.querySelector('#win').classList.toggle('shown');window.scrollTo(0,0)">
 	<li style="cursor:pointer; text-align:center;" class="room">
@@ -25,7 +25,7 @@
 </ul>
 <div class="window" id="win">
     <h2> Créer un nouveau cours</h2>
-    <form action="<%= config.PATH %>/manage/set/create" method="post" id="formNewSet">
+    <form action="<%= config.PATH %>/manage/course/<%= course.id %>/set/create" method="post" id="formNewSet">
 	<p>
 	    <input type='text' name="name" placeholder='Nom du nouveau set'>
 	</p>

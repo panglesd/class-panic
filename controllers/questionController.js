@@ -1,4 +1,5 @@
 var User = require('../models/user');
+var Course = require('../models/course');
 var Room = require('../models/room');
 var Set = require('../models/set');
 var SetController = require('./setController');
@@ -13,7 +14,7 @@ var async = require('async');
 
 // render de manage_question.ejs
 
-renderManageQuestion = function(user, questionID, setID, msgs, res) {
+renderManageQuestion = function(user, courseID, questionID, setID, msgs, res) {
     async.parallel(
 	{
 	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
@@ -36,6 +37,9 @@ renderManageQuestion = function(user, questionID, setID, msgs, res) {
 				 enonce: ""
 			     })
 	    },
+	    course : function(callback) {
+		Course.getByID(courseID, callback)
+	    },
 	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")},
 	    set: function (callback) {
 		Set.setOwnedGet(user, setID, function(a,b) {callback(a,b)});
@@ -54,13 +58,13 @@ renderManageQuestion = function(user, questionID, setID, msgs, res) {
 // Pour commencer à créer une question
 
 exports.question_create_get = function(req, res) {
-    renderManageQuestion(req.session.user, undefined, req.params.idSet, req.msgs, res);
+    renderManageQuestion(req.session.user, req.params.idCourse, undefined, req.params.idSet, req.msgs, res);
 };
 
 // Pour commencer à modifier une question 
 
 exports.question_update_get = function(req, res) {
-    renderManageQuestion(req.session.user, req.params.id, req.params.idSet, req.msgs, res);
+    renderManageQuestion(req.session.user, req.params.idCourse, req.params.id, req.params.idSet, req.msgs, res);
 };
 
 

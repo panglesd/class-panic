@@ -52,7 +52,7 @@ exports.room_admin = function(req, res) {
 		Room.ownedList(req.session.user, function (r) { callback(null, r) });
 	    },
 	    setOwnedList :  function (callback) {
-		Set.setOwnedList(req.session.user, callback);
+		Set.setOwnedList(req.session.user, req.params.idCourse, callback);
 	    }
 	},
 	function (err, results) {

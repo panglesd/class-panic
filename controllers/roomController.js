@@ -37,7 +37,7 @@ renderRooms = function(user, msgs, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderRoomManage = function (user, roomID, msgs, res) {
+renderRoomManage = function (user, courseID, roomID, msgs, res) {
     Room.getOwnedByID(user, roomID, function (err, thisRoom) {
 	async.parallel(
 	    {
@@ -56,7 +56,7 @@ renderRoomManage = function (user, roomID, msgs, res) {
 		    callback(null, msgs);
 		},
 	    	setOwnedList :  function (callback) {
-		    Set.setOwnedList(user, callback);
+		    Set.setOwnedList(user, courseID, callback);
 		}
 	    },
 	    function (err, results) {
@@ -67,7 +67,7 @@ renderRoomManage = function (user, roomID, msgs, res) {
 
 // Render manage_rooms.ejs
 
-/*renderManageRooms = function(user, msgs, res) {
+renderManageRooms = function(user, courseID, msgs, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
@@ -76,7 +76,10 @@ renderRoomManage = function (user, roomID, msgs, res) {
 		callback(null, user);
 	    },
 	    roomList : function (callback) {
-		Room.list(callback);
+		Room.listOfCourse(courseID, callback);
+	    },
+	    course : function(callback) {
+		Course.getByID(courseID, callback)
 	    },
 	    msgs : function(callback) {
 		callback(null, msgs);
@@ -85,13 +88,13 @@ renderRoomManage = function (user, roomID, msgs, res) {
 		Room.ownedList(user, callback);
 	    },
 	    setOwnedList :  function (callback) {
-		Set.setOwnedList(user, callback);
+		Set.setOwnedList(user, courseID, callback);
 	    }
 	},
 	function (err, results) {
 	    res.render('manage_rooms', results)
 	});
-};*/
+};
 
 /*************************************************************/
 /*         Controlleurs GET pour les rooms                   */
@@ -107,13 +110,13 @@ exports.room_list = function(req, res) {
 // Afficher le détails d'une room pour la modifier
 
 exports.room_manage = function (req, res) {
-    renderRoomManage(req.session.user, req.params.id, req.msgs, res);
+    renderRoomManage(req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
 };
 
 // Afficher la liste des rooms afin de les manager
 
 exports.room_manage_all = function(req, res) {
-    //renderManageRooms(req.session.user, [], res);
+    renderManageRooms(req.session.user, req.params.idCourse, req.msgs, res);
     
 };
 
@@ -167,11 +170,11 @@ exports.room_update_post = function(req, res) {
     Room.update(req.session.user, req.params, req.body, function (err, id) {
 	if(err) {
 	    req.msgs.push("Impossible de modifier la room");
-	    renderRoomManage(req.session.user, req.params.id, req.msgs, res);
+	    renderRoomManage(req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
 	}
 	else {
 	    req.msgs.push("Room updaté");
-	    renderRoomManage(req.session.user, req.params.id, req.msgs, res);
+	    renderRoomManage(req.session.user, req.params.idCourse, req.params.id, req.msgs, res);
 	    //	res.redirect(config.PATH+'/manage/room/');
 	}
     });

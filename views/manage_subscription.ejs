@@ -1,7 +1,7 @@
-<%- include('admin_header', {active : "salles"}); -%>
+<%- include('admin_header', {active : "subscription"}); -%>
 
-
-<h2>Inscrire des élèves au cours <%= course.name %> :</h2>
+<h2 style="cursor:pointer" id="inscription-etu-titre">Inscrire des élèves au cours <%= course.name %> :</h2>
+<div id="wrapper-inscriptions" style="display:none">
 <form id="searchForm">
     <p>
 	<label>Nom :</label><br>
@@ -25,6 +25,13 @@
 	</select>
     </p>
     <p>
+	<label>Inscris à</label><br>
+	<select name="subscribed" id="subscribed">
+	    <option value="IUT">IUT sénard</option>
+	    <option value="FAC">FAC de Créteil</option>
+	</select>
+    </p>
+    <p>
 	<input type="button" id="selectAll" value="Tout selectionner">
 	<input type="button" id="unSelectAll" value="Tout deselectionner">
 	<input type="button" id="subscribe" value="Inscrire la selection">
@@ -34,6 +41,17 @@
 
 <div id="wrapper-student-list">
 
+</div>
+</div>
+<h2 id="liste-etu-titre">Les étudiants de ce cours :</h2>
+<div id="wrapper-list-inscrits">
+<ul class="room">
+    <% students.forEach(function(student) { %>
+	<li class="room">
+	   <%= student.fullName %> (n°<%= student.studentNumber %>)
+	</li>
+    <% }); %>
+</ul>
 </div>
 
 <script>
@@ -59,6 +77,20 @@
  document.querySelector("#unSelectAll").addEventListener("click", unSelectAll);
  document.querySelector("#subscribe").addEventListener("click", subscribeStudent);
  document.querySelector("#unsubscribe").addEventListener("click", unSubscribeStudent);
+ document.querySelector("#liste-etu-titre").addEventListener("click", (ev) => {
+     wrapper = document.querySelector("#wrapper-list-inscrits");
+     if(wrapper.style.display == "none") 
+	 wrapper.style.display = ""
+    else
+	 wrapper.style.display = "none"
+ });
+ document.querySelector("#inscription-etu-titre").addEventListener("click", (ev) => {
+     wrapper = document.querySelector("#wrapper-inscriptions");
+     if(wrapper.style.display == "none") 
+	 wrapper.style.display = ""
+    else
+	 wrapper.style.display = "none"
+ });
  callSearch();
 </script>
 

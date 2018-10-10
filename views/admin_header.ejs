@@ -9,15 +9,21 @@
     <div id="main_wrapper">
       <h1>Class Panic</h1>
       <nav>
-	<ul>
-<!--	      <li><a href="<%= config.PATH %>/admin/room">Administrer</a></li> -->
-	      <a href="<%= config.PATH %>/manage/course"><li <%= active == "salles" ? "class=selected" : "" %>>Mes cours</li></a>
-	      <a href="<%= config.PATH %>/manage/set"><li <%= active == "sets" ? "class=selected" : "" %>>Mes sets</li></a>
-	      <a href="<%= config.PATH %>/manage/stats"><li <%= active == "stats" ? "class=selected" : "" %>>Statistiques</li></a>
-<!--	      <li <%= active == "salles" ? 'class="selected"' : "" %>><a href="<%= config.PATH %>/user">Mon compte</a></li>-->
-	      <a href="<%= config.PATH %>/"><li <%= active == "etudiant" ? "class=selected" : "" %>>Redevenir étudiant</li></a>
+	  <ul>
+	      <a href="<%= config.PATH %>/"><li <%= active == "etudiant" ? "class=selected" : "" %>>Travailler</li></a>
+	      <a href="<%= config.PATH %>/manage/course"><li <%= active == "courses" ? "class=selected" : "" %>>Gérer mes cours</li></a>
 	      <a id="leave" href="<%= config.PATH %>/logout"><li>Se d&eacute;connecter</li></a>
       </nav>
+      <% if(typeof course != "undefined") { %>
+	  <nav>
+	      <ul>
+		  <a href="<%= config.PATH %>/manage/course/<%= course.id %>"><li <%= active == "course" ? "class=selected" : "" %>><%= course.name %></li></a>
+		  <a href="<%= config.PATH %>/manage/course/<%= course.id %>/room"><li <%= active == "rooms" ? "class=selected" : "" %>>Salles</li></a>
+		  <a href="<%= config.PATH %>/manage/course/<%= course.id %>/set"><li <%= active == "sets" ? "class=selected" : "" %>>Sets</li></a>
+		  <a href="<%= config.PATH %>/manage/course/<%= course.id %>/subscription"><li <%= active == "subscription" ? "class=selected" : "" %>>Inscriptions</li></a>
+		  <a href="<%= config.PATH %>/manage/course/<%= course.id %>/stats"><li <%= active == "stats" ? "class=selected" : "" %>>Statistiques</li></a>
+	  </nav>
+      <% } %>
       <div class="wrapper" id="connect_wrapper">
 	  <div class="msg">
 	    <ul>

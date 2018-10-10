@@ -20,6 +20,9 @@ exports.stats = (req, res) => {
 	    msgs : function(callback) {
 		callback(null, req.msgs);
 	    },
+	    course : function(callback) {
+		Course.getByID(req.params.idCourse, callback)
+	    },
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
@@ -33,7 +36,7 @@ exports.stats = (req, res) => {
 		Question.ownedList(req.session.user, callback);
 	    },
 	    setOwnedList : function(callback) {
-		Set.setOwnedList(req.session.user, callback);
+		Set.setOwnedListAll(req.session.user, callback);
 	    }
 	},
 	function (err, results) {

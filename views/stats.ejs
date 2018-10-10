@@ -23,8 +23,8 @@
 	    Cours :<br/>
 	    <select  id="courseID" name="courseID">
 		<option value ="">Tous les cours</option>
-		<% courseOwnedList.forEach(function(course) { %>
-		<option value="<%=course.id%>"><%= course.name %></option>
+		<% courseOwnedList.forEach(function(course2) { %>
+		<option <%= course.id == course2.id ? "selected" : "" %> value="<%=course2.id%>"><%= course2.name %></option>
 		<% }); %>
 	    </select>
 	</p>
