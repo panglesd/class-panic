@@ -27,7 +27,8 @@ router.use(function (req, res, next) {
 /********************************************/
 // Autorisation d''être TDMan d'un cours
 // Autorisation de modifier les rooms
-// Autorisation de modifier les sets
+// Autorisation de modifier ses sets d'un cours
+// Autorisation de modifier les sets d'un cours
 // Autorisation de modifier les inscriptions
 
 
