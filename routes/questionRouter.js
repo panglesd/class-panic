@@ -16,6 +16,7 @@ var User = require('../models/user');
 var Course = require('../models/course');
 var Room = require('../models/room');
 var Set = require('../models/set');
+var Question = require('../models/question');
 var config = require('../configuration');
 var async = require('async');
 
