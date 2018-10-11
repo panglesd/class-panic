@@ -104,7 +104,7 @@ socket.on('newQuestion', function (reponse) {
 /*********************************************************************/
 
 socket.on('correction', function (correction) {
-//    console.log(correction);
+    console.log(correction);
     document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
     //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
     if(document.querySelector("#r"+correction.correctAnswer))
