@@ -1,5 +1,6 @@
 var bdd = require("./bdd");
 var Game = require("./game");
+var Room = require("./room");
 var async = require('async');
 
 

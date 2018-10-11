@@ -87,7 +87,8 @@ socketAdmin.on('newQuestion', function (reponse) {
 	    temp.classList.add("inactiveQuestion")
     }
     if(reponse.id) {
-	document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
+	if(document.querySelector("li#q"+reponse.id))
+	    document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
     }
     document.querySelector("#customQuestion").innerHTML = "Créer sa propre question temporaire";
     document.querySelector("#customQuestion").onclick = customQuestion;

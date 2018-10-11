@@ -121,6 +121,10 @@ router.use("/:courseID/room", roomRouter);
 router.use("/:courseID/set", setRouter);
 
 
+// GET request for entering a room.
+router.get('/:courseID/play/:roomID', game_controller.room_enter);
+// GET request for admining a room.
+router.get('/:courseID/control/:roomID', game_controller.room_admin);
 
 
 

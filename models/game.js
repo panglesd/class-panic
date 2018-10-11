@@ -1,10 +1,11 @@
 bdd = require("./bdd");
 var async = require('async');
 
-Room = require("./room");
-Question = require("./question");
-User = require("./user");
-Set = require("./set");
+var Room = require("./room");
+var Question = require("./question");
+var User = require("./user");
+var Set = require("./set");
+var Course = require("./course");
 
 /***********************************************************************/
 /*       Récupérer la question active d'une room                       */
@@ -21,7 +22,7 @@ exports.questionOwnedFromRoomID = function (user, roomID, callback) {
 }
 
 exports.questionControlledFromRoomID = function (user, roomID, callback) {
-    bdd.query("SELECT question FROM rooms WHERE id = ? AND courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1)", [roomID, user.id], function(err, row) { callback(err, JSON.parse(row[0].question))})
+    bdd.query("SELECT question FROM rooms WHERE id = ? AND (courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1) OR courseID IN (SELECT id FROM courses WHERE ownerID = ?))", [roomID, user.id,user.id], function(err, row) { console.log(this.sql);console.log(row[0].question);callback(err, JSON.parse(row[0].question))})
 }
 
 /***********************************************************************/
@@ -137,15 +138,15 @@ exports.leaveRoom = function (user, room, callback) {
 // Entrer dans une salle
 
 exports.enterRoom = function (user, room, callback) {
-    bdd.query("SELECT * from subscription WHERE userID = ? AND courseID = (SELECT courseID FROM rooms WHERE id = ?)", [user.id, room.id], (err_subs, subs_array) => {
-	console.log(err_subs);
-	subscription = subs_array[0];
-	if(!subscription.isTDMan) {
-//    if(room.ownerID != user.id) 
-	    bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, -1, ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
-	}
-	else
-	    callback();
+    Course.getByID(room.courseID, (err_course, course) => {
+	User.getSubscription(user, course, (err_subs, subscription) => {
+	    if(!subscription.isTDMan) {
+		//    if(room.ownerID != user.id) 
+		bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, -1, ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
+	    }
+	    else
+		callback();
+	});
     });
 }
 

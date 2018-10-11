@@ -11,6 +11,7 @@ var Question = require("./question");
 
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
+	console.log(this.sql);
 	callback(err, resu[0])});
 };
 
@@ -20,7 +21,7 @@ exports.getOwnedByID = function(user, roomID, callback) {
 };
 
 exports.getControllableByID = function(user, roomID, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `rooms`.courseID IN (SELECT courseID FROM subscription WHERE userID= ?) AND id = ?", [user.id, roomID], function (err, resu) {
+    bdd.query("SELECT * FROM `rooms` WHERE `rooms`.courseID IN (SELECT courseID FROM subscription WHERE userID= ? AND isTDMan=1) AND id = ?", [user.id, roomID], function (err, resu) {
 	console.log(err);
 	callback(err, resu[0])});
 };

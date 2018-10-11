@@ -2,6 +2,7 @@ var user = require('../models/user');
 var Stats = require('../models/stats');
 var room = require('../models/room');
 var Course = require('../models/course');
+var User = require('../models/user');
 var Question = require('../models/question');
 var Set = require('../models/set');
 var game = require('../models/game');
@@ -101,22 +102,32 @@ module.exports = function (server, sessionMiddleware) {
 	/******************************************/
 	
 	socket.on('chooseRoom', function (newRoom) {
+	    console.log("user try to enter room");
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    room.getByID(parseInt(newRoom), function (err, res) {
-		socket.room = res;
-		socket.join(newRoom);
-		//		console.log("socket.request.session.user is ",socket.request.session.user);
-		game.enterRoom(socket.request.session.user, socket.room, function (err) {
-		    sendOwnedStats(socket.room);
-		    sendRoomQuestion(socket, function () {
-			room.getStatus(socket.room, function (err, status) {
-			    if(status == "revealed") {
-				game.getStatsFromRoomID(socket.room.id, function (r,e) {
-				    io.of("/student").to(socket.room.id).emit("correction", e);
+		console.log("user got room", res);
+		Course.getByID(res.courseID, (er, course) => {
+		    User.getSubscription(socket.request.session.user, course, (err, subscription) => {
+			console.log("user got subscription", subscription);
+			if(subscription) {
+			    socket.room = res;
+			    console.log("user enter room");
+			    socket.join(newRoom);
+			    //		console.log("socket.request.session.user is ",socket.request.session.user);
+			    game.enterRoom(socket.request.session.user, socket.room, function (err) {
+				sendOwnedStats(socket.room);
+				sendRoomQuestion(socket, function () {
+				    room.getStatus(socket.room, function (err, status) {
+					if(status == "revealed") {
+					    game.getStatsFromRoomID(socket.room.id, function (r,e) {
+						io.of("/student").to(socket.room.id).emit("correction", e);
+					    });
+					}
+				    });
 				});
-			    }
-			});
+			    });
+			}
 		    });
 		});
 	    });
@@ -184,12 +195,18 @@ module.exports = function (server, sessionMiddleware) {
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    //	    console.log(socket.request.session);
-	    room.getControllableByID(socket.request.session.user, parseInt(newRoom), function (err, res) {
+	    room.getByID(parseInt(newRoom), function (err, res) {
 		if(res) {
-		    socket.room = res;
-		    socket.join(socket.room.id);
-		    sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
-		    //		sendOwnedStats(socket.room);
+		    Course.getByID(res.courseID,(er, course) => {
+			User.getSubscription(socket.request.session.user, course, (err, subscription) => {
+			    if(subscription && subscription.isTDMan) {
+				socket.room = res;
+				socket.join(socket.room.id);
+				sendRoomOwnedQuestion(socket.request.session.user, socket, function (err) {if(err) throw err});
+				//		sendOwnedStats(socket.room);
+			    }
+			});
+		    });
 		}
 	    });
 	});

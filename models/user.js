@@ -156,7 +156,7 @@ exports.getSubscription = function(user, course, callback) {
 	query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ?";
 	bdd.query(query, [user.id, course.id], function (err, res) {
 	    console.log(this.query);
-	    if(res)
+	    if(res) 
 		callback(err, res[0]);
 	    else
 		callback(err, null);

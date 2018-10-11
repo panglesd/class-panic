@@ -59,8 +59,6 @@ router.use(function (req, res, next) {
 
 
 
-// GET request for entering a room.
-//router.get('/course/:idCourse/room/:id', game_controller.room_enter);
 
 
 
@@ -73,10 +71,8 @@ router.use(function (req, res, next) {
 
 router.use("/course", courseRouter);
 
-// GET request for admining a room.
-router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 // GET request for admining a room.
-router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
+//router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 module.exports = router;
