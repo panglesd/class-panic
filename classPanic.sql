@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le :  mar. 09 oct. 2018 à 12:10
+-- Généré le :  jeu. 11 oct. 2018 à 10:52
 -- Version du serveur :  10.1.36-MariaDB
 -- Version de PHP :  7.2.10
 
@@ -35,11 +35,6 @@ CREATE TABLE `courses` (
   `commentaire` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Déchargement des données de la table `courses`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -54,11 +49,6 @@ CREATE TABLE `poll` (
   `last_activity` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `roomID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `poll`
---
-
 
 -- --------------------------------------------------------
 
@@ -77,11 +67,6 @@ CREATE TABLE `questions` (
   `description` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Déchargement des données de la table `questions`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -99,11 +84,6 @@ CREATE TABLE `rooms` (
   `courseID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Déchargement des données de la table `rooms`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -116,11 +96,6 @@ CREATE TABLE `sessions` (
   `data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Déchargement des données de la table `sessions`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -130,13 +105,9 @@ CREATE TABLE `sessions` (
 CREATE TABLE `setDeQuestion` (
   `id` int(11) NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `owner` int(11) NOT NULL
+  `owner` int(11) NOT NULL,
+  `courseID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `setDeQuestion`
---
-
 
 -- --------------------------------------------------------
 
@@ -147,16 +118,11 @@ CREATE TABLE `setDeQuestion` (
 CREATE TABLE `stats` (
   `id` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `correct` enum('juste','faux','NSPP') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `correct` enum('juste','faux','NSPP','unknown') COLLATE utf8mb4_unicode_ci NOT NULL,
   `blocID` int(11) NOT NULL,
   `response` int(11) NOT NULL,
   `responseText` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `stats`
---
-
 
 -- --------------------------------------------------------
 
@@ -174,11 +140,6 @@ CREATE TABLE `statsBloc` (
   `customQuestion` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Déchargement des données de la table `statsBloc`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -187,13 +148,16 @@ CREATE TABLE `statsBloc` (
 
 CREATE TABLE `subscription` (
   `userID` int(11) NOT NULL,
-  `courseID` int(11) NOT NULL
+  `courseID` int(11) NOT NULL,
+  `isTDMan` tinyint(1) NOT NULL,
+  `canRoomCreate` tinyint(1) NOT NULL,
+  `canRoomUpdate` tinyint(1) NOT NULL,
+  `canRoomDelete` tinyint(1) NOT NULL,
+  `canSetUpdate` tinyint(1) NOT NULL,
+  `canSetCreate` tinyint(1) NOT NULL,
+  `canSetDelete` tinyint(1) NOT NULL,
+  `canSubscribe` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `subscription`
---
-
 
 -- --------------------------------------------------------
 
@@ -212,11 +176,6 @@ CREATE TABLE `users` (
   `studentNumber` int(11) NOT NULL,
   `institution` enum('IUT','FAC') COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `users`
---
-
 
 --
 -- Index pour les tables déchargées
@@ -271,7 +230,9 @@ ALTER TABLE `setDeQuestion`
 -- Index pour la table `stats`
 --
 ALTER TABLE `stats`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`userID`),
+  ADD KEY `bloc` (`blocID`);
 
 --
 -- Index pour la table `statsBloc`
@@ -283,7 +244,9 @@ ALTER TABLE `statsBloc`
 -- Index pour la table `subscription`
 --
 ALTER TABLE `subscription`
-  ADD PRIMARY KEY (`userID`,`courseID`) USING BTREE;
+  ADD PRIMARY KEY (`userID`,`courseID`) USING BTREE,
+  ADD KEY `user subs` (`userID`),
+  ADD KEY `course subs` (`courseID`);
 
 --
 -- Index pour la table `users`
@@ -301,49 +264,49 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `poll`
 --
 ALTER TABLE `poll`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `questions`
 --
 ALTER TABLE `questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `setDeQuestion`
 --
 ALTER TABLE `setDeQuestion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `stats`
 --
 ALTER TABLE `stats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `statsBloc`
 --
 ALTER TABLE `statsBloc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Contraintes pour les tables déchargées
@@ -375,6 +338,20 @@ ALTER TABLE `rooms`
 --
 ALTER TABLE `setDeQuestion`
   ADD CONSTRAINT `idOwner` FOREIGN KEY (`owner`) REFERENCES `users` (`id`);
+
+--
+-- Contraintes pour la table `stats`
+--
+ALTER TABLE `stats`
+  ADD CONSTRAINT `bloclog` FOREIGN KEY (`blocID`) REFERENCES `statsBloc` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `userlog` FOREIGN KEY (`userID`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Contraintes pour la table `subscription`
+--
+ALTER TABLE `subscription`
+  ADD CONSTRAINT `subscription_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `subscription_ibfk_2` FOREIGN KEY (`courseID`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
