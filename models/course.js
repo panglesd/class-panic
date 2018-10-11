@@ -89,6 +89,26 @@ exports.subscribeStudent = function(studentID, courseID, callback) {
     query = "INSERT INTO subscription(courseID, userID) VALUES (?,?) ON DUPLICATE KEY UPDATE courseID = courseID";
     bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res)});
 }
+exports.subscribeTDMan = function(studentID, courseID, permission, callback) {
+    query = "INSERT INTO subscription(courseID, userID, canRoomCreate, canRoomUpdate, canRoomDelete, canSetCreate, canSetUpdate, canSetDelete, canSubscribe, isTDMan) VALUES (?,?, ?, ?, ?, ? , ?, ?, ?, 1 ) ON DUPLICATE KEY UPDATE isTDMan = 1 , canRoomCreate = ? , canRoomUpdate = ? , canRoomDelete = ? , canSetCreate = ? , canSetUpdate = ? , canSetDelete = ? , canSubscribe = ? ";
+    params = [courseID, studentID,
+	      permission.canCreateRoom,
+	      permission.canUpdateRoom,
+	      permission.canDeleteRoom,
+	      permission.canCreateSet,
+	      permission.canUpdateSet,
+	      permission.canDeleteSet,
+	      permission.canSubscribe,
+	      permission.canCreateRoom,
+	      permission.canUpdateRoom,
+	      permission.canDeleteRoom,
+	      permission.canCreateSet,
+	      permission.canUpdateSet,
+	      permission.canDeleteSet,
+	      permission.canSubscribe
+	      ]
+    bdd.query(query, params, (err, res) => {console.log(this.sql);console.log(err, res);callback(err, res)});
+}
 exports.unSubscribeStudent = function(studentID, courseID, callback) {
     query = "DELETE FROM subscription WHERE courseID = ? AND userID = ?";
     bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res)});

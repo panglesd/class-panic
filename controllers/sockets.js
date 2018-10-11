@@ -393,11 +393,30 @@ module.exports = function (server, sessionMiddleware) {
 			      });
 			  });
 	});
+	socket.on('subscribeListTDMan', function (studentList, permission) {
+	    console.log("we got this pemission", permission);
+	    if(socket.course.ownerID == socket.request.session.user.id) {
+		//	    console.log("studentList is", studentList);
+		async.forEach(studentList,
+			      (studentID, callback) => {
+				  //			      console.log("I am going to register ", studentID);
+				  Course.subscribeTDMan(studentID, socket.course.id, permission, callback);
+			      },
+			      (err, results) => {
+				  if(!socket.filter)
+				      socket.filter={};
+				  socket.filter.courseID = socket.course.id;
+				  User.userListByFilter(socket.filter, (err, results) => {
+				      socket.emit("users", results);
+				  });
+			      });
+	    }
+	});
 	socket.on('unSubscribeList', function (studentList) {
-//	    console.log("studentList is", studentList);
+	    //	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
-//			      console.log("I am going to unregister ", studentID);
+			      //			      console.log("I am going to unregister ", studentID);
 			      Course.unSubscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {

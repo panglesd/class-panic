@@ -17,7 +17,7 @@ exports.userList = function (callback) {
 
 exports.userListByFilter = function (filter, callback) {
 //    console.log("filter is", filter)
-    query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID FROM '+
+    query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID, isTDMan FROM '+
 	( "users LEFT OUTER JOIN (SELECT * FROM subscription WHERE `courseID` = ? ) subs ON `users`.`id` = `subs`.`userID`")+
 	' WHERE 1=1 '+
 	(filter.name ? " AND fullName LIKE ?" : "") +

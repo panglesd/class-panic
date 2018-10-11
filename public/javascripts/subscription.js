@@ -20,6 +20,11 @@ socket.on("users", (list) => {
 	li.textContent = student.fullName+" ("+student.studentNumber+"), " + "eleve de "+student.institution+", promotion "+student.promotion+"/"+(student.promotion+1);
 	if (student.courseID)
 	    li.style.color="red";
+	if (student.isTDMan)
+	    li.style.color="green";
+	if (student.id == courseID)
+	    li.style.color="orange";
+	
 	li.id = student.id;
 	li.onclick = (event) => {event.target.classList.toggle("selected-for-subscription");};
 	li.classList.add("room");
@@ -53,6 +58,32 @@ function subscribeStudent() {
     let arr = Array.from(l);
     console.log("arr is", arr);
     socket.emit("subscribeList", arr.map((e) => { return parseInt(e.id)}));
+    // Prevenir l'utilisateur de l'inscription
+}
+function subscribeTDMan() {
+    let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
+    let arr = Array.from(l);
+    console.log("arr is", arr);
+    console.log({
+		    canCreateRoom: document.querySelector("#canCreateRoom").checked,
+		    canUpdateRoom: document.querySelector("#canUpdateRoom").checked,
+		    canDeleteRoom: document.querySelector("#canDeleteRoom").checked,
+		    canCreateSet: document.querySelector("#canCreateSet").checked,
+		    canUpdateSet: document.querySelector("#canUpdateSet").checked,
+		    canDeleteSet: document.querySelector("#canDeleteSet").checked,
+		    canSubscribe: document.querySelector("#canSubscribe").checked
+    });
+    socket.emit("subscribeListTDMan", arr.map((e) => { return parseInt(e.id)}),
+		{
+		    canCreateRoom: document.querySelector("#canCreateRoom").checked,
+		    canUpdateRoom: document.querySelector("#canUpdateRoom").checked,
+		    canDeleteRoom: document.querySelector("#canDeleteRoom").checked,
+		    canCreateSet: document.querySelector("#canCreateSet").checked,
+		    canUpdateSet: document.querySelector("#canUpdateSet").checked,
+		    canDeleteSet: document.querySelector("#canDeleteSet").checked,
+		    canSubscribe: document.querySelector("#canSubscribe").checked
+		});
+    document.querySelector(".window").classList.remove("shown");
     // Prevenir l'utilisateur de l'inscription
 }
 function unSubscribeStudent() {

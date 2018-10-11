@@ -34,9 +34,14 @@
 	    <p>
 		<input type="button" id="selectAll" value="Tout selectionner">
 		<input type="button" id="unSelectAll" value="Tout deselectionner">
+	    </p>
+	    <p>
 		<input type="button" id="subscribe" value="Inscrire la selection">
 		<input type="button" id="unsubscribe" value="Desinscrire la selection">
 	    </p>
+	    <% if(course.ownerID == user.id) { %>
+		<input type="button" id="TDMan" value="Inscrire comme TDMan">
+	    <% }%>
 	</form>
 	
 	<div id="wrapper-student-list">
@@ -92,8 +97,43 @@
 	 else
 	     wrapper.style.display = "none"
      });
+
+     document.querySelector("#TDMan").addEventListener("click", (ev) => {
+	 list = document.querySelector("#tdman-list");
+	 list.innerHTML = "";
+	 document.querySelectorAll(".selected-for-subscription").forEach((elem) => {
+	     let li = document.createElement("li")
+	     li.textContent = elem.textContent
+	     list.appendChild(li);
+	 });
+	 document.querySelector(".window").classList.toggle("shown");
+     });
      callSearch();
     </script>
+<% } %>
+
+<% if(course.ownerID == user.id) {%>
+    <div class="window" id="win">
+	<h2> Inscrire comme TDMan :</h2>
+	Inscrire comme TDMan les utilisateurs suivants :
+	<ul id="tdman-list">
+	</ul>
+	<h2> Droits :</h2>
+	De base, un TDMan peut controller et corriger des salles. Choisir leurs droits supplémentaires :
+	<p>
+	    <input type='checkbox' id="canCreateRoom" name="canCreateRoom" > Peut créer des rooms <br>
+	    <input type='checkbox' id="canUpdateRoom" name="canUpdateRoom" > Peut modifier des rooms <br>
+	    <input type='checkbox' id="canDeleteRoom" name="canDeleteRoom" > Peut supprimer des rooms <br>
+	    <input type='checkbox' id="canCreateSet" name="canCreateSet" > Peut créer des sets <br>
+	    <input type='checkbox' id="canUpdateSet" name="canUpdateSet" > Peut modifier des sets <br>
+	    <input type='checkbox' id="canDeleteSet" name="canDeleteSet" > Peut supprimer des sets <br>
+	    <input type='checkbox' id="canSubscribe" name="canSubscribe" > Peut inscrire des étudiants (non TDMan) <br>
+	</p>
+	<p>
+	    <input type='button' onclick="subscribeTDMan()" value='Inscrire'>
+	    <input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'>
+	</p>
+    </div>
 <% } %>
 
 <a href="<%= config.PATH %>/course/<%= course.id %>/">Retourner au cours</a>
