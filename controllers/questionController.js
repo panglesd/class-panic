@@ -17,7 +17,7 @@ var async = require('async');
 renderManageQuestion = function(user, course, question, set, msgs, req, res) {
     async.parallel(
 	{
-	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    title: function(callback) { callback(null, "Big Sister: Gérer vos sets de questions")},
 	    config: function(callback) { callback(null, config) },	
 	    user: function (callback) {
 		callback(null, user);
