@@ -30,8 +30,8 @@ exports.getOwnedByID = function(user, courseID, callback) {
 // By ID
 
 exports.subscribedCourses = function (user, callback) {
-    query = "SELECT * FROM courses WHERE id IN (SELECT courseID FROM subscription WHERE userID = ?)";
-    bdd.query(query, [user.id], function(err, rows) {
+    query = "SELECT * FROM courses WHERE id IN (SELECT courseID FROM subscription WHERE userID = ?) OR ownerID = ?";
+    bdd.query(query, [user.id, user.id], function(err, rows) {
 //	console.log(rows);
 	callback(err, rows);
     })
