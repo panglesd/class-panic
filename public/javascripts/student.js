@@ -76,10 +76,12 @@ socket.on('newQuestion', function (reponse) {
 	    textarea = document.createElement("textarea");
 	    textarea.style.width="100%"
 	    textarea.style.display="block"
-	    textarea.addEventListener("input", (ev) => {
-		console.log("updateed");
-		chooseAnswer(index, event.currentTarget.parentNode);
-	    });
+	    if(typeof isAdmin == "undefined") {
+		textarea.addEventListener("input", (ev) => {
+		    console.log("updateed");
+		    chooseAnswer(index, event.currentTarget.parentNode);
+		});
+	    }
 	    elem.appendChild(textarea);
 	}
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
