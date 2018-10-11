@@ -8,7 +8,7 @@
 
 <h2> <%= newQuestion ? "Création" : "Modification" %> d'une question</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
-<form id="newQuestion" method="post" action="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
+<form id="newQuestion" method="post" action="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
     <ul class="room" id="listeQue">
 	<li class="room">
 	    <span class="froom">Énoncé :</span>
@@ -44,12 +44,12 @@ Utiliser $...$ pour mettre des maths.
 </form>
 <% if (!newQuestion) { %>
     <div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
-	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= question.id %>/delete">
+	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= question.id %>/delete">
 	    <input type="submit" value="Supprimer cette question"">
 	</form>
     </div>
 <% } %>
-<a href="<%= config.PATH %>/manage/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
+<a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
 <script>
  function toggleText(elem) {
      elem.classList.toggle("texted");

@@ -20,20 +20,26 @@ exports.stats = (req, res) => {
 	    msgs : function(callback) {
 		callback(null, req.msgs);
 	    },
+	    course : function(callback) {
+		callback(null, req.course);
+	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
+	    },
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
 	    roomOwnedList : function (callback) {
 		Room.ownedList(req.session.user, callback);
 	    },
-	    courseOwnedList : function(callback) {
-		Course.ownedList(req.session.user, callback);
+	    courseSubscribedList : function(callback) {
+		Course.subscribedAsTDMan(req.session.user, callback);
 	    },
 	    questionOwnedList : function(callback) {
-		Question.ownedList(req.session.user, callback);
+		Question.listByCourseID(req.course.id, callback);
 	    },
 	    setOwnedList : function(callback) {
-		Set.setOwnedList(req.session.user, callback);
+		Set.listByCourseID(req.course.id, callback);
 	    }
 	},
 	function (err, results) {

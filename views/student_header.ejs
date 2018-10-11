@@ -10,9 +10,11 @@
       <h1>Class Panic</h1>
       <nav>
 	<ul>
-	  <a href="<%= config.PATH %>/course"><li  <%= active == "salles" ? "class=selected" : "" %>>Mes cours</li></a>
-<!--	  <a href="<%= config.PATH %>/room"><li  <%= active == "join" ? "class=selected" : "" %>>Rejoindre un cours</li></a>-->
-	  <%- user.isAdmin ? '<a href="'+ config.PATH +'/manage/course"><li>Administrer</li>' : "" %></a>
+	  <a href="<%= config.PATH %>/course"><li  <%= active == "salles" ? "class=selected" : "" %>>Travailler</li></a>
+	  <!--	  <a href="<%= config.PATH %>/room"><li  <%= active == "join" ? "class=selected" : "" %>>Rejoindre un cours</li></a>-->
+	  <% if(user.isAdmin) { %>
+	      <a href="<%= config.PATH %>/manage/course" <%= active == "courses" ? "class=selected" : "" %>><li>Gérer mes cours</li></a>
+	  <% } %>
 <!--	  <li><a href="<%= config.PATH %>/user">Mon compte</a></li>-->
 	  <a id="leave" href="<%= config.PATH %>/logout"><li>Se d&eacute;connecter</li></a>
       </nav>

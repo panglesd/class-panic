@@ -42,6 +42,12 @@ exports.listOwnedByRoomID = function (user, id, callback) {
     });
 }
 
+exports.listByCourseID = function (courseID, callback) {
+    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ", [courseID], function(err, qList) {
+	callback(err, qList);
+    });
+}
+
 /***********************************************************************/
 /*       Getters pour les question : individus                         */
 /***********************************************************************/
@@ -50,7 +56,8 @@ exports.listOwnedByRoomID = function (user, id, callback) {
 
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
-//	console.log(rows);
+	//	console.log(rows);
+	console.log(err);
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
 	q.reponses.forEach(function(rep) { delete rep.validity });
@@ -70,6 +77,20 @@ exports.getOwnedByID = function (user, questionId, callback) {
 
 exports.getFirstOfOwnedSet = function (user, setID, callback) {
     bdd.query('SELECT * from `questions` WHERE owner = ? AND indexSet = 0 AND class = ?', [user.id, setID], function (err, rows) {
+	if(err)
+	    callback(err, null)
+	else if (rows.length == 0)
+	    callback("Set associé vide");
+	else {
+	    q = rows[0];
+	    q.reponses = JSON.parse(q.reponses);
+	    callback(err, q);
+	}
+    });
+}
+
+exports.getFirstOfSet = function (setID, callback) {
+    bdd.query('SELECT * from `questions` WHERE indexSet = 0 AND class = ?', [setID], function (err, rows) {
 	if(err)
 	    callback(err, null)
 	else if (rows.length == 0)

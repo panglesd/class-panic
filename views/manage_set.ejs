@@ -1,14 +1,14 @@
 <%- include('admin_header', {active:"sets"}); -%>
 
 <h2> Renommer ou supprimer "<%= set.name%>"</h2>
-<form action="<%= config.PATH %>/manage/set/<%=set.id%>/update" method="post">
+<form action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/update" method="post">
     Name : <input name="name" value="<%= set.name %>"> <br>
     <input type="submit" value="Modifier">
 </form>
 
 <h2>Ou la supprimer</h2>
 
-<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/manage/set/<%=set.id%>/delete" method="post">
+<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/delete" method="post">
     Irréversible : <input type="submit" value='Supprimer le set "<%= set.name%>"'>
 </form>
 
@@ -17,16 +17,18 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room sortable-list">
     <% questionList.forEach(function(q) { %>
-	<li class="question" id="q<%= q.id %>">
-		<span class="froom"><%= q.enonce %></span>
-		<div>
-			<a class="room" href="<%= config.PATH %>/manage/set/<%= set.id %>/question/<%= q.id %>"> Modifier </a>
-		</div>
-	</li>
+	    <li class="question" id="q<%= q.id %>">
+		<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= q.id %>"> 
+		    <span class="froom"><%= q.enonce %></span>
+		    <div>
+			Modifier
+		    </div>
+		</a>
+	    </li>
     <% });%>
     </ul>
     <ul>
-	<a href="<%= config.PATH %>/manage/set/<%= set.id %>/question/create">
+	<a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/create">
 	    <li class="room">
 		<span class="froom">Créer une nouvelle question</span>
 		<!--	<div>
@@ -36,7 +38,7 @@
 	</a>
 </ul>
 
-<a style="display:block; margin:40px;" href="<%= config.PATH %>/manage/set"> Retourner à la liste des sets </a>
+<a style="display:block; margin:40px;" href="<%= config.PATH %>/course/<%= course.id %>/set"> Retourner à la liste des sets </a>
 <script src="/javascripts/Sortable.js">
  </script>
  <script src="/socket.io/socket.io.js"></script>
@@ -53,6 +55,7 @@
       });
       return tmp;
   }
+  
   Sortable.create(document.querySelector('.sortable-list'), {
       onUpdate: function (event) {
 	  console.log(event);

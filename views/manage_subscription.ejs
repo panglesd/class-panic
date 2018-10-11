@@ -1,67 +1,101 @@
-<%- include('admin_header', {active : "salles"}); -%>
-
-
-<h2>Inscrire des élèves au cours <%= course.name %> :</h2>
-<form id="searchForm">
-    <p>
-	<label>Nom :</label><br>
-	<input type="text" id="name" name="name">
-    </p>
-    <p>
-	<label>Numéro(s) d'étudiant :</label><br>
-	<input type="text" name="n_etu" id="n_etu">
-    </p>
-    <p>
-	<label>Promotion</label><br>
-	<select name="promotion" id="promotion">
-	    <option value="2018">2018/2019</option>
-	</select>
-    </p>
-    <p>
-	<label>Institution</label><br>
-	<select name="institution" id="institution">
-	    <option value="IUT">IUT sénard</option>
-	    <option value="FAC">FAC de Créteil</option>
-	</select>
-    </p>
-    <p>
-	<input type="button" id="selectAll" value="Tout selectionner">
-	<input type="button" id="unSelectAll" value="Tout deselectionner">
-	<input type="button" id="subscribe" value="Inscrire la selection">
-	<input type="button" id="unsubscribe" value="Desinscrire la selection">
-    </p>
-</form>
-
-<div id="wrapper-student-list">
-
+<%- include('admin_header', {active : "subscription"}); -%>
+<% if(subscription.canSubscribe) { %>
+    <h2 style="cursor:pointer" id="inscription-etu-titre">Inscrire des élèves au cours <%= course.name %> :</h2>
+    <div id="wrapper-inscriptions" style="display:none">
+	<form id="searchForm">
+	    <p>
+		<label>Nom :</label><br>
+		<input type="text" id="name" name="name">
+	    </p>
+	    <p>
+		<label>Numéro(s) d'étudiant :</label><br>
+		<input type="text" name="n_etu" id="n_etu">
+	    </p>
+	    <p>
+		<label>Promotion</label><br>
+		<select name="promotion" id="promotion">
+		    <option value="2018">2018/2019</option>
+		</select>
+	    </p>
+	    <p>
+		<label>Institution</label><br>
+		<select name="institution" id="institution">
+		    <option value="IUT">IUT sénard</option>
+		    <option value="FAC">FAC de Créteil</option>
+		</select>
+	    </p>
+	    <p>
+		<label>Inscris à</label><br>
+		<select name="subscribed" id="subscribed">
+		    <option value="IUT">IUT sénard</option>
+		    <option value="FAC">FAC de Créteil</option>
+		</select>
+	    </p>
+	    <p>
+		<input type="button" id="selectAll" value="Tout selectionner">
+		<input type="button" id="unSelectAll" value="Tout deselectionner">
+		<input type="button" id="subscribe" value="Inscrire la selection">
+		<input type="button" id="unsubscribe" value="Desinscrire la selection">
+	    </p>
+	</form>
+	
+	<div id="wrapper-student-list">
+	    
+	</div>
+    </div>
+<% } %>
+<h2 id="liste-etu-titre">Les étudiants de ce cours :</h2>
+<div id="wrapper-list-inscrits">
+<ul class="room">
+    <% students.forEach(function(student) { %>
+	<li class="room">
+	   <%= student.fullName %> (n°<%= student.studentNumber %>)
+	</li>
+    <% }); %>
+</ul>
 </div>
+<% if(subscription.canSubscribe) { %>
+    <script>
+	var server = "<%= server %>";
+	var courseID = <%= course.id %>;
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/subscription.js"></script>
+    
+    <script>
+     function callSearch() {
+	 name = document.querySelector("#name").value;
+	 n_etu = document.querySelector("#n_etu").value;
+	 promotion = document.querySelector("#promotion").value;
+	 institution = document.querySelector("#institution").value;
+	 searchStudent(name, n_etu, promotion, institution);
+     }
+     document.querySelector("#n_etu").addEventListener("change", callSearch);
+     document.querySelector("#name").addEventListener("input", callSearch);
+     document.querySelector("#promotion").addEventListener("change", callSearch);
+     document.querySelector("#institution").addEventListener("change", callSearch);
+     document.querySelector("#selectAll").addEventListener("click", selectAll);
+     document.querySelector("#unSelectAll").addEventListener("click", unSelectAll);
+     document.querySelector("#subscribe").addEventListener("click", subscribeStudent);
+     document.querySelector("#unsubscribe").addEventListener("click", unSubscribeStudent);
+     document.querySelector("#liste-etu-titre").addEventListener("click", (ev) => {
+	 wrapper = document.querySelector("#wrapper-list-inscrits");
+	 if(wrapper.style.display == "none") 
+	     wrapper.style.display = ""
+	 else
+	     wrapper.style.display = "none"
+     });
+     document.querySelector("#inscription-etu-titre").addEventListener("click", (ev) => {
+	 wrapper = document.querySelector("#wrapper-inscriptions");
+	 if(wrapper.style.display == "none") 
+	     wrapper.style.display = ""
+	 else
+	     wrapper.style.display = "none"
+     });
+     callSearch();
+    </script>
+<% } %>
 
-<script>
- var server = "<%= server %>";
- var courseID = <%= course.id %>;
-</script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/javascripts/subscription.js"></script>
-
-<script>
- function callSearch() {
-     name = document.querySelector("#name").value;
-     n_etu = document.querySelector("#n_etu").value;
-     promotion = document.querySelector("#promotion").value;
-     institution = document.querySelector("#institution").value;
-     searchStudent(name, n_etu, promotion, institution);
- }
- document.querySelector("#n_etu").addEventListener("change", callSearch);
- document.querySelector("#name").addEventListener("input", callSearch);
- document.querySelector("#promotion").addEventListener("change", callSearch);
- document.querySelector("#institution").addEventListener("change", callSearch);
- document.querySelector("#selectAll").addEventListener("click", selectAll);
- document.querySelector("#unSelectAll").addEventListener("click", unSelectAll);
- document.querySelector("#subscribe").addEventListener("click", subscribeStudent);
- document.querySelector("#unsubscribe").addEventListener("click", unSubscribeStudent);
- callSearch();
-</script>
-
-<a href="<%= config.PATH %>/manage/course/<%= course.id %>/">Retourner au cours</a>
+<a href="<%= config.PATH %>/course/<%= course.id %>/">Retourner au cours</a>
 
 <%- include('admin_footer'); -%>
