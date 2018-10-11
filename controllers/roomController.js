@@ -16,7 +16,7 @@ var courseController = require("./courseController");
 renderRooms = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -43,7 +43,7 @@ renderRooms = function(user, msgs, req, res) {
     renderRoomManage = function (user, course, room, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Administrer "+room.name)},
+	    title : function(callback) { callback(null, "Big Sister: Administrer "+room.name)},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -74,7 +74,7 @@ renderRooms = function(user, msgs, req, res) {
     renderManageRooms = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
