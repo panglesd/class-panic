@@ -16,7 +16,7 @@ var async = require('async');
 renderCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -39,7 +39,7 @@ renderCourses = function(user, msgs, req, res) {
 renderCourse = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -69,7 +69,7 @@ renderCourse = function(user, course, msgs, req, res) {
 renderCourseManage = function (user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Administrer "+course.name)},
+	    title : function(callback) { callback(null, "Big Sister: Administrer "+course.name)},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -104,7 +104,7 @@ renderCourseManage = function (user, course, msgs, req, res) {
 renderManageCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -166,7 +166,7 @@ exports.course_manage_all = function(req, res) {
 exports.subscribe_list = function(req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: ... une salle")},
+	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );

@@ -12,7 +12,7 @@ var courseController = require("./courseController");
 exports.stats = (req, res) => {
         async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Rejoindre une salle")},
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, req.session.user);

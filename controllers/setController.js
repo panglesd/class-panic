@@ -16,7 +16,7 @@ var async = require('async');
 renderManageSets = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    title : function(callback) { callback(null, "Big Sister: Gérer vos sets de questions")},
 	    config : function(callback) { callback(null, config) },	
 	    user : function (callback) {
 		callback(null, user);
@@ -45,7 +45,7 @@ renderManageSets = function(user, course, msgs, req, res) {
 renderManageSet = function(req, user, course, set, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
+	    title : function(callback) { callback(null, "Big Sister: Gérer vos sets de questions")},
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
