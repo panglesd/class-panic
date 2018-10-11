@@ -3,14 +3,13 @@
 <h2>Votre cours <%= course.name %> :</h2>
 <% if(course.ownerID == user.id) { %>
     <form action="<%= config.PATH %>/course/<%=course.id%>/update" method="post">
-	Name : <input name="name" style="margin:10px;" value="<%= course.name %>"> <br>
-	Description : <textarea name="commentaire" rows="10" style="display:block;width:90%; margin:20px" ><%= course.commentaire %></textarea>
-	<input type="submit" value="Modifier">
-    </form>
-<% } else {%>
-    Name : <%= course.name %> <br>
-    Description : <div><%= course.commentaire %></div>
 <% } %>
+Name : <input <%= course.ownerID == user.id ? "" : "readonly" %> name="name" style="margin:10px;" value="<%= course.name %>"> <br>
+Description : <textarea <%= course.ownerID == user.id ? "" : "readonly" %>  name="commentaire" rows="10" style="display:block;width:90%; margin:20px" ><%= course.commentaire %></textarea>
+<% if(course.ownerID == user.id) { %>
+    <input type="submit" value="Modifier">
+    </form>
+<% }%>
 
 <h2>Travailler</h2>
 <ul class="room">

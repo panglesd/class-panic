@@ -1,25 +1,33 @@
 <%- include('admin_header', {active : "salles"}); -%>
 
-<h2>Modifier votre salle <%= room.name %></h2>
-
-<form action="<%= config.PATH %>/course/<%= course.id %>/room/<%=room.id%>/update" method="post">
-    Name : <input name="name" value="<%= room.name %>"> <br>
-    Acutellement avec le set :
-    <select name="questionSet">
-	<% setOwnedList.forEach( function (set) { %>
-	    <option value="<%=set.id%>" <%= set.id==room.questionSet ? "selected" : ""%>>
-		<%=set.name %>
-	    </option>
-	<% }); %>
-    </select>
+<% if(subscription.canRoomUpdate) {%>
+    <h2>Modifier votre salle <%= room.name %></h2>
+<% } else { %>
+    <h2> La salle <%= room.name %></h2>
+<% } %>
+<% if(subscription.canRoomUpdate) {%>
+    <form action="<%= config.PATH %>/course/<%= course.id %>/room/<%=room.id%>/update" method="post">
+<% } %>
+Name : <input <%= subscription.canRoomUpdate ? "" : "readonly" %> name="name" value="<%= room.name %>"> <br>
+Actuellement avec le set :
+<select <%= subscription.canRoomUpdate ? "" : "readonly" %> name="questionSet">
+    <% setOwnedList.forEach( function (set) { %>
+	<option value="<%=set.id%>" <%= set.id==room.questionSet ? "selected" : ""%>>
+	    <%=set.name %>
+	</option>
+    <% }); %>
+</select>
+<% if(subscription.canRoomUpdate) {%>
     <input type="submit" value="Modifier">
-</form>
-
-<h2>Ou la supprimer</h2>
-
-<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="<%= config.PATH %>/course/<%= room.courseID %>/room/<%=room.id%>/delete" method="post">
-    Irréversible : <input type="submit" value="Supprimer la salle <%= room.name%>">
-</form>
+    </form>
+<% } %>
+<% if(subscription.canRoomDelete) {%>
+    <h2>Ou la supprimer</h2>
+    
+    <form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="<%= config.PATH %>/course/<%= room.courseID %>/room/<%=room.id%>/delete" method="post">
+	Irréversible : <input type="submit" value="Supprimer la salle <%= room.name%>">
+    </form>
+<% } %>
 
 <a style="display:block; margin:40px;" href="<%= config.PATH %>/course/<%= room.courseID %>"> Retourner à la liste des rooms </a>
 

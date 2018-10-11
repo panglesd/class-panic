@@ -362,7 +362,7 @@ module.exports = function (server, sessionMiddleware) {
 	socket.on("chooseCourse", function(courseID) {
 	    Course.getByID(parseInt(courseID), function (err, course) {
 		User.getSubscription(socket.request.session.user, course, function(err, subs) {
-		    if(subs.canSubscribe)
+		    if(subs && subs.canSubscribe)
 			socket.course = course;
 		});
 	    });
@@ -395,6 +395,8 @@ module.exports = function (server, sessionMiddleware) {
 	});
 	socket.on('subscribeListTDMan', function (studentList, permission) {
 	    console.log("we got this pemission", permission);
+	    console.log("socket.course.ownerID",socket.course.ownerID);
+	    console.log("socket.request.session.user.id",socket.request.session.user.id);
 	    if(socket.course.ownerID == socket.request.session.user.id) {
 		//	    console.log("studentList is", studentList);
 		async.forEach(studentList,
@@ -417,7 +419,8 @@ module.exports = function (server, sessionMiddleware) {
 	    async.forEach(studentList,
 			  (studentID, callback) => {
 			      //			      console.log("I am going to unregister ", studentID);
-			      Course.unSubscribeStudent(studentID, socket.course.id, callback);
+			      if(studentID != socket.request.session.user.id)
+				  Course.unSubscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
 			      if(!socket.filter)

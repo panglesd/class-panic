@@ -1,21 +1,28 @@
 <%- include('admin_header', {active:"sets"}); -%>
 
-<h2> Renommer ou supprimer "<%= set.name%>"</h2>
-<form action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/update" method="post">
-    Name : <input name="name" value="<%= set.name %>"> <br>
-    <input type="submit" value="Modifier">
-</form>
-
-<h2>Ou la supprimer</h2>
-
-<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/delete" method="post">
-    Irréversible : <input type="submit" value='Supprimer le set "<%= set.name%>"'>
-</form>
-
-
-<h2> Votre set "<%= set.name %>" contient les questions suivantes (glisser-déposer pour réordonner) :</h2>
-<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
-<ul class="room sortable-list">
+<% if(subscription.isTDMan) { %>
+    <% if(subscription.canSetUpdate) { %>
+	<h2> Renommer ou supprimer "<%= set.name%>"</h2>
+    <% } else { %>
+	<h2><%= set.name%></h2>
+    <% } %>
+    <form action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/update" method="post">
+	Name : <input name="name" value="<%= set.name %>"> <br>
+	<input type="submit" value="Modifier">
+    </form>
+    <% if(subscription.canSetUpdate) { %>
+	<h2>Ou la supprimer</h2>
+	
+	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/delete" method="post">
+	    Irréversible : <input type="submit" value='Supprimer le set "<%= set.name%>"'>
+	</form>
+    <% } %>
+    
+    
+    
+    <h2> Votre set "<%= set.name %>" contient les questions suivantes  <%= subscription.canSetUpdate ? "(glisser-déposer pour réordonner)" : "" %> :</h2>
+    <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class=" <%= subscription.canSetUpdate ? "room sortable-list" : "" %>">
     <% questionList.forEach(function(q) { %>
 	    <li class="question" id="q<%= q.id %>">
 		<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= q.id %>"> 
@@ -27,44 +34,46 @@
 	    </li>
     <% });%>
     </ul>
-    <ul>
-	<a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/create">
-	    <li class="room">
-		<span class="froom">Créer une nouvelle question</span>
-		<!--	<div>
-		     <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
-		     </div> -->
-	    </li>
-	</a>
-</ul>
-
-<a style="display:block; margin:40px;" href="<%= config.PATH %>/course/<%= course.id %>/set"> Retourner à la liste des sets </a>
-<script src="/javascripts/Sortable.js">
- </script>
- <script src="/socket.io/socket.io.js"></script>
- <script>
-  var server = "<%= server %>";
-  var socket = io.connect(server+'/manage');
-
-  function getOrder() {
-      tmp = [];
-      i=0;
-      document.querySelectorAll("li.question").forEach(function (q) {
-	  tmp[i]=q.id.split("q")[1];
-	  i++;
-      });
-      return tmp;
-  }
-  
-  Sortable.create(document.querySelector('.sortable-list'), {
-      onUpdate: function (event) {
-	  console.log(event);
-	  no = getOrder();
-	  console.log(no);
-	  socket.emit("new order", no);
-	  
-      }
-  });
-</script>
-
+    <% if(subscription.canSetUpdate) { %>
+	<ul>
+	    <a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/create">
+		<li class="room">
+		    <span class="froom">Créer une nouvelle question</span>
+		    <!--	<div>
+			 <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+			 </div> -->
+		</li>
+	    </a>
+	</ul>
+    <% } %>
+    
+    <a style="display:block; margin:40px;" href="<%= config.PATH %>/course/<%= course.id %>/set"> Retourner à la liste des sets </a>
+    <script src="/javascripts/Sortable.js">
+    </script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+     var server = "<%= server %>";
+     var socket = io.connect(server+'/manage');
+     
+     function getOrder() {
+	 tmp = [];
+	 i=0;
+	 document.querySelectorAll("li.question").forEach(function (q) {
+	     tmp[i]=q.id.split("q")[1];
+	     i++;
+	 });
+	 return tmp;
+     }
+     
+     Sortable.create(document.querySelector('.sortable-list'), {
+	 onUpdate: function (event) {
+	     console.log(event);
+	     no = getOrder();
+	     console.log(no);
+	     socket.emit("new order", no);
+	     
+	 }
+     });
+    </script>
+<% } %>
 <%- include('admin_footer'); -%>
