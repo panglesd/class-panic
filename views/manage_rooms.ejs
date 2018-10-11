@@ -3,7 +3,7 @@
 <h2>Vos salle(s) de classe :</h2>
 <ul class="room">
     <% roomOwnedList.forEach(function(room) { %>
-	<a class="room" href="<%= config.PATH %>/manage/course/<%= course.id %>/room/<%= room.id %>">
+	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/room/<%= room.id %>">
 	    <li class="room">
 		<span class="froom"><%= room.name %></span>
 		<ul>		
@@ -30,7 +30,7 @@
 <% if(subscription.canRoomCreate) {%>
     <div class="window" id="win">
 	<h2> Créer une salle de classe</h2>
-	<form action="<%= config.PATH %>/manage/course/<%= course.id %>/room/create" method="post">
+	<form action="<%= config.PATH %>/course/<%= course.id %>/room/create" method="post">
 	    <p>
 		<input type='text' name="name" placeholder='Nom de la salle'>
 	    </p>

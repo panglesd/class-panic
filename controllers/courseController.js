@@ -80,6 +80,9 @@ renderCourseManage = function (user, course, msgs, req, res) {
 	    msgs : function(callback) {
 		callback(null, msgs);
 	    },
+	    roomList : function(callback) {
+		Room.listOfCourse(course.id, callback);
+	    },
 	    subscription: function(callback) {
 		callback(null, req.subscription);
 	    },
@@ -113,7 +116,7 @@ renderManageCourses = function(user, msgs, req, res) {
 		callback(null, msgs);
 	    },
 	    courseOwnedList :  function (callback) {
-		Course.ownedList(user, callback);
+		Course.subscribedCourses(user, callback);
 	    }
 /*	    setOwnedList :  function (callback) {
 		Set.setOwnedList(user, callback);

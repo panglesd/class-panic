@@ -4,7 +4,7 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
     <% courseOwnedList.forEach(function(cours) { %>
-	<a class="room" href="<%= config.PATH %>/manage/course/<%= cours.id %>">
+	<a class="room" href="<%= config.PATH %>/course/<%= cours.id %>">
 	    <li class="room">
 		<span class="froom"><%= cours.name %></span>
 		<ul>		
@@ -13,22 +13,24 @@
 		     </ul>
 		<div>
 		    <ul>
-<!-- 			<a class="room" href="<%= config.PATH %>/manage/room/<%= //room.id %>"><li> Modifier </li></a> -->
+<!-- 			<a class="room" href="<%= config.PATH %>/room/<%= //room.id %>"><li> Modifier </li></a> -->
 <!--			<a class="room" href="<%= config.PATH %>/admin/<%= //room.id %>"><li> Détails du cours </li></a> -->
 		    </ul>
 		</div>
 	    </li>
 	</a>
     <% });%>
-    <a class="room" onclick="document.querySelector('#win').classList.toggle('shown');window.scrollTo(0,0)">
-	<li style="cursor:pointer; text-align:center;" class="room">
-	    <span class="froom">+</span>
-	</li>
-    </a>
+    <% if(user.isAdmin) { %>
+	<a class="room" onclick="document.querySelector('#win').classList.toggle('shown');window.scrollTo(0,0)">
+	    <li style="cursor:pointer; text-align:center;" class="room">
+		<span class="froom">+</span>
+	    </li>
+	</a>
+    <% } %>
 <!--    <li class="room">
 	<span class="froom">Créer un nouveau cours</span>
 	<div>
-	<form id="formNewRoom" action="<%= config.PATH %>/manage/course/create" method="post">
+	<form id="formNewRoom" action="<%= config.PATH %>/course/create" method="post">
 	    <input placeholder="Nom du cours" name="name"> -->
 <!--	    <select name="questionSet">
 		<% //setOwnedList.forEach( function (set) { %>
@@ -43,20 +45,22 @@
     </li> -->
 </ul>
 
-<div class="window" id="win">
-    <h2> Créer un nouveau cours</h2>
-    <form action="<%= config.PATH %>/manage/course/create" method="post">
-	<p>
-	    <input type='text' name="name" placeholder='Nom du nouveau cours'>
-	</p>
-	<p>
-	    <textarea name="commentaire" placeholder="Une description du cours" style="width:80%;height:90px";></textarea>
-	</p>
-	<p>
-	    <input type='submit' value='Créer le cours'>
-	    <input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'>
-	</p>
-    </form>
-</div>
+<% if(user.isAdmin) { %>
+    <div class="window" id="win">
+	<h2> Créer un nouveau cours</h2>
+	<form action="<%= config.PATH %>/course/create" method="post">
+	    <p>
+		<input type='text' name="name" placeholder='Nom du nouveau cours'>
+	    </p>
+	    <p>
+		<textarea name="commentaire" placeholder="Une description du cours" style="width:80%;height:90px";></textarea>
+	    </p>
+	    <p>
+		<input type='submit' value='Créer le cours'>
+		<input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'>
+	    </p>
+	</form>
+    </div>
+<% } %>
 
 <%- include('admin_footer'); -%>

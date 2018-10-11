@@ -51,10 +51,10 @@ router.use('/:courseID/', function (req, res, next) {
 		    req.subscription = subscription;
 		    req.course = course;
 		    console.log(subscription)
-		    if(req.subscription.isTDMan)
+//		    if(req.subscription.isTDMan)
 			next();
-		    else
-			res.redirect(config.PATH);
+//		    else
+//			res.redirect(config.PATH);
 		}
 		else
 		    res.redirect(config.PATH);

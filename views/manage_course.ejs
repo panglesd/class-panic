@@ -2,7 +2,7 @@
 
 <h2>Votre cours <%= course.name %> :</h2>
 <% if(course.ownerID == user.id) { %>
-    <form action="<%= config.PATH %>/manage/course/<%=course.id%>/update" method="post">
+    <form action="<%= config.PATH %>/course/<%=course.id%>/update" method="post">
 	Name : <input name="name" style="margin:10px;" value="<%= course.name %>"> <br>
 	Description : <textarea name="commentaire" rows="10" style="display:block;width:90%; margin:20px" ><%= course.commentaire %></textarea>
 	<input type="submit" value="Modifier">
@@ -11,13 +11,33 @@
     Name : <%= course.name %> <br>
     Description : <div><%= course.commentaire %></div>
 <% } %>
+
+<h2>Travailler</h2>
+<ul class="room">
+    <% roomList.forEach(function(room) { %>
+	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%= subscription.isTDMan ? "control" : "play"%>/<%= room.id %>">
+	    <li class="room">
+		<span class="froom"><%= room.name %></span>
+		<ul>
+		    <li>Nombre de participants : <%= //room.number %></li>
+		    <li>Administrateur: <%=room.owner %></li>
+		</ul>
+		<div>
+		    Rejoindre
+		</div>
+	    </li>
+	</a>
+  <% });%>
+</ul>
+
+
 <% if(course.ownerID == user.id) { %>
 <h2>Ou le supprimer</h2>
 
-<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer le cours <%=course.name%> ?');" action="<%= config.PATH %>/manage/course/<%=course.id%>/delete" method="post">
+<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer le cours <%=course.name%> ?');" action="<%= config.PATH %>/course/<%=course.id%>/delete" method="post">
     Irréversible : <input type="submit" value="Supprimer le cours <%= course.name%>">
 </form>
 <% } %>
-<a style="display:block; margin:40px;" href="<%= config.PATH %>/manage/course"> Retourner à la liste des cours </a>
+<a style="display:block; margin:40px;" href="<%= config.PATH %>/course"> Retourner à la liste des cours </a>
 
 <%- include('admin_footer'); -%>

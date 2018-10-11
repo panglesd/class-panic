@@ -14,7 +14,7 @@ var async = require('async');
 
 // render de manage_question.ejs
 
-renderManageQuestion = function(user, course, question, set, msgs, res) {
+renderManageQuestion = function(user, course, question, set, msgs, req, res) {
     async.parallel(
 	{
 	    title: function(callback) { callback(null, "ClassPanic: Gérer vos sets de questions")},
@@ -40,6 +40,9 @@ renderManageQuestion = function(user, course, question, set, msgs, res) {
 	    course : function(callback) {
 		callback(null, course)
 	    },
+	    subscription: function(callback) {
+		callback(null, req.subscription);
+	    },
 	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")},
 	    set: function (callback) {
 		callback(null, set)
@@ -58,13 +61,13 @@ renderManageQuestion = function(user, course, question, set, msgs, res) {
 // Pour commencer à créer une question
 
 exports.question_create_get = function(req, res) {
-    renderManageQuestion(req.session.user, req.course, undefined, req.set, req.msgs, res);
+    renderManageQuestion(req.session.user, req.course, undefined, req.set, req.msgs, req, res);
 };
 
 // Pour commencer à modifier une question 
 
 exports.question_update_get = function(req, res) {
-    renderManageQuestion(req.session.user, req.course, req.question, req.set, req.msgs, res);
+    renderManageQuestion(req.session.user, req.course, req.question, req.set, req.msgs, req, res);
 };
 
 
