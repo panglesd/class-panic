@@ -133,10 +133,12 @@ function sendQuestionPlease() {
 /*                 pour envoyer son choix de reponse                 */
 /*********************************************************************/
 
-var reponses=document.querySelectorAll(".reponse");
-for(var vari=0;vari<reponses.length;vari++) {
-    reponses[vari].addEventListener("click",chooseAnswer);
-};
+if(typeof isAdmin == "undefined") {
+    var reponses=document.querySelectorAll(".reponse");
+    for(var vari=0;vari<reponses.length;vari++) {
+	reponses[vari].addEventListener("click",chooseAnswer);
+    };
+}
 
 function chooseAnswer(i, elem) {
     answer = {};
