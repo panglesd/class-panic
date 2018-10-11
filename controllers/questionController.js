@@ -90,8 +90,10 @@ exports.question_create_post = function(req, res) {
 	    reponse[i]= {
 		reponse: req.body[i] ,
 		validity: false,
-		texted:req.body["text-"+i]=="true" ? true : false
+		texted:req.body["text-"+i]=="true" ? true : false,
 	    };
+	    if(reponse[i].texted) 
+		reponse[i].correction=req.body["correction-"+i]
 	    i++;
 	}
 	

@@ -31,7 +31,7 @@ Utiliser $...$ pour mettre des maths.
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
 		<span class="froom"> Réponse <%= i %> :</span>
-		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea><div class="<%= reponsePossible.texted ? "texted" : "" %>"style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-<%= i %>" value="<%= reponsePossible.texted ? true : false %>"><span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span></div>
+		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea><div class="<%= reponsePossible.texted ? "texted" : "" %>"style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-<%= i %>" value="<%= reponsePossible.texted ? true : false %>"><span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span></div><textarea name="correction-<%= i %>" style="visibility:hidden; display:block; width:100%" placeholder="Rentrez la correction" ></textarea>
 	    <% if(subscription.canSetUpdate) { %>
 		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
 	    <% } %>
@@ -60,7 +60,8 @@ Utiliser $...$ pour mettre des maths.
     <script>
      function toggleText(elem) {
 	 elem.classList.toggle("texted");
-	 elem.querySelector("input").value = elem.querySelector("input").value=="true" ? "false" : "true";
+	 value = elem.querySelector("input").value = elem.querySelector("input").value=="true" ? "false" : "true";
+	 elem.nextSibling.style.visibility = elem.nextSibling.style.visibility=="hidden" /* && elem.parentNode.classList.contains("true")*/ ? "visible" : "hidden";
 	 text = elem.querySelector("span")
 	 if(text.textContent == "Enlever le champs texte")
 	     text.textContent = "Ajouter un champs texte";
@@ -69,7 +70,7 @@ Utiliser $...$ pour mettre des maths.
      }
      
      function returnTextQuestion (i) {
-	 return '<div style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-'+i+'" value="false"><span>Ajouter un champs texte</span></div>'
+	 return '<div style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-'+i+'" value="false"><span>Ajouter un champs texte</span><textarea name="correction-'+i+'" style="visibility:hidden; display:block; width:100%" placeholder="Rentrez la correction" ></textarea></div>'
      }
      
      function addAnswer () {

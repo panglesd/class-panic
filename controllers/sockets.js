@@ -349,17 +349,24 @@ module.exports = function (server, sessionMiddleware) {
 	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
 	
 	socket.use(function (packet, next) {
-	    //	    console.log("packet is", packet);
-	    if(packet[0]=="chooseCourse")
-		next();
-	    else if(socket.course)
-		next();
+	    console.log("packet is", packet);
+	    if(packet[1]) {
+		courseID=packet[1]
+		Course.getByID(parseInt(courseID), function (err, course) {
+		    User.getSubscription(socket.request.session.user, course, function(err, subs) {
+			if(subs && subs.canSubscribe) {
+			    socket.course = course;
+			    next();
+			}
+		    });
+		});
+	    }
 	    else
 		console.log("refused");
 	});
 	
 	
-	socket.on("chooseCourse", function(courseID) {
+/*	socket.on("chooseCourse", function(courseID) {
 	    Course.getByID(parseInt(courseID), function (err, course) {
 		User.getSubscription(socket.request.session.user, course, function(err, subs) {
 		    if(subs && subs.canSubscribe)
@@ -367,8 +374,8 @@ module.exports = function (server, sessionMiddleware) {
 		});
 	    });
 	});
-
-	socket.on('getUser', function (filter) {
+*/
+	socket.on('getUser', function (courseID, filter) {
 //	    console.log(filter);
 	    socket.filter = filter;
 	    socket.filter.courseID = socket.course.id;
@@ -377,7 +384,7 @@ module.exports = function (server, sessionMiddleware) {
 	    });
 	});
 	
-	socket.on('subscribeList', function (studentList) {
+	socket.on('subscribeList', function (courseID, studentList) {
 //	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
@@ -393,7 +400,7 @@ module.exports = function (server, sessionMiddleware) {
 			      });
 			  });
 	});
-	socket.on('subscribeListTDMan', function (studentList, permission) {
+	socket.on('subscribeListTDMan', function (courseID, studentList, permission) {
 	    console.log("we got this pemission", permission);
 	    console.log("socket.course.ownerID",socket.course.ownerID);
 	    console.log("socket.request.session.user.id",socket.request.session.user.id);
@@ -414,7 +421,7 @@ module.exports = function (server, sessionMiddleware) {
 			      });
 	    }
 	});
-	socket.on('unSubscribeList', function (studentList) {
+	socket.on('unSubscribeList', function (courseID, studentList) {
 	    //	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
