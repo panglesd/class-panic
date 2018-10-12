@@ -42,14 +42,14 @@
   </head>
   <body>
       <div id="answerContainer">
-	<div id="question" onclick="chooseAnswer(-1)"></div>
+	<div id="question"></div>
 	<div class="markdown" id="description">
 	</div>
 	<div id="wrapperAnswer">
 	</div>
 	  <div id="leave"><a href="<%= config.PATH %>/course/<%= room.courseID %>">Quitter la salle</a></div>
       </div>
-      <div id="controlPanel">
+      <div id="controlPanel" class="lili">
 	  <div class="controlPanel" id="reveal">Réveler</div>
 	  <div class="controlPanel" id="nextQuestion">Passer à la question suivante</div>
 	  <!--	      <div class="controlPanel" id="choose">La prochaine question sera</div>-->

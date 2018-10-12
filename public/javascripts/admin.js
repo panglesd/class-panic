@@ -135,8 +135,9 @@ sendReponse = function() {
     i=0;
     document.querySelectorAll("#wrapperAnswer > .reponse:not(#plus)").forEach(function(questionElem) {
 	text = questionElem.querySelector(".text");
+	console.log("text is", text);
 	rep = {
-	    reponse:text.textContent,
+	    reponse:text.innerText,
 	    validity:false,
 	    texted: questionElem.querySelector(".isTexted").value == "true" ? true : false
 	}
@@ -151,11 +152,11 @@ sendReponse = function() {
 	    newQuestion.correct = i;
 	i++;
     });
-    newQuestion.enonce = document.querySelector("#question").textContent;
+    newQuestion.enonce = document.querySelector("#question").innerText;
     newQuestion.description = document.querySelector("#newDescr").value;
 //    console.log(newQuestion);
     //    backToSetQuestion();
-    console.log(newQuestion);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAa",newQuestion);
     socketAdmin.emit("customQuestion", newQuestion);
     
 }
@@ -171,7 +172,7 @@ customQuestion = function(event) {
     document.querySelector("#question").contentEditable = true;//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
     document.querySelector("#question").innerHTML = "Question éditable";//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
     innerHTML = "<div class=\"reponse notSelected juste\"><span class='text' contentEditable=\"true\">Réponse éditable</span>"
-    innerHTML += "<br><button class='isTexted' value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button><br>"
+    innerHTML += "<br/><button class='isTexted' value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button><br>"
     document.querySelector("#wrapperAnswer").innerHTML = innerHTML + "<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
     document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
     document.querySelector("#customQuestion").onclick = backToSetQuestion;
@@ -182,10 +183,11 @@ customQuestion = function(event) {
 function addTextarea(elem) {
     elem.value = elem.value == "false" ? "true" : "false";
     elem.classList.toggle("texted");
-    console.log("elem.textContent", elem.textContent);
+//    console.log("elem.textContent", elem.textContent);
     if(elem.textContent=="Ajouter un textarea") {
 	elem.textContent="Enlever le textarea";
 	elem.classList.add("isTexted");
+//	elem.outerHTML = "<br>"+elem.outerHTML
 	elem.outerHTML+="<textarea class='textCorrect' style='display:block;width:100%;' placeholder='Correction ou justification'></textarea>"
     }
     else {
@@ -205,17 +207,19 @@ function modifyQuestion() {
 	question.contentEditable=true;
 	question.textContent=currentQuestionOfAdmin.enonce;
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse,index) => {
-	    if(index == currentQuestionOfAdmin.correct)
+	    if(index == currentQuestionOfAdmin.correct) {
 		reponse.classList.add("vrai");
-	    reponse.textContent = currentQuestionOfAdmin.reponses[index].reponse;
+		reponse.classList.add("juste");
+	    }
+	    reponse.innerText = currentQuestionOfAdmin.reponses[index].reponse;
 	    reponse.innerHTML = "<span  class='text' contentEditable='true'>"+reponse.innerHTML +"</span>";
 	    if(currentQuestionOfAdmin.reponses[index].texted) {
-		reponse.innerHTML+="<br><button value=\"true\" class=\"texted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
+		reponse.innerHTML+="<br><button value=\"true\" class=\"isTexted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
 		reponse.innerHTML+="<textarea class='textCorrect' style='display:block;width:100%;' placeholder='Correction ou justification'></textarea>"
 		reponse.querySelector(".textCorrect").textContent = currentQuestionOfAdmin.reponses[index].correction
 	    }
 	    else
-		reponse.innerHTML+="<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
+		reponse.innerHTML+="<br><button value=\"false\" class=\"isTexted\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
 	    reponse.innerHTML+="<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button>"
 	});
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse) => {

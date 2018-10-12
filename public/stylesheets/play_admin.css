@@ -1,3 +1,20 @@
+.lili ul, .lili ol, .lili li {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+a {
+    color:white;
+}
+
+.lili ol, .lili ul {
+	list-style: none;
+}
+
 /*****************************************************************************/
 /*            CSS du jeu pour les admins                                     */
 /*****************************************************************************/
@@ -37,8 +54,8 @@
     cursor:pointer;
 }
 #controlPanel li {
-    padding:10px;
-    border-bottom: 1px solid white;
+    padding:10px; !important
+    border-bottom: 1px solid white; 
 }
 
 li.currentQuestion {

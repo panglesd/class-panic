@@ -1,0 +1,130 @@
+:not(.markdown) {
+  /*****************************************************************************/
+  /*            CSS Resetter                                                   */
+  /*****************************************************************************/
+  /* HTML5 display-role reset for older browsers */
+}
+:not(.markdown) html,
+:not(.markdown) body,
+:not(.markdown) div,
+:not(.markdown) span,
+:not(.markdown) applet,
+:not(.markdown) object,
+:not(.markdown) iframe,
+:not(.markdown) h1,
+:not(.markdown) h2,
+:not(.markdown) h3,
+:not(.markdown) h4,
+:not(.markdown) h5,
+:not(.markdown) h6,
+:not(.markdown) p,
+:not(.markdown) blockquote,
+:not(.markdown) pre,
+:not(.markdown) a,
+:not(.markdown) abbr,
+:not(.markdown) acronym,
+:not(.markdown) address,
+:not(.markdown) big,
+:not(.markdown) cite,
+:not(.markdown) code,
+:not(.markdown) del,
+:not(.markdown) dfn,
+:not(.markdown) em,
+:not(.markdown) img,
+:not(.markdown) ins,
+:not(.markdown) kbd,
+:not(.markdown) q,
+:not(.markdown) s,
+:not(.markdown) samp,
+:not(.markdown) small,
+:not(.markdown) strike,
+:not(.markdown) strong,
+:not(.markdown) sub,
+:not(.markdown) sup,
+:not(.markdown) tt,
+:not(.markdown) var,
+:not(.markdown) b,
+:not(.markdown) u,
+:not(.markdown) i,
+:not(.markdown) center,
+:not(.markdown) dl,
+:not(.markdown) dt,
+:not(.markdown) dd,
+:not(.markdown) ol,
+:not(.markdown) fieldset,
+:not(.markdown) form,
+:not(.markdown) label,
+:not(.markdown) legend,
+:not(.markdown) table,
+:not(.markdown) caption,
+:not(.markdown) tbody,
+:not(.markdown) tfoot,
+:not(.markdown) thead,
+:not(.markdown) tr,
+:not(.markdown) th,
+:not(.markdown) td,
+:not(.markdown) article,
+:not(.markdown) aside,
+:not(.markdown) canvas,
+:not(.markdown) details,
+:not(.markdown) embed,
+:not(.markdown) figure,
+:not(.markdown) figcaption,
+:not(.markdown) footer,
+:not(.markdown) header,
+:not(.markdown) hgroup,
+:not(.markdown) menu,
+:not(.markdown) nav,
+:not(.markdown) output,
+:not(.markdown) ruby,
+:not(.markdown) section,
+:not(.markdown) summary,
+:not(.markdown) time,
+:not(.markdown) mark,
+:not(.markdown) audio,
+:not(.markdown) video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+:not(.markdown) article,
+:not(.markdown) aside,
+:not(.markdown) details,
+:not(.markdown) figcaption,
+:not(.markdown) figure,
+:not(.markdown) footer,
+:not(.markdown) header,
+:not(.markdown) hgroup,
+:not(.markdown) menu,
+:not(.markdown) nav,
+:not(.markdown) section {
+  display: block;
+}
+:not(.markdown) body {
+  line-height: 1;
+}
+:not(.markdown) ol,
+:not(.markdown) ul {
+  list-style: none;
+}
+:not(.markdown) blockquote,
+:not(.markdown) q {
+  quotes: none;
+}
+:not(.markdown) blockquote:before,
+:not(.markdown) blockquote:after,
+:not(.markdown) q:before,
+:not(.markdown) q:after {
+  content: '';
+  content: none;
+}
+:not(.markdown) table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+:not(.markdown) a {
+  color: white;
+}
