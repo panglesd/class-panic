@@ -1,5 +1,7 @@
 
-// How will you access the website? required for socket.io, has to be the same
+// How will you access the website?
 exports.PORT = 3000 ;
 exports.PATH = "/classPanic" ;
 exports.ADMINPASSWD = "classPanic";
+exports.TITLE = "Big Sister";
+exports.SUBTITLE = "Ta grande soeur t'aide à faire tes devoirs";

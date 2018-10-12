@@ -131,12 +131,14 @@ exports.delete = function (user, room, callback) {
 
 exports.update = function (user, room, newRoom, callback) {
     console.log([newRoom.name, newRoom.questionSet, room.id, user.id]);
-    bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ? WHERE `id` = ? AND `ownerID` = ?',
-	      [newRoom.name, newRoom.questionSet, room.id, user.id],
-	      (err, res) => {
-		  console.log(err, this.sql);
-		  callback(err, res)
-	      })
+    Question.getFirstOfSet(newRoom.questionSet, (err, question) => {
+	bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ?, id_currentQuestion = ? WHERE `id` = ? AND `ownerID` = ?',
+		  [newRoom.name, newRoom.questionSet, room.id, user.id, question.id],
+		  (err, res) => {
+		      console.log(err, this.sql);
+		      callback(err, res)
+		  });
+    });
 }
 
 /***********************************************************************/

@@ -93,7 +93,7 @@ socketAdmin.on('newQuestion', function (reponse) {
     document.querySelector("#customQuestion").onclick = customQuestion;
 /*    }
     else {
-	document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+	document.querySelector("#customQuestion").innerHTML = "Revenir à la question en cours";
 	document.querySelector("#customQuestion").onclick = backToSetQuestion;
 	}*/
 
@@ -174,7 +174,7 @@ customQuestion = function(event) {
     innerHTML = "<div class=\"reponse notSelected juste\"><span class='text' contentEditable=\"true\">Réponse éditable</span>"
     innerHTML += "<br/><button class='isTexted' value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button><br>"
     document.querySelector("#wrapperAnswer").innerHTML = innerHTML + "<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
-    document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+    document.querySelector("#customQuestion").innerHTML = "Revenir à la question en cours";
     document.querySelector("#customQuestion").onclick = backToSetQuestion;
     document.querySelector("#description").innerHTML="<textarea id='newDescr' style='width:100%;height:200px'></textarea>";
     document.querySelector("#description").style.visibility = "visible";
@@ -229,7 +229,7 @@ function modifyQuestion() {
 	descr.style.visibility="visible";
 	descr.innerHTML = "<textarea id=\"newDescr\" style='width:100%;height:200px;'></textarea>";
 	descr.firstChild.textContent = currentQuestionOfAdmin.description;
-	document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
+	document.querySelector("#customQuestion").innerHTML = "Revenir à la question en cours";
 	document.querySelector("#customQuestion").onclick = backToSetQuestion;
 	document.querySelector("#wrapperAnswer").innerHTML+="<div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
     }
