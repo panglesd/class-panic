@@ -52,7 +52,7 @@ socket.on('connect', () => {
 
 var sem = false;
 
-socket.on('newQuestion', function (reponse) {
+socket.on('newQuestion', function (reponse, correction) {
     console.log(reponse);
     currentQuestionOfStudent=reponse;
     enonce = document.querySelector("#question");
@@ -107,13 +107,16 @@ socket.on('newQuestion', function (reponse) {
     else
 	descr.innerHTML = reponse.description;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
+    if(correction) 
+	correct(correction);
 });
 
 /*********************************************************************/
 /*                 lorsque l'on reçoit la correction                 */
 /*********************************************************************/
 
-socket.on('correction', function (correction) {
+//socket.on('correction', function (correction) {
+correct = function (correction) {
     console.log(correction);
 //    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
     //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
@@ -129,7 +132,7 @@ socket.on('correction', function (correction) {
 	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100./*-5*/)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
 	}
     });
-});
+}//);
 
 /*********************************************************************/
 /*                 pour redemander d'envoyer la question             */
