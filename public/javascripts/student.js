@@ -52,7 +52,7 @@ socket.on('connect', () => {
 
 var sem = false;
 
-socket.on('newQuestion', function (reponse) {
+socket.on('newQuestion', function (reponse, correction) {
     console.log(reponse);
     currentQuestionOfStudent=reponse;
     enonce = document.querySelector("#question");
@@ -66,6 +66,14 @@ socket.on('newQuestion', function (reponse) {
 	elem = document.createElement('div');
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
+	if(rep.validity == "juste" || reponse.correct == index) {
+	    elem.classList.add("vrai")
+	}
+	console.log(reponse.correct, index);
+	console.log((typeof reponse.correct !== "undefined" && reponse.correct != index));
+	if(rep.validity == "faux" || (typeof reponse.correct !== "undefined" && reponse.correct != index)) {
+	    elem.classList.add("faux");
+	}
 	elem.id = "r"+index;
 	if(typeof isAdmin == "undefined")
 	    elem.addEventListener("click", function (ev) {
@@ -84,6 +92,8 @@ socket.on('newQuestion', function (reponse) {
 		    chooseAnswer(index, event.currentTarget.parentNode);
 		});
 	    }
+	    if(rep.correction)
+		textarea.textContent=rep.correction
 	    elem.appendChild(textarea);
 	}
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
@@ -99,18 +109,21 @@ socket.on('newQuestion', function (reponse) {
     else
 	descr.innerHTML = reponse.description;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
+    if(correction) 
+	correct(correction);
 });
 
 /*********************************************************************/
 /*                 lorsque l'on reçoit la correction                 */
 /*********************************************************************/
 
-socket.on('correction', function (correction) {
-//    console.log(correction);
-    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
+//socket.on('correction', function (correction) {
+correct = function (correction) {
+    console.log(correction);
+//    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
     //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
-    if(document.querySelector("#r"+correction.correctAnswer))
-	document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
+//    if(document.querySelector("#r"+correction.correctAnswer))
+//	document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
     var total = 0;
     correction.anonStats.forEach(function (v) { total += v.count });
     total=Math.max(total,1);
@@ -121,7 +134,7 @@ socket.on('correction', function (correction) {
 	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100./*-5*/)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
 	}
     });
-});
+}//);
 
 /*********************************************************************/
 /*                 pour redemander d'envoyer la question             */

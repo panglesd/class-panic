@@ -1,7 +1,6 @@
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketAdmin = io.connect(server+'/admin');
-var isAdmin = true;
 let currentQuestionOfAdmin;
 
 
@@ -118,27 +117,37 @@ addReponse = function (event) {
     n = document.createElement("div");
     n.classList.add("reponse");
     n.classList.add("notSelected");
-    n.innerHTML = "<span contenteditable=\"true\">Réponse éditable</span>"
-    n.innerHTML+="<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
+    n.innerHTML = "<span  class='text' contenteditable=\"true\">Réponse éditable</span>"
+    n.innerHTML+="<br><button class='isTexted' value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button><br>"
     n.innerHTML += "<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\"> Retirer</button>";
     document.querySelector("#plus").parentNode.insertBefore(n,document.querySelector("#plus"));
 }
 
 removeReponse = function (elem) {
-    elem.parentNode.remove();
+    while(!elem.classList.contains("reponse")) {
+	elem=elem.parentNode}
+    elem.remove();
 }
 
 sendReponse = function() {
     newQuestion = {};
     newQuestion.reponses = [];
     i=0;
-    document.querySelectorAll("#wrapperAnswer > div > span").forEach(function(span) {
-	newQuestion.reponses.push({
-	    reponse:span.textContent,
+    document.querySelectorAll("#wrapperAnswer > .reponse:not(#plus)").forEach(function(questionElem) {
+	text = questionElem.querySelector(".text");
+	rep = {
+	    reponse:text.textContent,
 	    validity:false,
-	    texted: span.nextSibling.value == "true" ? true : false
-	});
-	if(span.parentNode.classList.contains("juste"))
+	    texted: questionElem.querySelector(".isTexted").value == "true" ? true : false
+	}
+	console.log("questionElem",questionElem);
+	console.log("rep now", rep);
+	if(rep.texted)
+	    rep.correction = questionElem.querySelector(".textCorrect").value
+	console.log("querySelec", questionElem.querySelector(".textCorrect"));
+	console.log("rep maintenant", rep);
+	newQuestion.reponses.push(rep);
+	if(questionElem.classList.contains("juste"))
 	    newQuestion.correct = i;
 	i++;
     });
@@ -161,22 +170,33 @@ chooseAsCorrect = function (elem) {
 customQuestion = function(event) {
     document.querySelector("#question").contentEditable = true;//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
     document.querySelector("#question").innerHTML = "Question éditable";//innerHTML = "<input type=\"textarea\" placeholder=\"Votre question\">";
-    innerHTML = "<div class=\"reponse notSelected juste\" id=\"r0\"><span contentEditable=\"true\">Réponse éditable</span>"
-    innerHTML += "<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
+    innerHTML = "<div class=\"reponse notSelected juste\"><span class='text' contentEditable=\"true\">Réponse éditable</span>"
+    innerHTML += "<br><button class='isTexted' value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button><br>"
     document.querySelector("#wrapperAnswer").innerHTML = innerHTML + "<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button></div><div class=\"reponse notSelected\" id=\"plus\"> <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button></div>";
     document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
     document.querySelector("#customQuestion").onclick = backToSetQuestion;
     document.querySelector("#description").innerHTML="<textarea id='newDescr' style='width:100%;height:200px'></textarea>";
+    document.querySelector("#description").style.visibility = "visible";
 }
 
 function addTextarea(elem) {
     elem.value = elem.value == "false" ? "true" : "false";
     elem.classList.toggle("texted");
     console.log("elem.textContent", elem.textContent);
-    if(elem.textContent=="Ajouter un textarea")
+    if(elem.textContent=="Ajouter un textarea") {
 	elem.textContent="Enlever le textarea";
-    else
+	elem.classList.add("isTexted");
+	elem.outerHTML+="<textarea class='textCorrect' style='display:block;width:100%;' placeholder='Correction ou justification'></textarea>"
+    }
+    else {
 	elem.textContent="Ajouter un textarea"
+	//	elem.nextSibling.remove()
+	reponseElem = elem;
+	while(!reponseElem.classList.contains("reponse")) {
+	    reponseElem=reponseElem.parentNode
+	}
+	reponseElem.querySelector(".textCorrect").remove();
+    }
 }
 
 function modifyQuestion() {
@@ -185,10 +205,15 @@ function modifyQuestion() {
 	question.contentEditable=true;
 	question.textContent=currentQuestionOfAdmin.enonce;
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse,index) => {
+	    if(index == currentQuestionOfAdmin.correct)
+		reponse.classList.add("vrai");
 	    reponse.textContent = currentQuestionOfAdmin.reponses[index].reponse;
-	    reponse.innerHTML = "<span contentEditable='true'>"+reponse.innerHTML +"</span>";
-	    if(currentQuestionOfAdmin.reponses[index].texted)
-		reponse.innerHTML+="<button value=\"true\" class=\"texted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
+	    reponse.innerHTML = "<span  class='text' contentEditable='true'>"+reponse.innerHTML +"</span>";
+	    if(currentQuestionOfAdmin.reponses[index].texted) {
+		reponse.innerHTML+="<br><button value=\"true\" class=\"texted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
+		reponse.innerHTML+="<textarea class='textCorrect' style='display:block;width:100%;' placeholder='Correction ou justification'></textarea>"
+		reponse.querySelector(".textCorrect").textContent = currentQuestionOfAdmin.reponses[index].correction
+	    }
 	    else
 		reponse.innerHTML+="<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
 	    reponse.innerHTML+="<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button>"

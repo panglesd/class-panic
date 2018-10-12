@@ -6,7 +6,7 @@ var socket = io.connect(server+'/users');
 
 // On informe le serveur dans quel room on est
 socket.on('connect', () => {
-    socket.emit("chooseCourse", courseID);
+//    socket.emit("chooseCourse", courseID);
     callSearch();
 });
 
@@ -49,7 +49,7 @@ function searchStudent(name, n_etu, promotion, institution) {
 	promotion:promotion,
 	institution:institution
     }
-    socket.emit("getUser", search);
+    socket.emit("getUser", courseID, search);
 
 }
 
@@ -57,7 +57,7 @@ function subscribeStudent() {
     let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
     let arr = Array.from(l);
     console.log("arr is", arr);
-    socket.emit("subscribeList", arr.map((e) => { return parseInt(e.id)}));
+    socket.emit("subscribeList", courseID, arr.map((e) => { return parseInt(e.id)}));
     // Prevenir l'utilisateur de l'inscription
 }
 function subscribeTDMan() {
@@ -73,7 +73,7 @@ function subscribeTDMan() {
 		    canDeleteSet: document.querySelector("#canDeleteSet").checked,
 		    canSubscribe: document.querySelector("#canSubscribe").checked
     });
-    socket.emit("subscribeListTDMan", arr.map((e) => { return parseInt(e.id)}),
+    socket.emit("subscribeListTDMan", courseID, arr.map((e) => { return parseInt(e.id)}),
 		{
 		    canCreateRoom: document.querySelector("#canCreateRoom").checked,
 		    canUpdateRoom: document.querySelector("#canUpdateRoom").checked,
@@ -90,7 +90,7 @@ function unSubscribeStudent() {
     let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
     let arr = Array.from(l);
     console.log("arr is", arr);
-    socket.emit("unSubscribeList", arr.map((e) => { return parseInt(e.id)}));
+    socket.emit("unSubscribeList", courseID, arr.map((e) => { return parseInt(e.id)}));
     // Prevenir l'utilisateur de l'inscription
 }
 

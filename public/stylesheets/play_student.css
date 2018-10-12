@@ -58,3 +58,10 @@ html {
     padding: 20px;
     color:black;
 }
+
+.faux {
+    box-shadow:0 0 8px 10px red;
+}
+.vrai {
+    box-shadow:0 0 8px 10px green;
+}
