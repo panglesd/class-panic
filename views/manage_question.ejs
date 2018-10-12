@@ -28,6 +28,7 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
+	<label><input style="vertical-align: middle;" type="checkbox">Multi-réponses</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
 		<span class="froom"> Réponse <%= i %> :</span>
