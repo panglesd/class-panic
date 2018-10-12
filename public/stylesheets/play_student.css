@@ -26,10 +26,10 @@ html {
     display:block;
     padding:20px;
     border-radius:15px;
-/*    font-size:2em;*/
+    font-size:2em;
     box-shadow: 4px 4px 8px black;
     background-color:#F5F5DC;
-/*    color:#165a70;*/
+    color:#165a70;
     transition: all .2s ease-in-out;
     cursor:pointer;
     margin:30px;  

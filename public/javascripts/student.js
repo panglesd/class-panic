@@ -79,9 +79,13 @@ socket.on('newQuestion', function (reponse, correction) {
 	    elem.addEventListener("click", function (ev) {
 		chooseAnswer(index, event.currentTarget);
 	    });
-//	elem.textContent = (rep.reponse);
-	elem.innerHTML = md.render(rep.reponse);
-	elem.classList.add("markdown");
+	//	elem.textContent = (rep.reponse);
+	span = document.createElement("span");
+	elem.innerHTML = "";
+	span.innerHTML = md.render(rep.reponse);
+	console.log(span, rep.reponse);
+	span.classList.add("markdown");
+	elem.appendChild(span)
 	if(rep.texted) {
 	    textarea = document.createElement("textarea");
 	    textarea.style.width="100%"
