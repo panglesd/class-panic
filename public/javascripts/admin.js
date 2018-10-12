@@ -1,7 +1,6 @@
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketAdmin = io.connect(server+'/admin');
-var isAdmin = true;
 let currentQuestionOfAdmin;
 
 
@@ -142,8 +141,11 @@ sendReponse = function() {
 	    texted: questionElem.querySelector(".isTexted").value == "true" ? true : false
 	}
 	console.log("questionElem",questionElem);
+	console.log("rep now", rep);
 	if(rep.texted)
-	    rep.description = questionElem.querySelector(".textCorrect").value
+	    rep.correction = questionElem.querySelector(".textCorrect").value
+	console.log("querySelec", questionElem.querySelector(".textCorrect"));
+	console.log("rep maintenant", rep);
 	newQuestion.reponses.push(rep);
 	if(questionElem.classList.contains("juste"))
 	    newQuestion.correct = i;
@@ -174,6 +176,7 @@ customQuestion = function(event) {
     document.querySelector("#customQuestion").innerHTML = "Revenir à la question du set";
     document.querySelector("#customQuestion").onclick = backToSetQuestion;
     document.querySelector("#description").innerHTML="<textarea id='newDescr' style='width:100%;height:200px'></textarea>";
+    document.querySelector("#description").style.visibility = "visible";
 }
 
 function addTextarea(elem) {
@@ -198,8 +201,11 @@ function modifyQuestion() {
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse,index) => {
 	    reponse.textContent = currentQuestionOfAdmin.reponses[index].reponse;
 	    reponse.innerHTML = "<span  class='text' contentEditable='true'>"+reponse.innerHTML +"</span>";
-	    if(currentQuestionOfAdmin.reponses[index].texted)
-		reponse.innerHTML+="<button value=\"true\" class=\"texted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
+	    if(currentQuestionOfAdmin.reponses[index].texted) {
+		reponse.innerHTML+="<br><button value=\"true\" class=\"texted\" onclick=\"addTextarea(this)\">Enlever le textarea</button>"
+		reponse.innerHTML+="<textarea class='textCorrect' style='display:block;width:100%;' placeholder='Correction ou justification'></textarea>"
+		reponse.querySelector(".textCorrect").textContent = currentQuestionOfAdmin.reponses[index].correction
+	    }
 	    else
 		reponse.innerHTML+="<button value=\"false\" onclick=\"addTextarea(this)\">Ajouter un textarea</button>"
 	    reponse.innerHTML+="<button onclick=\"chooseAsCorrect(this)\">Choisir comme réponse juste</button><button onclick=\"removeReponse(this)\">Retirer</button>"
