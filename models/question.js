@@ -149,8 +149,8 @@ exports.questionUpdate = function (user, questionID, newQuestion, newReponse, ca
 	reponse[i]= { reponse: newQuestion[i] , validity: false };
 	i++;
     }*/
-    bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `correct` = ?, `description` = ?  WHERE `id` = ? AND `owner` = ?",
-	      [newQuestion.enonce, JSON.stringify(newReponse), newQuestion.correct, newQuestion.description, questionID, user.id], callback);
+    bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `correct` = ?, `description` = ?  WHERE `id` = ?",
+	      [newQuestion.enonce, JSON.stringify(newReponse), newQuestion.correct, newQuestion.description, questionID], callback);
 }
 
 

@@ -132,7 +132,7 @@ sendReponse = function() {
     newQuestion = {};
     newQuestion.reponses = [];
     i=0;
-    document.querySelectorAll("#wrapperAnswer div span").forEach(function(span) {
+    document.querySelectorAll("#wrapperAnswer > div > span").forEach(function(span) {
 	newQuestion.reponses.push({
 	    reponse:span.textContent,
 	    validity:false,
