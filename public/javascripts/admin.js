@@ -126,7 +126,7 @@ addReponse = function (event) {
 removeReponse = function (elem) {
     while(!elem.classList.contains("reponse")) {
 	elem=elem.parentNode}
-    elem.parentNode.remove();
+    elem.remove();
 }
 
 sendReponse = function() {
@@ -185,11 +185,17 @@ function addTextarea(elem) {
     console.log("elem.textContent", elem.textContent);
     if(elem.textContent=="Ajouter un textarea") {
 	elem.textContent="Enlever le textarea";
+	elem.classList.add("isTexted");
 	elem.outerHTML+="<textarea class='textCorrect' style='display:block;width:100%;' placeholder='Correction ou justification'></textarea>"
     }
     else {
 	elem.textContent="Ajouter un textarea"
-	elem.nextSibling.remove()
+	//	elem.nextSibling.remove()
+	reponseElem = elem;
+	while(!reponseElem.classList.contains("reponse")) {
+	    reponseElem=reponseElem.parentNode
+	}
+	reponseElem.querySelector(".textCorrect").remove();
     }
 }
 
@@ -199,6 +205,8 @@ function modifyQuestion() {
 	question.contentEditable=true;
 	question.textContent=currentQuestionOfAdmin.enonce;
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse,index) => {
+	    if(index == currentQuestionOfAdmin.correct)
+		reponse.classList.add("vrai");
 	    reponse.textContent = currentQuestionOfAdmin.reponses[index].reponse;
 	    reponse.innerHTML = "<span  class='text' contentEditable='true'>"+reponse.innerHTML +"</span>";
 	    if(currentQuestionOfAdmin.reponses[index].texted) {
