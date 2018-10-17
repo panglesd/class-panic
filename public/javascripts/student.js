@@ -50,7 +50,7 @@ socket.on('connect', () => {
 /*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
-var sem = false;
+// var sem = false;
 
 socket.on('newQuestion', function (reponse, correction) {
     console.log(reponse);
@@ -77,7 +77,8 @@ socket.on('newQuestion', function (reponse, correction) {
 	elem.id = "r"+index;
 	if(typeof isAdmin == "undefined")
 	    elem.addEventListener("click", function (ev) {
-		chooseAnswer(index, event.currentTarget);
+//		chooseAnswer(index, event.currentTarget);
+		chooseAnswer(index, elem);
 	    });
 	//	elem.textContent = (rep.reponse);
 	span = document.createElement("span");
