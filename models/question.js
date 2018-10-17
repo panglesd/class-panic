@@ -60,7 +60,7 @@ exports.getByID = function (questionId, callback) {
 	console.log(err);
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
-	q.reponses.forEach(function(rep) { delete rep.validity });
+//	q.reponses.forEach(function(rep) { delete rep.validity });
 	callback(err, q)
     });
 }

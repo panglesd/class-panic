@@ -28,13 +28,13 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
-	<label><input style="vertical-align: middle;" type="checkbox">Multi-réponses</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
+	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox" onchange="toggleMultiAnswer()">Multi-réponses</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
-	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
+	    <li class="reponse <%= reponsePossible.validity ? "true" : "" %>">
 		<span class="froom"> Réponse <%= i %> :</span>
-		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea><div class="<%= reponsePossible.texted ? "texted" : "" %>"style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-<%= i %>" value="<%= reponsePossible.texted ? true : false %>"><span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span></div><textarea name="correction-<%= i %>" style="visibility:hidden; display:block; width:100%" placeholder="Vous pouvez rentrer la correction/justification/explication" ><% reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
+		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea><div class="<%= reponsePossible.texted ? "texted" : "" %>"style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-<%= i %>" value="<%= reponsePossible.texted ? true : false %>"><span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span></div><textarea name="correction-<%= i %>" style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%" placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
 	    <% if(subscription.canSetUpdate) { %>
-		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
+		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)" class="correct">Choisir comme réponse correcte</li></ul></div>
 	    <% } %>
 	    </li>
 	    <% i++;
@@ -88,7 +88,8 @@ Utiliser $...$ pour mettre des maths.
      
      function setTrue(elem) {
 	 a=document.querySelector(".true");
-	 if (a)
+	 isMultiAnswer = document.querySelector("#multi").checked;
+	 if (a && !isMultiAnswer)
 	     a.classList.remove("true");
 	 elem.parentNode.parentNode.parentNode.classList.add("true");
 	 //     document.querySelector("#true").value=elem.parentNode.parentNode.parentNode.querySelector("textarea").id;
@@ -109,6 +110,23 @@ Utiliser $...$ pour mettre des maths.
      function removeElement(elem) {
 	 elem.parentNode.parentNode.parentNode.parentNode.remove();
 	 renumber();
+     }
+
+     function toggleMultiAnswer() {
+	 isMultiAnswer = document.querySelector("#multi").checked;
+	 if(isMultiAnswer) {
+	     document.querySelectorAll(".correct").forEach((button) => {
+		 button.textContent = "Changer valeur de vérité";
+	     });
+	     
+	 }
+	 else {
+	     document.querySelectorAll(".correct").forEach((button) => {
+		 button.textContent = "Choisir comme réponse correcte";
+	     });
+	     
+	 }
+	 
      }
     </script>
 <% } %>

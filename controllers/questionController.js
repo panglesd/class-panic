@@ -49,7 +49,8 @@ renderManageQuestion = function(user, course, question, set, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
+	    //	    console.log(results);
+//	    console.log("question iiiiiiiiiiiiiiiiiis", question);
 	    res.render('manage_question', results)
 	});
 };
