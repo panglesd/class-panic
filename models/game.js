@@ -1,4 +1,4 @@
-bdd = require("./bdd");
+var bdd = require("./bdd");
 var async = require('async');
 
 var Room = require("./room");
@@ -34,20 +34,14 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 	bdd.query("SELECT * from subscription WHERE userID = ? AND courseID = (SELECT courseID FROM rooms WHERE id = ?)", [user.id, room.id], (err_subs, subs_array) => {
 	    subscription = subs_array[0];
 	    console.log(err_subs);
-	    console.log("subs", subs_array);
-	    console.log(this.sql);
-	    if(!subscription.isTDMan) {
-		if(room.status=="pending") {
-		    bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
-			if(answ[0].count>0) 
-			    bdd.query("UPDATE `poll` SET `response`= ?, `responseText` = ? WHERE `roomID`= ? AND `pseudo`= ?", [newAnswer.n, newAnswer.text, room.id, user.pseudo], callback);
-			else {
-			    bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`responseText`,`roomID`) VALUES (?, ?, ?, ?)", [user.pseudo, newAnswer.n, newAnswer.text, room.id], callback);
-			}
-		    });
-		}
-		else
-		    callback();
+	    if(!subscription.isTDMan && room.status == "pending") {
+		bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
+		    if(answ[0].count>0) 
+			bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?", [JSON.stringify(newAnswer), room.id, user.pseudo], callback);
+		    else {
+			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)", [user.pseudo, JSON.stringify(newAnswer), room.id], callback);
+		    }
+		});
 	    }
 	    else
 		callback();

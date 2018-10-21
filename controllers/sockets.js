@@ -117,14 +117,14 @@ module.exports = function (server, sessionMiddleware) {
 	/******************************************/
 	
 	socket.on('chooseRoom', function (newRoom) {
-	    console.log("user try to enter room");
+//	    console.log("user try to enter room");
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    Room.getByID(parseInt(newRoom), function (err, res) {
-		console.log("user got room", res);
+//		console.log("user got room", res);
 		Course.getByID(res.courseID, (er, course) => {
 		    User.getSubscription(socket.request.session.user, course, (err, subscription) => {
-			console.log("user got subscription", subscription);
+//			console.log("user got subscription", subscription);
 			if(subscription) {
 			    socket.room = res;
 			    console.log("user enter room");
@@ -162,7 +162,7 @@ module.exports = function (server, sessionMiddleware) {
 	/******************************************/
 	
 	socket.on('chosenAnswer', function (answer) {
-//	    console.log(answer);
+	    console.log("answer is", answer);
 	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		sendOwnedStats(socket.room)
 	    });
