@@ -112,9 +112,11 @@ exports.getFirstOfSet = function (setID, callback) {
 exports.questionCreate = function (user, question, setID, callback) {
     i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
+	if(er)
+	    console.log(err);
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`) VALUES (?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
 		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type],
-		  function (err, r) {callback(err, r[0])});
+		  function (err, r) {console.log(err); callback(err, r[0])});
     });
 }
 

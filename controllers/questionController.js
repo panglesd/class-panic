@@ -31,10 +31,12 @@ renderManageQuestion = function(user, course, question, set, msgs, req, res) {
 			     {
 				 reponses : [{
 				     reponse: "",
-				     validity: false
+				     validity: "false",
+				     texted: false
 				 }],
-				 correct:0,
-				 enonce: ""
+				 enonce: "",
+				 description:"",
+				 type:"mono"
 			     })
 	    },
 	    course : function(callback) {
@@ -85,7 +87,7 @@ function formatQuestionFromBody(body) {
     }
     let reponse = [];
     let i=0;
-    while(body["value-reponse"+i]) {
+    while(body["value-reponse-"+i]) {
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
@@ -95,7 +97,7 @@ function formatQuestionFromBody(body) {
 	    reponse[i].correction = body["correction-"+i]
 	i++;
     }
-    question.reponse = JSON.parse(reponse);
+    question.reponse = JSON.stringify(reponse);
     return question
 }
 // Create

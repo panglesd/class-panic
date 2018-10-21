@@ -28,7 +28,7 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
-	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox" onchange="toggleMultiAnswer()">Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
+	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox">Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
 	<!--    Regroupement des champs hidden   -->
