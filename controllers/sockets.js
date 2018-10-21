@@ -52,7 +52,7 @@ module.exports = function (server, sessionMiddleware) {
 			if(reponse.texted)
 			    delete(reponse.correction)
 		    });
-		    delete(question.correct);
+//		    delete(question.correct);
 		    socket.emit("newQuestion", question);
 		    callback();
 		}

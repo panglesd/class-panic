@@ -54,14 +54,19 @@ socketAdmin.on('newStats', function (newStats) {
     ul = document.createElement("ul")
     ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
-    newStats.namedStats.forEach(function (stat) {
+    newStats.forEach(function (stat) {
 	li = document.createElement("li");
 	li.id = stat.id;
-	color = newStats.correctAnswer == stat.response ? "green" : ( stat.response != -1 ? "red" : "white");
-	if(stat.response == -1)
-	    stat.response2 = "?";
-	else 
+	let color="white";
+	if(stat.response>=0) {
+	    if(currentQuestionOfAdmin.reponses[stat.response].validity == "true") 
+		color="green";
+	    else if(currentQuestionOfAdmin.reponses[stat.response].validity == "false") 
+		color="red";
 	    stat.response2 = currentQuestionOfAdmin.reponses[stat.response].reponse;
+	}
+	else 
+	    stat.response2 = "?";
 	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+' '+stat.responseText+'</span></div>'
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);

@@ -60,29 +60,16 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 /***********************************************************************/
 
 exports.getStatsFromRoomID = function (roomID, callback) {
-    async.parallel(
-	{
-	    anonStats : function (callback) {
-		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? GROUP BY response", [roomID], function(err, row) {callback(err,row)});
-	    },
-	    correctAnswer : function (callback) {
-		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
-	    }
-	},
-	callback);
-    
+    bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? GROUP BY response", [roomID], function(err, row) {
+	callback(err,row)
+    });
 }
+
 exports.getStatsFromOwnedRoomID = function (roomID, callback) {
-    async.parallel(
-	{
-	    namedStats : function (callback) {
-		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`, `poll`.`responseText`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {/*console.log(row);*/ callback(err, row)});
-	    },
-	    correctAnswer : function (callback) {
-		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
-	    }
-	},
-	callback);
+    bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`, `poll`.`responseText`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {
+	/*console.log(row);*/
+	callback(err, row)
+    });
 }
 
 /***********************************************************************/

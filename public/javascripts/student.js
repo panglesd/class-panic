@@ -66,12 +66,10 @@ socket.on('newQuestion', function (reponse, correction) {
 	elem = document.createElement('div');
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
-	if(rep.validity == "juste" || reponse.correct == index) {
+	if(rep.validity == "true") {
 	    elem.classList.add("vrai")
 	}
-	console.log(reponse.correct, index);
-	console.log((typeof reponse.correct !== "undefined" && reponse.correct != index));
-	if(rep.validity == "faux" || (typeof reponse.correct !== "undefined" && reponse.correct != index)) {
+	if(rep.validity == "false") {
 	    elem.classList.add("faux");
 	}
 	elem.id = "r"+index;
@@ -125,14 +123,10 @@ socket.on('newQuestion', function (reponse, correction) {
 //socket.on('correction', function (correction) {
 correct = function (correction) {
     console.log(correction);
-//    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
-    //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
-//    if(document.querySelector("#r"+correction.correctAnswer))
-//	document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
     var total = 0;
-    correction.anonStats.forEach(function (v) { total += v.count });
+    correction.forEach(function (v) { total += v.count });
     total=Math.max(total,1);
-    correction.anonStats.forEach(function (v) {
+    correction.forEach(function (v) {
 	if(v.answer!=-1) {
 //	    console.log("#rep"+v.answer);
 	    document.querySelector("#r"+v.answer).style.background =

@@ -139,12 +139,6 @@ exports.questionDelete = function (user, questionID, callback) {
 
 exports.questionUpdate = function (user, questionID, newQuestion, callback) {
     i=0;
-//    console.log(newQuestion);
-/*    reponse = [];
-    while(newQuestion[i]) {
-	reponse[i]= { reponse: newQuestion[i] , validity: false };
-	i++;
-    }*/
     bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?  WHERE `id` = ?",
 	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, questionID], callback);
 }
