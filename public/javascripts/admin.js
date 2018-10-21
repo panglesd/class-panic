@@ -51,27 +51,38 @@ function gotoQuestion(i) {
 
 socketAdmin.on('newStats', function (newStats) {
     console.log(newStats);
-    ul = document.createElement("ul")
-    ul.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
+    ula = document.createElement("ul")
+    ula.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
 
     newStats.forEach(function (stat) {
 	li = document.createElement("li");
 	li.id = stat.id;
-	let color="white";
-	if(stat.response>=0) {
-	    if(currentQuestionOfAdmin.reponses[stat.response].validity == "true") 
-		color="green";
-	    else if(currentQuestionOfAdmin.reponses[stat.response].validity == "false") 
-		color="red";
-	    stat.response2 = currentQuestionOfAdmin.reponses[stat.response].reponse;
-	}
-	else 
-	    stat.response2 = "?";
-	li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*/stat.fullName+' : <span>'+stat.response2+' '+stat.responseText+'</span></div>'
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
-	ul.appendChild(li);
+	li.innerHTML = '<div style="display:flex; justify-content: space-between;"></div>'
+	li.firstChild.innerText = stat.fullName;
+	ula.appendChild(li)
+	let ul = document.createElement("ul");
+	li.appendChild(ul);
+	JSON.parse(stat.response).forEach((ans) => {
+	    let li = document.createElement("li");
+	    let color="white";
+	    console.log("ans is", ans);
+	    if(ans.n>=0) {
+		if(currentQuestionOfAdmin.reponses[ans.n].validity == "true") 
+		    color="green";
+		else if(currentQuestionOfAdmin.reponses[ans.n].validity == "false") 
+		    color="red";
+		ans.response2 = currentQuestionOfAdmin.reponses[ans.n].reponse;
+	    }
+	    else 
+		ans.response2 = "?";
+	    li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*//*stat.fullName+*/' <span>'+ans.response2+' '+ans.text+'</span></div>'
+	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+	    ul.appendChild(li);
+	    console.log(ul);
+	});
+	console.log(li);
     });
-    document.querySelector("#stats ul").innerHTML = ul.innerHTML;
+    document.querySelector("#stats ul").innerHTML = ula.innerHTML;
 });
 
 /*********************************************************************/

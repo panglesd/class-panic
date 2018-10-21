@@ -97,7 +97,7 @@ socket.on('newQuestion', function (reponse, stats) {
 	if(typeof isAdmin == "undefined")
 	    elem.addEventListener("click", function (ev) {
 		//		chooseAnswer(index, event.currentTarget);
-		if(event.target.tagName != "TEXTAREA")
+		if(ev.target.tagName != "TEXTAREA")
 		    chooseAnswer(index, elem);
 		else
 		    updateAnswer(index, elem);
@@ -129,6 +129,7 @@ socket.on('newQuestion', function (reponse, stats) {
 	wrapper.appendChild(elem);
     });
     // Si l'on nous a aussi envoyé les stats, on les affiche.
+    console.log("stats", stats);
     if(stats) 
 	showStats(stats);
 });
@@ -139,17 +140,33 @@ socket.on('newQuestion', function (reponse, stats) {
 
 //socket.on('correction', function (correction) {
 showStats = function (stats) {
-    console.log(stats);
-    let total = 0;
-    stats.forEach(function (v) { total += v.count });
-    total=Math.max(total,1);
+    console.log("stats", stats);
+//    let total = 0;
+    //stats.forEach(function (v) { total += v.count });
+    let total = Math.max(stats.length,1);
+    //total=Math.max(total,1);
+    count=[];
     stats.forEach(function (v) {
-	if(v.answer!=-1) {
-//	    console.log("#rep"+v.answer);
-	    document.querySelector("#r"+v.answer).style.background =
-	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100./*-5*/)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
-	}
+	console.log("yoo", JSON.parse(v.answer))
+	tab_rep_one_student = JSON.parse(v.answer)
+	tab_rep_one_student.forEach((rep) => {
+	    n_answer = rep.n
+	    console.log("n_answer", n_answer);
+	    if(count[n_answer])
+		count[n_answer]++
+	    else
+		count[n_answer]=1
+	});
     });
+    console.log(count, total);
+    count.forEach((c,i) => {
+	document.querySelector("#r"+i).style.background =
+	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+c)/total*100./*-5*/)+"%,#F5F5DC "+((0.+c)/total*100.)+"%)";	
+    });
+//	if(n_answer != -1) {
+//	    console.log("#rep"+v.answer);
+//	}
+//    });
 }//);
 
 /*********************************************************************/
