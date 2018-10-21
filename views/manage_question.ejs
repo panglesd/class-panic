@@ -28,21 +28,37 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
-	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox" onchange="toggleMultiAnswer()">Multi-réponses</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
+	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox" onchange="toggleMultiAnswer()">Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
-		<span class="froom"> Réponse <%= i %> :</span>
-		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea>
-		<div class="text <%= reponsePossible.texted ? "texted" : "" %>"style="text-align:left;margin:3px;" onclick="toggleText(this)">
-		    <input type="hidden" name="text-<%= i %>" value="<%= reponsePossible.texted ? true : false %>">
+	<!--    Regroupement des champs hidden   -->
+		<input type="hidden" class="texted-hidden" name="texted-<%= i %>" value="<%= reponsePossible.texted ? true : false %>">
+		<input type="hidden" class="correctness-hidden" name="correctness-<%= i %>" value="<%= reponsePossible.validity %>">
+	<!--    Numéro de réponse                -->
+		<span class="froom nreponse"> Réponse <%= i %> :</span>
+	<!--    Texte de la réponse              -->
+		<textarea
+		    <%= subscription.canSetUpdate ? "" : "readonly" %>
+		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
+		    class="value-reponse-textarea" name="value-reponse-<%= i %>"
+		    style="width:100%"><%= reponsePossible.reponse %></textarea>
+	<!--    Réponse custom ou non            -->
+		<div
+		    class="text <%= reponsePossible.texted ? "texted" : "" %>"
+		    style="text-align:left;margin:3px;">
 		    <span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span>
 		</div>
-		<textarea name="correction-<%= i %>" style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%" placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
+		<textarea
+		    class="correction-textarea"
+		    name="correction-<%= i %>"
+		    style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%"
+		    placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
+	<!--    Boutons pour le management       -->
 		<% if(subscription.canSetUpdate) { %>
 		    <div>
 			<ul>
 			    <li style="display:inline-block; margin-right:20px;">
-				<a class="room" onclick="removeElement(this)">Enlever cette réponse</a>
+				<a class="room remove">Enlever cette réponse</a>
 			    </li>
 			    <li class="set-true select <%= reponsePossible.validity=="true" ? "selected" : "" %>" >
 				Réponse juste
@@ -62,7 +78,6 @@ Utiliser $...$ pour mettre des maths.
 	    <% if(subscription.canSetUpdate) { %>
 		<div  id="ajoutrep"></div>
 		<li onclick="addAnswer()" class="room"> <span class="froom">+</span></li>
-		<input name="correct" id="true" type="hidden" value="<%= question.correct %>">
 		<input type="submit" value="Enregistrer cette question">
 	    <% } %>
     </ul>
@@ -81,8 +96,7 @@ Utiliser $...$ pour mettre des maths.
     <script src="/javascripts/question.js"></script>
     <script>
      // ICI ajouter les events listener
-     document.querySelectorAll(".reponse").forEach((div) => {
-//	 let div2 = div;
+     function addReponseListener(div) {
 	 div.querySelector(".select.set-true").addEventListener("click", (ev) => {
 	     setValue("true", div);
 	 });
@@ -92,6 +106,16 @@ Utiliser $...$ pour mettre des maths.
 	 div.querySelector(".select.set-to_correct").addEventListener("click", (ev) => {
 	     setValue("to_correct", div);
 	 });
+	 div.querySelector(".text").addEventListener("click", (ev) => {
+	     toggleText(div);
+	 });
+	 div.querySelector(".remove").addEventListener("click", (ev) => {
+	     removeElement(div);
+	 });	 
+     }
+     document.querySelectorAll(".reponse").forEach((div) => {
+//	 let div2 = div;
+	 addReponseListener(div);
 	 console.log(div)
      });
     </script>
