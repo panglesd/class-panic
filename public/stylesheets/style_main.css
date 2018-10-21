@@ -290,3 +290,12 @@ input[type=checkbox] {
     border: 1px solid white;
     border-radius:5px;
 }
+.select.set-true {
+    color:green
+}
+.select.set-false {
+    color:red
+}
+.select.set-to_correct {
+    color:white
+}

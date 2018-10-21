@@ -25,14 +25,22 @@ function addAnswer () {
     a.insertBefore(b,c);
 }
 
-function setTrue(elem) {
-    a=document.querySelector(".true");
+function setValue(value, elem) {
     isMultiAnswer = document.querySelector("#multi").checked;
-    if (a && !isMultiAnswer)
-	a.classList.remove("true");
-    elem.parentNode.parentNode.parentNode.classList.add("true");
+    if (!isMultiAnswer) {
+	let a=document.querySelector(".true");
+	if(a) {
+	    a.classList.replace("true", "false");
+	    a.querySelector(".set-true").classList.remove("selected");
+	    a.querySelector(".set-false").classList.add("selected");
+	}
+    }
+    elem.classList.remove("true", "false", "to_correct");
+    elem.classList.add(value);
+    elem.querySelector(".select.selected").classList.remove("selected");
+    elem.querySelector(".set-"+value).classList.add("selected");
     //     document.querySelector("#true").value=elem.parentNode.parentNode.parentNode.querySelector("textarea").id;
-    document.querySelector("#true").value=document.querySelector(".true textarea").id;
+//    document.querySelector("#true").value=document.querySelector(".true textarea").id;
 }
 
 function renumber() {

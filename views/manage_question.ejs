@@ -44,13 +44,13 @@ Utiliser $...$ pour mettre des maths.
 			    <li style="display:inline-block; margin-right:20px;">
 				<a class="room" onclick="removeElement(this)">Enlever cette réponse</a>
 			    </li>
-			    <li class="select <%= reponsePossible.validity=="true" ? "selected" : "" %>" style="color:green" onclick="setTrue(this)" class="correct">
+			    <li class="set-true select <%= reponsePossible.validity=="true" ? "selected" : "" %>" >
 				Réponse juste
 			    </li>
-			    <li class="select <%= reponsePossible.validity=="to_correct" ? "selected" : "" %>" style="color:white" onclick="setTrue(this)" class="correct">
+			    <li class="set-to_correct select <%= reponsePossible.validity=="to_correct" ? "selected" : "" %>" >
 				Réponse à corriger
 			    </li>
-			    <li class="select <%= reponsePossible.validity=="false" ? "selected" : "" %>" style="color:red" onclick="setTrue(this)" class="correct">
+			    <li class="set-false select <%= reponsePossible.validity=="false" ? "selected" : "" %>" >
 				Réponse fausse
 			    </li>
 			</ul>
@@ -78,9 +78,22 @@ Utiliser $...$ pour mettre des maths.
 <% } %>
 <a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
 <% if(subscription.canSetUpdate) { %>
-    <script src="/javascripts/question.js">
+    <script src="/javascripts/question.js"></script>
+    <script>
      // ICI ajouter les events listener
-
+     document.querySelectorAll(".reponse").forEach((div) => {
+//	 let div2 = div;
+	 div.querySelector(".select.set-true").addEventListener("click", (ev) => {
+	     setValue("true", div);
+	 });
+	 div.querySelector(".select.set-false").addEventListener("click", (ev) => {
+	     setValue("false", div);
+	 });
+	 div.querySelector(".select.set-to_correct").addEventListener("click", (ev) => {
+	     setValue("to_correct", div);
+	 });
+	 console.log(div)
+     });
     </script>
 <% } %>
 <%- include('admin_footer'); -%>
