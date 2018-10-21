@@ -109,19 +109,13 @@ exports.getFirstOfSet = function (setID, callback) {
 
 // Création
 
-exports.questionCreate = function (user, question, reponse, setID, callback) {
+exports.questionCreate = function (user, question, setID, callback) {
     i=0;
-/*    reponse = [];
-    while(question[i]) {
-	reponse[i]= { reponse: question[i] , validity: false };
-	i++;
-    }*/
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `correct`, `description`) VALUES (? , ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
-		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, JSON.stringify(reponse), question.correct , question.description],
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
+		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type],
 		  function (err, r) {callback(err, r[0])});
     });
-    
 }
 
 // Suppression
@@ -149,8 +143,8 @@ exports.questionUpdate = function (user, questionID, newQuestion, newReponse, ca
 	reponse[i]= { reponse: newQuestion[i] , validity: false };
 	i++;
     }*/
-    bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `correct` = ?, `description` = ?  WHERE `id` = ?",
-	      [newQuestion.enonce, JSON.stringify(newReponse), newQuestion.correct, newQuestion.description, questionID], callback);
+    bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?  WHERE `id` = ?",
+	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, questionID], callback);
 }
 
 

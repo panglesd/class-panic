@@ -40,7 +40,8 @@ Utiliser $...$ pour mettre des maths.
 		<textarea
 		    <%= subscription.canSetUpdate ? "" : "readonly" %>
 		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
-		    class="value-reponse-textarea" name="value-reponse-<%= i %>"
+		    class="value-reponse-textarea"
+		    name="value-reponse-<%= i %>"
 		    style="width:100%"><%= reponsePossible.reponse %></textarea>
 	<!--    Réponse custom ou non            -->
 		<div
