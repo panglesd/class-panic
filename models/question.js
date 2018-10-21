@@ -137,7 +137,7 @@ exports.questionDelete = function (user, questionID, callback) {
 
 // Update
 
-exports.questionUpdate = function (user, questionID, newQuestion, newReponse, callback) {
+exports.questionUpdate = function (user, questionID, newQuestion, callback) {
     i=0;
 //    console.log(newQuestion);
 /*    reponse = [];
