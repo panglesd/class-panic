@@ -116,7 +116,8 @@ socket.on('newQuestion', function (reponse, stats) {
 	    if(typeof isAdmin == "undefined") {
 		textarea.addEventListener("input", (ev) => {
 		    console.log("updateed");
-		    sendAnswer();
+		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
+//		    sendAnswer();
 		});
 	    }
 	    elem.appendChild(textarea);
@@ -190,19 +191,25 @@ function chooseAnswer(i, elem, update) {
     }
     else {
 	a = document.querySelector("#r"+i);
-	a.classList.toggle("notSelected");
-	a.classList.toggle("selected");
+	if(update) {
+	    a.classList.remove("notSelected");
+	    a.classList.add("selected");
+	}
+	else {
+	    a.classList.toggle("notSelected");
+	    a.classList.toggle("selected");
+	}
     }
     sendAnswer();
 }
 
-function updateAnswer(i, elem) {
+/*function updateAnswer(i, elem) {
     if(i>-1) {
 	a = document.querySelector("#r"+i);
 	a.classList.replace("notSelected", "selected");
     }
     sendAnswer();
-}
+}*/
 
 	
 function sendAnswer() {
