@@ -132,14 +132,17 @@ backToSetQuestion = function (event) {
 // On envoie au serveur notre nouvelle question
 sendReponse = function() {
     newQuestion = {};
+    // Pour l'énoncé
+    newQuestion.enonce = document.querySelector("#question").innerText;
+    // Pour la description
+    newQuestion.description = document.querySelector("#newDescr").value;
+    // Pour les réponses
     newQuestion.reponses = [];
-    i=0;
     document.querySelectorAll("#wrapperAnswer > .reponse:not(#plus)").forEach(function(questionElem) {
 	text = questionElem.querySelector(".text");
 	console.log("text is", text);
 	rep = {
 	    reponse:text.innerText,
-	    validity:false,
 	    texted: questionElem.querySelector(".isTexted").value == "true" ? true : false
 	}
 	console.log("questionElem",questionElem);
@@ -148,13 +151,15 @@ sendReponse = function() {
 	    rep.correction = questionElem.querySelector(".textCorrect").value
 	console.log("querySelec", questionElem.querySelector(".textCorrect"));
 	console.log("rep maintenant", rep);
+	// Pour la validité
+	if(questionElem.classList.contains("true"))
+	    rep.validity = "true"
+	if(questionElem.classList.contains("false"))
+	    rep.validity = "false"
+	if(questionElem.classList.contains("to_correct"))
+	    rep.validity = "to_correct"
 	newQuestion.reponses.push(rep);
-	if(questionElem.classList.contains("juste"))
-	    newQuestion.correct = i;
-	i++;
     });
-    newQuestion.enonce = document.querySelector("#question").innerText;
-    newQuestion.description = document.querySelector("#newDescr").value;
     socketAdmin.emit("customQuestion", newQuestion);
     
 }
@@ -246,6 +251,7 @@ function modifyQuestion() {
 	// Pour le panel de droite
 	document.querySelector("#customQuestion").innerHTML = "Revenir à la question en cours";
 	document.querySelector("#customQuestion").onclick = backToSetQuestion;
+	// Pour le panel du bas
 	let div = document.createElement("div");
 	div.classList.add("reponse","notSelected");
 	div.id = "plus";
