@@ -136,6 +136,8 @@ sendReponse = function() {
     newQuestion.enonce = document.querySelector("#question").innerText;
     // Pour la description
     newQuestion.description = document.querySelector("#newDescr").value;
+    // Pour le type
+    newQuestion.type = document.querySelector("#isMulti").checked ? "multi" : "mono";
     // Pour les réponses
     newQuestion.reponses = [];
     document.querySelectorAll("#wrapperAnswer > .reponse:not(#plus)").forEach(function(questionElem) {
@@ -189,6 +191,7 @@ customQuestion = function(event) {
     // On crée le panel du bas (pour ajouter des réponses et envoyer au serveur)
     innerHTML += "<div class=\"reponse notSelected\" id=\"plus\"> " +
 	              "<button onclick=\"addReponse()\"> Ajouter une réponse</button>"+
+	              "<input type='checkbox' id='isMulti' onChange='toggleType()'><span style='font-size:0.65em;color:black'>Question multi-réponses</span>"+
 	              "<button onclick=\"sendReponse()\"> Envoyer aux élèves </button>"+
 	         "</div>";
     document.querySelector("#wrapperAnswer").innerHTML = innerHTML
@@ -255,7 +258,9 @@ function modifyQuestion() {
 	let div = document.createElement("div");
 	div.classList.add("reponse","notSelected");
 	div.id = "plus";
-	div.innerHTML = " <button onclick=\"addReponse()\"> Ajouter une réponse</button><button onclick=\"sendReponse()\"> Envoyer aux élèves </button>"
+	div.innerHTML = " <button onclick=\"addReponse()\"> Ajouter une réponse</button>" +
+	    "<input type='checkbox' id='isMulti' onChange='toggleType()'"+(currentQuestionOfAdmin.type == "multi" ?  "checked" : "")+"><span style='font-size:0.65em;color:black'>Question multi-réponses</span>"+
+	    "<button onclick=\"sendReponse()\"> Envoyer aux élèves </button>"
 	document.querySelector("#wrapperAnswer").appendChild(div);
     }
 }
@@ -293,10 +298,10 @@ removeResponse = function (response) {
     response.remove();
 }
 
-// On choisit le status de la réponse
+// On choisit le statut de la réponse
 chooseAs = function (status, elem) {
     //    console.log(elem);
-    if(status =="true" && document.querySelector(".reponse.true"))
+    if(status =="true" && !document.querySelector("#isMulti").checked && document.querySelector(".reponse.true"))
 	document.querySelector(".reponse.true").classList.replace("true", "false");
     elem.classList.remove("true", "false", "to_correct");
     elem.classList.add(status);
@@ -322,3 +327,13 @@ function toggleTextarea(reponse) {
     }
 }
 
+function toggleType() {
+    let isMulti = document.querySelector("#isMulti").checked
+    if(!isMulti) {
+	document.querySelectorAll(".reponse.true").forEach((rep, index) => {
+	    if(index>0)
+		rep.classList.replace("true", "false");
+	});
+    }
+
+}
