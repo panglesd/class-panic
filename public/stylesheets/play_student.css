@@ -59,12 +59,12 @@ html {
     color:black;
 }
 
-.true {
+.reponse.false {
     box-shadow:0 0 8px 10px red;
 }
-.false {
+.reponse.true {
     box-shadow:0 0 8px 10px green;
 }
-.to_correct {
+.reponse.to_correct {
     box-shadow:0 0 8px 10px black;
 }

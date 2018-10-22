@@ -94,9 +94,9 @@ socket.on('newQuestion', function (reponse, stats) {
 	    elem.addEventListener("click", function (ev) {
 		//		chooseAnswer(index, event.currentTarget);
 		if(ev.target.tagName != "TEXTAREA")
-		    chooseAnswer(index, elem);
+		    chooseAnswer(index, elem, false);
 		else
-		    updateAnswer(index, elem);
+		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
 	    });
 	// Création de l'élément contenant l'énoncé de la réponse
 	span = document.createElement("span");
@@ -177,14 +177,7 @@ function sendQuestionPlease() {
 /*                 pour envoyer son choix de reponse                 */
 /*********************************************************************/
 
-/*if(typeof isAdmin == "undefined") {
-    let reponses=document.querySelectorAll(".reponse");
-    for(let i=0; i<reponses.length ; i++) {
-	reponses[i].addEventListener("click",chooseAnswer);
-    };
-}*/
-
-function chooseAnswer(i, elem) {
+function chooseAnswer(i, elem, update) {
     if(currentQuestionOfStudent.type!="multi") {
 	var reponse=document.querySelector(".reponse.selected");
 	if(reponse) {
