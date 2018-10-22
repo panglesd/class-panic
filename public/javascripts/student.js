@@ -85,12 +85,8 @@ socket.on('newQuestion', function (reponse, stats) {
 	elem = document.createElement('div');
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
-	if(rep.validity == "true") {
-	    elem.classList.add("vrai")
-	}
-	if(rep.validity == "false") {
-	    elem.classList.add("faux");
-	}
+	if(rep.validity)
+	    elem.classList.add(rep.validity)
 	elem.id = "r"+index;
 
 	// Si besoin est, ajout d'un event listener
