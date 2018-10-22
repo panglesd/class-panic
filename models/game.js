@@ -60,7 +60,7 @@ exports.getStatsFromRoomID = function (roomID, callback) {
 }
 
 exports.getStatsFromOwnedRoomID = function (roomID, callback) {
-    bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`, `poll`.`responseText`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {
+    bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {
 	/*console.log(row);*/
 	callback(err, row)
     });

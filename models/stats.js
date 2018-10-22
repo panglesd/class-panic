@@ -73,12 +73,11 @@ exports.logStats = function (roomID,  callback) {
 	params = [        room.questionSet , roomID ,  room.id_currentQuestion, room.courseID, room.question ];
 	bdd.query(query, params, (err, res) => {
 	    console.log(err);
-//	    console.log(err, res);
 	    blocID = res[1][0].blocID;
 	    Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
-		async.forEach(stats.namedStats, (oneStat, callback) => {
-		    query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `responseText`) VALUES (?,?,?,?,?)";
-		    bdd.query(query,[oneStat.id, oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), blocID, oneStat.response, oneStat.responseText], (err, res) => {callback(err, res)})
+		async.forEachSeries(stats,(oneStat, callback) => {
+		    query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`) VALUES (?,?,?,?)";
+		    bdd.query(query,[oneStat.id, "NSPP", blocID, JSON.stringify(oneStat.response)], (err, res) => {callback(err, res)})
 		}, (err) => {
 		    console.log(err);
 		    callback();
@@ -87,20 +86,4 @@ exports.logStats = function (roomID,  callback) {
 	});
     });
 }
-/*    exports.getStatsFromOwnedRoomID(roomID, (err, stats) => {
-	Room.getByID(roomID, (err, room) => {
-	    Set.setGet(room.questionSet, (err, set) => {
-		async.forEach(stats.namedStats, (oneStat, callback) => {
-		    query = "INSERT INTO `stats`(`userID`, `roomID`, `roomName`, `setID`, `setName`, `correct`, `questionType`, `question`) VALUES (?,?,?,?,?,?,?,?)";
-		    bdd.query(query,[oneStat.id, room.id, JSON.stringify(room), set.id, JSON.stringify(set), oneStat.response==stats.correctAnswer ? "juste" : (oneStat.response == -1 ? "NSPP" : "faux"), /*"fromSet"*//* "set", room.question], (err, res) => {callback(err, res)})
-		}, (err) => {
-//		    console.log(err);
-		    callback();
-		});
-	    });*/
-//    });
-//    });
-    
-			  
-//}
 
