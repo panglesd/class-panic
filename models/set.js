@@ -42,6 +42,11 @@ exports.setGet = function (setID, callback) {
 	callback(err, rows[0]);
     });
 }
+exports.getByID = function (setID, callback) {
+    bdd.query('SELECT * FROM setDeQuestion WHERE `id` = ?', [setID], function(err, rows) {
+	callback(err, rows[0]);
+    });
+}
 
 exports.setOwnedGet = function (user, setID, callback) {
     bdd.query('SELECT * FROM setDeQuestion WHERE `owner` = ? AND `id` = ?', [user.id, setID], function(err, rows) {

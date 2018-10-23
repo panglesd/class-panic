@@ -57,7 +57,7 @@ exports.listByCourseID = function (courseID, callback) {
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
 	//	console.log(rows);
-	console.log(err);
+	console.log(err, questionId);
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
 //	q.reponses.forEach(function(rep) { delete rep.validity });
