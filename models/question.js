@@ -144,3 +144,21 @@ exports.questionUpdate = function (user, questionID, newQuestion, callback) {
 }
 
 
+
+/***********************************************************************/
+/*       Correction des questions                                      */
+/***********************************************************************/
+
+exports.correctSubmission = function(question, submission) {
+    console.log("queztion", question);
+   console.log("queztion", question.type);
+    console.log("submission", submission);
+    switch(/*[*/question.type/*, question.strategy]*/) {
+    case "multi":
+	return "faux"
+    case "mono":
+	return "juste"
+    }
+    
+    
+}

@@ -80,12 +80,17 @@
 	      Modifier (temporairement) la question en cours
 	  </div>
 	  <div class="controlPanel" id="stats">
-	    <ul>
-	      <li style="font-family: Impact, 'Arial Black', Arial, Verdana, sans-serif;"> Ce qu'en disent les élèves : </li>
+	    <ul onclick="document.querySelector('.windowContainer').classList.add('shown')">
+	      <li style="font-family: Impact, 'Arial Black', Arial, Verdana, sans-serif;" > Ce qu'en disent les élèves : </li>
 	    </ul>
 	  </div>
       </div>
       <div id="nbVoters"> </div>
+      <div class="windowContainer">
+	  <div class="window">
+	      fqsfsefdfsef
+	  </div>
+      </div>
       <script src="/socket.io/socket.io.js">
       </script>
       <script>
@@ -100,8 +105,13 @@
 	     /*                 Mise en place des event listeners                 */
 	     /*********************************************************************/
 	
-	document.querySelector("#reveal").addEventListener("click", revealResults);
-	document.querySelector("#nextQuestion").addEventListener("click", changeQuestionPlease);
+       document.querySelector("#reveal").addEventListener("click", revealResults);
+       document.querySelector("#nextQuestion").addEventListener("click", changeQuestionPlease);
+       document.querySelector(".windowContainer").addEventListener("click", (ev) => {
+	   if(ev.target.classList.contains("windowContainer")) {
+	       document.querySelector(".windowContainer").classList.remove("shown");
+	   }
+       });
 //	document.querySelector("#customQuestion").addEventListener("click", );
 
 

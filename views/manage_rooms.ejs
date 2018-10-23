@@ -19,7 +19,7 @@
 	</a>
     <% }});%>
     <% if(subscription.canOwnRoom) {%>
-	<a class="room" onclick="document.querySelector('#win').classList.toggle('shown');window.scrollTo(0,0)">
+	<a class="room" onclick="document.querySelector('.windowContainer').classList.toggle('shown');window.scrollTo(0,0)">
 	    <li style="cursor:pointer; text-align:center;" class="room">
 		<span class="froom">+</span>
 	    </li>
@@ -27,30 +27,39 @@
     <% } %>
 </ul>
 <% if(subscription.canOwnRoom) {%>
-    <div class="window" id="win">
-	<h2> Créer une salle de classe</h2>
-	<form action="<%= config.PATH %>/course/<%= course.id %>/room/create" method="post">
-	    <p>
-		<input type='text' name="name" placeholder='Nom de la salle'>
-	    </p>
-	    <p>
-		<!--	    <select name="type">
-		     <option value='Type de la room'>Type de salle</option>
-		     </select> -->
-		<select name="questionSet">
-		    <% setOwnedList.forEach( function (set) { %>
-			<option value="<%=set.id%>">
-			    <%=set.name %>
-			</option>
-		    <% }); %>
-		</select>
-	    </p>
-	    <p>
-		<input type='submit' value='Créer la salle'>
-		<input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'>
-	    </p>
-	</form>
+    <div class="windowContainer">
+	<div class="window" id="win">
+	    <h2> Créer une salle de classe</h2>
+	    <form action="<%= config.PATH %>/course/<%= course.id %>/room/create" method="post">
+		<p>
+		    <input type='text' name="name" placeholder='Nom de la salle'>
+		</p>
+		<p>
+		    <!--	    <select name="type">
+			 <option value='Type de la room'>Type de salle</option>
+			 </select> -->
+		    <select name="questionSet">
+			<% setOwnedList.forEach( function (set) { %>
+			    <option value="<%=set.id%>">
+				<%=set.name %>
+			    </option>
+			<% }); %>
+		    </select>
+		</p>
+		<p>
+		    <input type='submit' value='Créer la salle'>
+<!--		    <input type='button' onclick="document.querySelector('.windowContainer').classList.toggle('shown')" value='Supprimer la fenetre'>-->
+		</p>
+	    </form>
+	</div>
     </div>
+<script>
+ document.querySelector(".windowContainer").addEventListener("click", (ev) => {
+     if(ev.target.classList.contains("windowContainer")) {
+	 document.querySelector(".windowContainer").classList.remove("shown");
+     }
+ });
+</script>
 <% } %>
 <% if(roomOwnedList.find((room) => {return room.ownerID != user.id})) { %>
     <h2>Les salle(s) de classe créés par d'autres :</h2>

@@ -56,7 +56,7 @@ socketAdmin.on('newStats', function (newStats) {
 
     newStats.forEach(function (stat) {
 	li = document.createElement("li");
-	li.id = stat.id;
+	//li.id = stat.id;
 	li.innerHTML = '<div style="display:flex; justify-content: space-between;"></div>'
 	li.firstChild.innerText = stat.fullName;
 	ula.appendChild(li)
@@ -83,6 +83,7 @@ socketAdmin.on('newStats', function (newStats) {
 	console.log(li);
     });
     document.querySelector("#stats ul").innerHTML = ula.innerHTML;
+    document.querySelector(".window").innerHTML = document.querySelector("#stats").outerHTML;
 });
 
 /*********************************************************************/

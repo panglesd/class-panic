@@ -1,5 +1,6 @@
 var bdd = require("./bdd");
 var Game = require("./game");
+var Question = require("./question");
 var Room = require("./room");
 var async = require('async');
 
@@ -77,7 +78,7 @@ exports.logStats = function (roomID,  callback) {
 	    Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		async.forEachSeries(stats,(oneStat, callback) => {
 		    query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`) VALUES (?,?,?,?)";
-		    bdd.query(query,[oneStat.id, "NSPP", blocID, JSON.stringify(oneStat.response)], (err, res) => {callback(err, res)})
+		    bdd.query(query,[oneStat.id, Question.correctSubmission(JSON.parse(room.question), oneStat.reponse), blocID, JSON.stringify(oneStat.response)], (err, res) => {callback(err, res)})
 		}, (err) => {
 		    console.log(err);
 		    callback();

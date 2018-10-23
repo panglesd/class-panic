@@ -72,3 +72,55 @@ li.inactiveQuestion {
 .texted {
     color:red;
 }
+
+.windowContainer {
+    position: absolute;
+    background-color: rgba(0,0,0,0);
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+    visibility:hidden;
+    opacity:0;
+    transition:visibility 0.5s 0s, opacity 0.5s ;
+}
+.windowContainer .window {
+    position: absolute;
+    background-color: rgba(0,0,0,0.9);
+    left: 5%;
+    right: 5%;
+    top: 20%;
+    border-radius: 40px;
+    padding: 50px;
+    border: 3px solid grey;
+}
+
+.window h2 {
+    text-align:center;
+}
+.windowContainer.shown {
+    opacity:1;
+    visibility:visible;
+}
+
+/*.window {
+    position: absolute;
+    background-color: rgba(0,0,0,0.9);
+    left: 5%;
+    right: 5%;
+    top: 20%;
+    border-radius: 40px;
+    padding: 50px;
+    border: 3px solid grey;
+    visibility:hidden;
+    opacity:0;
+    transition:visibility 0.5s 0s, opacity 0.5s ;
+}
+.window h2 {
+    text-align:center;
+}
+.window.shown {
+    opacity:1;
+    visibility:visible;
+}
+*/

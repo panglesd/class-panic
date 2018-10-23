@@ -106,32 +106,41 @@
 	     li.textContent = elem.textContent
 	     list.appendChild(li);
 	 });
-	 document.querySelector(".window").classList.toggle("shown");
+	 document.querySelector(".windowContainer").classList.toggle("shown");
      });
      callSearch();
     </script>
 <% } %>
 
 <% if(course.ownerID == user.id) {%>
-    <div class="window" id="win">
-	<h2> Inscrire comme TDMan :</h2>
-	Inscrire comme TDMan les utilisateurs suivants :
-	<ul id="tdman-list">
-	</ul>
-	<h2> Droits :</h2>
-	De base, un TDMan peut controller et corriger des salles. Choisir leurs droits supplémentaires :
-	<p>
-	    <label><input type='checkbox' id="canOwnRoom" name="canOwnRoom" > Peut créer/éditer/supprimer ses salles dans ce cours </label><br>
-	    <label><input type='checkbox' id="canAllRoom" name="canAllRoom" > Peut créer/éditer/supprimer toutes les salles dans ce cours, y compris celles qui ne lui appartiennent pas </label><br>
-	    <label><input type='checkbox' id="canOwnSet" name="canOwnSet" > Peut créer/éditer/supprimer ses questions dans ce cours </label><br>
-	    <label><input type='checkbox' id="canAllSet" name="canAllSet" > Peut créer/éditer/supprimer toutes les questions de ce cours, y compris celles qui ne lui appartiennent pas </label><br>
-	    <label><input type='checkbox' id="canSubscribe" name="canSubscribe" > Peut inscrire des étudiants (non TDMan) </label><br>
-	</p>
-	<p>
-	    <input type='button' onclick="subscribeTDMan()" value='Inscrire'>
-	    <input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'>
-	</p>
+    <div class="windowContainer">
+	<div class="window" id="win">
+	    <h2> Inscrire comme TDMan :</h2>
+	    Inscrire comme TDMan les utilisateurs suivants :
+	    <ul id="tdman-list">
+	    </ul>
+	    <h2> Droits :</h2>
+	    De base, un TDMan peut controller et corriger des salles. Choisir leurs droits supplémentaires :
+	    <p>
+		<label><input type='checkbox' id="canOwnRoom" name="canOwnRoom" > Peut créer/éditer/supprimer ses salles dans ce cours </label><br>
+		<label><input type='checkbox' id="canAllRoom" name="canAllRoom" > Peut créer/éditer/supprimer toutes les salles dans ce cours, y compris celles qui ne lui appartiennent pas </label><br>
+		<label><input type='checkbox' id="canOwnSet" name="canOwnSet" > Peut créer/éditer/supprimer ses questions dans ce cours </label><br>
+		<label><input type='checkbox' id="canAllSet" name="canAllSet" > Peut créer/éditer/supprimer toutes les questions de ce cours, y compris celles qui ne lui appartiennent pas </label><br>
+		<label><input type='checkbox' id="canSubscribe" name="canSubscribe" > Peut inscrire des étudiants (non TDMan) </label><br>
+	    </p>
+	    <p>
+		<input type='button' onclick="subscribeTDMan()" value='Inscrire'>
+<!--		<input type='button' onclick="document.querySelector('#win').classList.toggle('shown')" value='Supprimer la fenetre'> -->
+	    </p>
+	</div>
     </div>
+    <script>
+     document.querySelector(".windowContainer").addEventListener("click", (ev) => {
+	 if(ev.target.classList.contains("windowContainer")) {
+	     document.querySelector(".windowContainer").classList.remove("shown");
+	 }
+     });
+    </script>
 <% } %>
 
 <a href="<%= config.PATH %>/course/<%= course.id %>/">Retourner au cours</a>
