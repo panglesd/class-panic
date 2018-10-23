@@ -21,7 +21,7 @@
 		  <a href="<%= config.PATH %>/course/<%= course.id %>"><li <%= active == "course" ? "class=selected" : "" %>><%= course.name %></li></a>
 		  <% if(subscription.isTDMan) { %>
 		      <a href="<%= config.PATH %>/course/<%= course.id %>/room"><li <%= active == "rooms" ? "class=selected" : "" %>>Salles</li></a>
-		      <a href="<%= config.PATH %>/course/<%= course.id %>/set"><li <%= active == "sets" ? "class=selected" : "" %>>Sets</li></a>
+		      <a href="<%= config.PATH %>/course/<%= course.id %>/set"><li <%= active == "sets" ? "class=selected" : "" %>>Questions</li></a>
 		  <% } %>
 		  <a href="<%= config.PATH %>/course/<%= course.id %>/subscription"><li <%= active == "subscription" ? "class=selected" : "" %>>Inscriptions</li></a>
 		  <% if(subscription.isTDMan) { %>
