@@ -103,7 +103,7 @@ function formatQuestionFromBody(body) {
 // Create
 
 exports.question_create_post = function(req, res) {
-    if(req.subscription.canSetUpdate) {
+    if(req.subscription.canOwnSet) {
 	let question = formatQuestionFromBody(req.body);
 	Question.questionCreate(req.session.user, question, req.set.id, function(err, info) {
 	    if(err) {
@@ -125,7 +125,7 @@ exports.question_create_post = function(req, res) {
 // Update
 
 exports.question_update_post = function(req, res) {
-    if(req.subscription.canSetUpdate) {
+    if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
 	let question = formatQuestionFromBody(req.body);
 	Question.questionUpdate(req.session.user, req.question.id, question, function(err, info) {
 	    if(err) {
@@ -147,7 +147,7 @@ exports.question_update_post = function(req, res) {
 // Delete
 
 exports.question_delete_post = function(req, res) {
-    if(req.subscription.canSetUpdate) {
+    if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
 	Question.questionDelete(req.session.user, req.question.id,  function(err, id) {
 	    //	console.log(err);
 //	    req.params.id = req.params.idSet; // HORRIBLE HACK

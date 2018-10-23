@@ -43,7 +43,10 @@ router.use('/:setID', function (req, res, next) {
 	Set.setGet(parseInt(req.params.setID), (err, set) => {
 	    if(!err) {
 		req.set = set;
-		next();
+		if(set.courseID != req.course.id)
+		    res.redirect(config.PATH);
+		else
+		    next();
 	    }
 	    else {
 		res.redirect(config.PATH);

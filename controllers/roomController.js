@@ -136,7 +136,7 @@ exports.room_manage_all = function(req, res) {
 // Create
 
 exports.room_create_post = function(req, res) {
-    if(req.subscription.canRoomCreate) {
+    if(req.subscription.canOwnRoom) {
 	if(req.body.questionSet) { 
 	    Room.create(req.session.user, req.body, req.course.id, function (err,r) { // HACK DEGEU
 		//	    res.redirect(config.PATH+'/manage/room');
@@ -168,7 +168,7 @@ exports.room_create_post = function(req, res) {
 //Delete
 
 exports.room_delete_post = function(req, res) {
-    if(req.subscription.canRoomDelete) {
+    if(req.subscription.canAllRoom || (req.subscription.canOwnRoom && req.room.ownerID == req.user.id)) {
 	Room.delete(req.session.user, req.room.id, function (err, info) {
 	    if(err) {
 		req.msgs.push("Impossible de supprimer la room");
@@ -191,7 +191,7 @@ exports.room_delete_post = function(req, res) {
 //Update
 
 exports.room_update_post = function(req, res) {
-    if(req.subscription.canRoomUpdate) {
+    if(req.subscription.canAllRoom || (req.subscription.canOwnRoom && req.room.ownerID == req.user.id)) {
 	Room.update(req.session.user, req.room, req.body, function (err, id) {
 	    if(err) {
 		req.msgs.push("Impossible de modifier la room");

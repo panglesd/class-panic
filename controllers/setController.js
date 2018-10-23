@@ -101,7 +101,7 @@ exports.set_manage = function(req, res) {
 // Create
 
 exports.set_create_post = function(req, res) {
-    if(req.subscription.canSetCreate) {
+    if(req.subscription.canOwnSet) {
 	Set.setCreate(req.session.user, req.course.id, req.body, function (err, set) { //HACK DEGUEU
 	    if(err) {
 		req.msgs.push("Impossible de créer le set !");
@@ -125,7 +125,7 @@ exports.set_create_post = function(req, res) {
 //Delete
 
 exports.set_delete_post = function(req, res) {
-    if(req.subscription.canSetDelete) {
+    if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
 	Set.setDelete(req.session.user, req.set, function (err, set) {
 	    //	console.log(err);
 	    if(err) {
@@ -147,7 +147,7 @@ exports.set_delete_post = function(req, res) {
 // Update
 
 exports.set_update_post = function(req, res) {
-    if(req.subscription.canSetUpdate) {
+    if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
 	Set.setUpdate(req.session.user, req.set, req.body, function (err, set) { //HACK DEGUEU
 	    if(err)  {
 		req.msgs.push("Impossible de modifier le set");
