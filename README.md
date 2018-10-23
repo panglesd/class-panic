@@ -19,6 +19,7 @@ cd class-panic
 
 ```shell
 npm install
+git clone https://github.com/mathjax/MathJax.git MathJax
 ```
 
 ### Set up the database
