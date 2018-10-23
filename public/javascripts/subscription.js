@@ -65,22 +65,18 @@ function subscribeTDMan() {
     let arr = Array.from(l);
     console.log("arr is", arr);
     console.log({
-		    canCreateRoom: document.querySelector("#canCreateRoom").checked,
-		    canUpdateRoom: document.querySelector("#canUpdateRoom").checked,
-		    canDeleteRoom: document.querySelector("#canDeleteRoom").checked,
-		    canCreateSet: document.querySelector("#canCreateSet").checked,
-		    canUpdateSet: document.querySelector("#canUpdateSet").checked,
-		    canDeleteSet: document.querySelector("#canDeleteSet").checked,
+		    canOwnRoom: document.querySelector("#canOwnRoom").checked,
+		    canAllRoom: document.querySelector("#canAllRoom").checked,
+		    canOwnSet: document.querySelector("#canOwnSet").checked,
+		    canAllSet: document.querySelector("#canAllSet").checked,
 		    canSubscribe: document.querySelector("#canSubscribe").checked
     });
     socket.emit("subscribeListTDMan", courseID, arr.map((e) => { return parseInt(e.id)}),
 		{
-		    canCreateRoom: document.querySelector("#canCreateRoom").checked,
-		    canUpdateRoom: document.querySelector("#canUpdateRoom").checked,
-		    canDeleteRoom: document.querySelector("#canDeleteRoom").checked,
-		    canCreateSet: document.querySelector("#canCreateSet").checked,
-		    canUpdateSet: document.querySelector("#canUpdateSet").checked,
-		    canDeleteSet: document.querySelector("#canDeleteSet").checked,
+		    canOwnRoom: document.querySelector("#canOwnRoom").checked,
+		    canAllRoom: document.querySelector("#canAllRoom").checked,
+		    canOwnSet: document.querySelector("#canOwnSet").checked,
+		    canAllSet: document.querySelector("#canAllSet").checked,
 		    canSubscribe: document.querySelector("#canSubscribe").checked
 		});
     document.querySelector(".window").classList.remove("shown");

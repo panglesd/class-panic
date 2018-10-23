@@ -1,27 +1,27 @@
 <%- include('admin_header', {active : "salles"}); -%>
 
-<% if(subscription.canRoomUpdate) {%>
-    <h2>Modifier votre salle <%= room.name %></h2>
+<% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
+    <h2>Modifier la salle <%= room.name %></h2>
 <% } else { %>
     <h2> La salle <%= room.name %></h2>
 <% } %>
-<% if(subscription.canRoomUpdate) {%>
+<% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <form action="<%= config.PATH %>/course/<%= course.id %>/room/<%=room.id%>/update" method="post">
 <% } %>
-Name : <input <%= subscription.canRoomUpdate ? "" : "readonly" %> name="name" value="<%= room.name %>"> <br>
+Name : <input <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="name" value="<%= room.name %>"> <br>
 Actuellement avec le set :
-<select <%= subscription.canRoomUpdate ? "" : "readonly" %> name="questionSet">
+<select <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="questionSet">
     <% setOwnedList.forEach( function (set) { %>
 	<option value="<%=set.id%>" <%= set.id==room.questionSet ? "selected" : ""%>>
 	    <%=set.name %>
 	</option>
     <% }); %>
 </select>
-<% if(subscription.canRoomUpdate) {%>
+<% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <input type="submit" value="Modifier">
     </form>
 <% } %>
-<% if(subscription.canRoomDelete) {%>
+<% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <h2>Ou la supprimer</h2>
     
     <form onsubmit="return confirm('Etes-vous sure de vouloir supprimer la salle <%=room.name%> ?');" action="<%= config.PATH %>/course/<%= room.courseID %>/room/<%=room.id%>/delete" method="post">

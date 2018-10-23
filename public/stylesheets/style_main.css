@@ -259,12 +259,14 @@ table input[type=submit]{
     right: 5%;
     top: 20%;
     border-radius: 40px;
-    padding: 30px;
+    padding: 50px;
     border: 3px solid grey;
-    text-align:center;
     visibility:hidden;
     opacity:0;
     transition:visibility 0.5s 0s, opacity 0.5s ;
+}
+.window h2 {
+    text-align:center;
 }
 .window.shown {
     opacity:1;

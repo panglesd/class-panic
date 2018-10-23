@@ -121,13 +121,11 @@
 	<h2> Droits :</h2>
 	De base, un TDMan peut controller et corriger des salles. Choisir leurs droits supplémentaires :
 	<p>
-	    <input type='checkbox' id="canCreateRoom" name="canCreateRoom" > Peut créer des rooms <br>
-	    <input type='checkbox' id="canUpdateRoom" name="canUpdateRoom" > Peut modifier des rooms <br>
-	    <input type='checkbox' id="canDeleteRoom" name="canDeleteRoom" > Peut supprimer des rooms <br>
-	    <input type='checkbox' id="canCreateSet" name="canCreateSet" > Peut créer des sets <br>
-	    <input type='checkbox' id="canUpdateSet" name="canUpdateSet" > Peut modifier des sets <br>
-	    <input type='checkbox' id="canDeleteSet" name="canDeleteSet" > Peut supprimer des sets <br>
-	    <input type='checkbox' id="canSubscribe" name="canSubscribe" > Peut inscrire des étudiants (non TDMan) <br>
+	    <label><input type='checkbox' id="canOwnRoom" name="canOwnRoom" > Peut créer/éditer/supprimer ses salles dans ce cours </label><br>
+	    <label><input type='checkbox' id="canAllRoom" name="canAllRoom" > Peut créer/éditer/supprimer toutes les salles dans ce cours, y compris celles qui ne lui appartiennent pas </label><br>
+	    <label><input type='checkbox' id="canOwnSet" name="canOwnSet" > Peut créer/éditer/supprimer ses questions dans ce cours </label><br>
+	    <label><input type='checkbox' id="canAllSet" name="canAllSet" > Peut créer/éditer/supprimer toutes les questions de ce cours, y compris celles qui ne lui appartiennent pas </label><br>
+	    <label><input type='checkbox' id="canSubscribe" name="canSubscribe" > Peut inscrire des étudiants (non TDMan) </label><br>
 	</p>
 	<p>
 	    <input type='button' onclick="subscribeTDMan()" value='Inscrire'>

@@ -149,7 +149,11 @@ exports.getSubscription = function(user, course, callback) {
 	    canSetUpdate:1,
 	    canSetCreate:1,
 	    canSetDelete:1,
-	    canSubscribe:1
+	    canSubscribe:1,
+	    canOwnRoom:1,
+	    canAllRoom:1,
+	    canOwnSet:1,
+	    canAllSet:1
 	});
     }
     else {

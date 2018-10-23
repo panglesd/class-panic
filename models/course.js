@@ -45,13 +45,13 @@ exports.subscribedAsTDMan = function (user, callback) {
     })
 }
 
-exports.getSubscription = function (user, courseID, callback) {
+/*exports.getSubscription = function (user, courseID, callback) {
     query = "SELECT * FROM courses INNER JOIN subscription ON courseID = `courses`.`id` INNER JOIN users ON `courses`.`ownerID` = `users`.`id` WHERE userID = ? AND courseID = ?";
     bdd.query(query, [user.id, courseID], function(err, rows) {
 //	console.log(rows);
 	callback(err, rows[0]);
     })
-}
+}*/
 
 exports.ownedList = function (user, callback) {
     bdd.query('SELECT * FROM courses WHERE `ownerID` = ?', [user.id], function(err, rows) {
@@ -90,21 +90,17 @@ exports.subscribeStudent = function(studentID, courseID, callback) {
     bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res)});
 }
 exports.subscribeTDMan = function(studentID, courseID, permission, callback) {
-    query = "INSERT INTO subscription(courseID, userID, canRoomCreate, canRoomUpdate, canRoomDelete, canSetCreate, canSetUpdate, canSetDelete, canSubscribe, isTDMan) VALUES (?,?, ?, ?, ?, ? , ?, ?, ?, 1 ) ON DUPLICATE KEY UPDATE isTDMan = 1 , canRoomCreate = ? , canRoomUpdate = ? , canRoomDelete = ? , canSetCreate = ? , canSetUpdate = ? , canSetDelete = ? , canSubscribe = ? ";
+    query = "INSERT INTO subscription(courseID, userID, canOwnRoom, canAllRoom, canOwnSet, canAllSet, canSubscribe, isTDMan) VALUES (?, ?, ?, ?, ?, ?, ?, 1 ) ON DUPLICATE KEY UPDATE isTDMan = 1 , canOwnRoom = ? , canAllRoom = ? , canownSet = ? , canAllSet = ? , canSubscribe = ? ";
     params = [courseID, studentID,
-	      permission.canCreateRoom,
-	      permission.canUpdateRoom,
-	      permission.canDeleteRoom,
-	      permission.canCreateSet,
-	      permission.canUpdateSet,
-	      permission.canDeleteSet,
+	      permission.canOwnRoom,
+	      permission.canAllRoom,
+	      permission.canOwnSet,
+	      permission.canAllSet,
 	      permission.canSubscribe,
-	      permission.canCreateRoom,
-	      permission.canUpdateRoom,
-	      permission.canDeleteRoom,
-	      permission.canCreateSet,
-	      permission.canUpdateSet,
-	      permission.canDeleteSet,
+	      permission.canOwnRoom,
+	      permission.canAllRoom,
+	      permission.canOwnSet,
+	      permission.canAllSet,
 	      permission.canSubscribe
 	      ]
     bdd.query(query, params, (err, res) => {console.log(this.sql);console.log(err, res);callback(err, res)});

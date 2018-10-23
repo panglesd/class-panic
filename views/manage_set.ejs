@@ -1,53 +1,57 @@
 <%- include('admin_header', {active:"sets"}); -%>
-
-<% if(subscription.isTDMan) { %>
-    <% if(subscription.canSetUpdate) { %>
-	<h2> Renommer ou supprimer "<%= set.name%>"</h2>
-    <% } else { %>
-	<h2><%= set.name%></h2>
-    <% } %>
+<% var canModify = subscription.canAllSet || (subscription.canOwnSet && set.ownerID == user.id) %>
+<% if(canModify) { %>
+    <h2> Modifier "<%= set.name%>"</h2>
+<% } else { %>
+    <h2><%= set.name%></h2>
+<% } %>
+<% if(canModify) { %>
     <form action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/update" method="post">
-	Name : <input name="name" value="<%= set.name %>"> <br>
-	<input type="submit" value="Modifier">
+<% } %>
+    Name : <input <%= canModify ? "" : "readonly" %> name="name" value="<%= set.name %>"> <br>
+<% if(canModify) { %>
+    <input type="submit" value="Modifier">
     </form>
-    <% if(subscription.canSetUpdate) { %>
-	<h2>Ou la supprimer</h2>
-	
-	<form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/delete" method="post">
-	    Irréversible : <input type="submit" value='Supprimer le set "<%= set.name%>"'>
-	</form>
-    <% } %>
+<% } %>
+<% if(canModify) { %>
+    <h2>Ou le supprimer</h2>
     
-    
-    
-    <h2> Votre set "<%= set.name %>" contient les questions suivantes  <%= subscription.canSetUpdate ? "(glisser-déposer pour réordonner)" : "" %> :</h2>
-    <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
-<ul class=" <%= subscription.canSetUpdate ? "room sortable-list" : "" %>">
+    <form onsubmit='return confirm("Etes-vous sure de vouloir supprimer le set \"<%=set.name%>\" ?");' action="<%= config.PATH %>/course/<%= course.id %>/set/<%=set.id%>/delete" method="post">
+	Irréversible : <input type="submit" value='Supprimer le set "<%= set.name%>"'>
+    </form>
+<% } %>
+
+
+
+<h2> Le set "<%= set.name %>" contient les questions suivantes  <%= canModify ? "(glisser-déposer pour réordonner)" : "" %> :</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class=" <%= canModify ? "room sortable-list" : "" %>">
     <% questionList.forEach(function(q) { %>
-	    <li class="question" id="q<%= q.id %>">
-		<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= q.id %>"> 
-		    <span class="froom"><%= q.enonce %></span>
-		    <div>
-			Modifier
-		    </div>
-		</a>
-	    </li>
-    <% });%>
-    </ul>
-    <% if(subscription.canSetUpdate) { %>
-	<ul>
-	    <a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/create">
-		<li class="room">
-		    <span class="froom">Créer une nouvelle question</span>
-		    <!--	<div>
-			 <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
-			 </div> -->
-		</li>
+	<li class="question" id="q<%= q.id %>">
+	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= q.id %>"> 
+		<span class="froom"><%= q.enonce %></span>
+		<div>
+		    Modifier
+		</div>
 	    </a>
-	</ul>
-    <% } %>
-    
-    <a style="display:block; margin:40px;" href="<%= config.PATH %>/course/<%= course.id %>/set"> Retourner à la liste des sets </a>
+	</li>
+    <% });%>
+</ul>
+<% if(canModify) { %>
+    <ul>
+	<a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/create">
+	    <li class="room">
+		<span class="froom">Créer une nouvelle question</span>
+		<!--	<div>
+		     <ul> <li> Modifier </li> <li> Supprimer </li> </ul>
+		     </div> -->
+	    </li>
+	</a>
+    </ul>
+<% } %>
+
+<a style="display:block; margin:40px;" href="<%= config.PATH %>/course/<%= course.id %>/set"> Retourner à la liste des sets </a>
+<% if(canModify) { %>
     <script src="/javascripts/Sortable.js">
     </script>
     <script src="/socket.io/socket.io.js"></script>

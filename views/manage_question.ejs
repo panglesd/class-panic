@@ -1,4 +1,7 @@
 <%- include('admin_header', {active:"sets"}); -%>
+
+<% var canModify = subscription.canAllSet || (subscription.canOwnSet && set.ownerID == user.id) %>
+
 <style>
  .texted {
      color:red;
@@ -12,12 +15,12 @@
     <ul class="room" id="listeQue">
 	<li class="room">
 	    <span class="froom">Énoncé :</span>
-	    <textarea <%= subscription.canSetUpdate ? "" : "readonly" %> name="enonce" style="width:100%;height:50px;" placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"><%= question.enonce %></textarea>
+	    <textarea <%= canModify ? "" : "readonly" %> name="enonce" style="width:100%;height:50px;" placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"><%= question.enonce %></textarea>
 	</li>
 	<li class="room">
 	    <label>
 		<span class="froom">Description plus détaillée :</span><br>
-		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> name="description" style="width:100%;height:200px;" placeholder="Ceci sera interpreté comme du markdown. Par exemple, il est possible de mettre du code en utilisant:
+		<textarea  <%= canModify ? "" : "readonly" %> name="description" style="width:100%;height:200px;" placeholder="Ceci sera interpreté comme du markdown. Par exemple, il est possible de mettre du code en utilisant:
 
 ```ocaml
  let id = fun a -> a in 
@@ -28,7 +31,7 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
-	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox">Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
+	<label><input <%- canModify ? "" : "onclick='return false'" %> name="multi" id="multi" style="vertical-align: middle;" type="checkbox" <%= question.type == "multi" ? "checked" : "" %>>Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
 	<!--    Regroupement des champs hidden   -->
@@ -38,7 +41,7 @@ Utiliser $...$ pour mettre des maths.
 		<span class="froom nreponse"> Réponse <%= i %> :</span>
 	<!--    Texte de la réponse              -->
 		<textarea
-		    <%= subscription.canSetUpdate ? "" : "readonly" %>
+		    <%= canModify ? "" : "readonly" %>
 		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
 		    class="value-reponse-textarea"
 		    name="value-reponse-<%= i %>"
@@ -55,7 +58,7 @@ Utiliser $...$ pour mettre des maths.
 		    style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%"
 		    placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
 	<!--    Boutons pour le management       -->
-		<% if(subscription.canSetUpdate) { %>
+		<% if(canModify) { %>
 		    <div>
 			<ul>
 			    <li style="display:inline-block; margin-right:20px;">
@@ -76,14 +79,14 @@ Utiliser $...$ pour mettre des maths.
 	    </li>
 	    <% i++;
 	    }); %>
-	    <% if(subscription.canSetUpdate) { %>
+	    <% if(canModify) { %>
 		<div  id="ajoutrep"></div>
 		<li onclick="addAnswer()" class="room"> <span class="froom">+</span></li>
 		<input type="submit" value="Enregistrer cette question">
 	    <% } %>
     </ul>
 </form>
-<% if(subscription.canSetUpdate) { %>
+<% if(canModify) { %>
     <% if (!newQuestion) { %>
 	<div style="margin:20px";>    Vous pouvez aussi supprimer définitivement cette question :
 	    <form onsubmit='return confirm("Etes-vous sure de vouloir supprimer la question \"<%= question.enonce%>\" ?");' id="delete" method="post" action="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= question.id %>/delete">
@@ -93,7 +96,7 @@ Utiliser $...$ pour mettre des maths.
     <% } %>
 <% } %>
 <a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
-<% if(subscription.canSetUpdate) { %>
+<% if(canModify) { %>
     <script src="/javascripts/question.js"></script>
     <script>
      // ICI ajouter les events listener

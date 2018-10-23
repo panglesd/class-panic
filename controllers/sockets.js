@@ -417,6 +417,7 @@ module.exports = function (server, sessionMiddleware) {
 			      });
 			  });
 	});
+
 	socket.on('subscribeListTDMan', function (courseID, studentList, permission) {
 	    console.log("we got this pemission", permission);
 	    console.log("socket.course.ownerID",socket.course.ownerID);
