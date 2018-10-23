@@ -108,8 +108,13 @@ module.exports = function (server, sessionMiddleware) {
 	    //	    console.log("packet is", packet);
 	    if(packet[0]=="chooseRoom")
 		next();
-	    if(socket.room)
-		next();
+	    if(socket.roomID) {
+		Room.getByID(socket.roomID, function (err, room) {
+		    socket.room = room;
+		    socket.room.question = JSON.parse(socket.room.question)
+		    next();
+		})
+	    }
 	});
 	
 	/******************************************/
@@ -127,6 +132,7 @@ module.exports = function (server, sessionMiddleware) {
 //			console.log("user got subscription", subscription);
 			if(subscription) {
 			    socket.room = res;
+			    socket.roomID = res.id;
 			    console.log("user enter room");
 			    socket.join(newRoom);
 			    //		console.log("socket.request.session.user is ",socket.request.session.user);
@@ -163,9 +169,15 @@ module.exports = function (server, sessionMiddleware) {
 	
 	socket.on('chosenAnswer', function (answer) {
 	    console.log("answer is", answer);
-	    game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
-		sendOwnedStats(socket.room)
-	    });
+	    console.log("room is", socket.room);
+	    if(answer.length == 0 || socket.room.question.type == "multi")
+		game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
+		    sendOwnedStats(socket.room)
+		});
+	    else 
+		game.registerAnswer(socket.request.session.user, socket.room, [answer[0]], function () {
+		    sendOwnedStats(socket.room)
+		});
 	});
 	
 	/******************************************/
