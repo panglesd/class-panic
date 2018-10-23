@@ -50,59 +50,24 @@ socket.on('connect', () => {
 /*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
-var sem = false;
+// var sem = false;
 
-socket.on('newQuestion', function (reponse, correction) {
+socket.on('newQuestion', function (reponse, stats) {
     console.log(reponse);
     currentQuestionOfStudent=reponse;
+    
+    // On écrit l'énoncé là où il faut. MathJax rendered.
     enonce = document.querySelector("#question");
     enonce.textContent=reponse.enonce;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
+
+    // On nettoie les réponses précédentes
     wrapper = document.querySelector("#wrapperAnswer");
     while (wrapper.firstChild) {
 	wrapper.removeChild(wrapper.firstChild);
     }
-    reponse.reponses.forEach(function (rep, index) {
-	elem = document.createElement('div');
-	elem.classList.add("reponse");
-	elem.classList.add("notSelected");
-	if(rep.validity == "juste" || reponse.correct == index) {
-	    elem.classList.add("vrai")
-	}
-	console.log(reponse.correct, index);
-	console.log((typeof reponse.correct !== "undefined" && reponse.correct != index));
-	if(rep.validity == "faux" || (typeof reponse.correct !== "undefined" && reponse.correct != index)) {
-	    elem.classList.add("faux");
-	}
-	elem.id = "r"+index;
-	if(typeof isAdmin == "undefined")
-	    elem.addEventListener("click", function (ev) {
-		chooseAnswer(index, event.currentTarget);
-	    });
-	//	elem.textContent = (rep.reponse);
-	span = document.createElement("span");
-	elem.innerHTML = "";
-	span.innerHTML = md.render(rep.reponse);
-	console.log(span, rep.reponse);
-	span.classList.add("markdown");
-	elem.appendChild(span)
-	if(rep.texted) {
-	    textarea = document.createElement("textarea");
-	    textarea.style.width="100%"
-	    textarea.style.display="block"
-	    if(typeof isAdmin == "undefined") {
-		textarea.addEventListener("input", (ev) => {
-		    console.log("updateed");
-		    chooseAnswer(index, event.currentTarget.parentNode);
-		});
-	    }
-	    if(rep.correction)
-		textarea.textContent=rep.correction
-	    elem.appendChild(textarea);
-	}
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
-	wrapper.appendChild(elem);
-    });
+
+    // Si besoin est, on rajoute la description
     descr = document.querySelector("#description");
     if(reponse.description)
 	descr.style.visibility="visible";
@@ -113,8 +78,57 @@ socket.on('newQuestion', function (reponse, correction) {
     else
 	descr.innerHTML = reponse.description;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
-    if(correction) 
-	correct(correction);
+
+    // Pour chaque nouvelle réponse :
+    reponse.reponses.forEach(function (rep, index) {
+	// Création de l'élément HTML vide
+	elem = document.createElement('div');
+	elem.classList.add("reponse");
+	elem.classList.add("notSelected");
+	if(rep.validity)
+	    elem.classList.add(rep.validity)
+	elem.id = "r"+index;
+
+	// Si besoin est, ajout d'un event listener
+	if(typeof isAdmin == "undefined")
+	    elem.addEventListener("click", function (ev) {
+		//		chooseAnswer(index, event.currentTarget);
+		if(ev.target.tagName != "TEXTAREA")
+		    chooseAnswer(index, elem, false);
+		else
+		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
+	    });
+	// Création de l'élément contenant l'énoncé de la réponse
+	span = document.createElement("span");
+	elem.innerHTML = "";
+	span.innerHTML = md.render(rep.reponse);
+	console.log(span, rep.reponse);
+	span.classList.add("markdown");
+	elem.appendChild(span)
+	// Si besoin, ajout d'un textarea
+	if(rep.texted) {
+	    textarea = document.createElement("textarea");
+	    textarea.style.width="100%"
+	    textarea.style.display="block"
+	    if(rep.correction)
+		textarea.textContent=rep.correction
+	    // Ajout d'un event listener pour le textarea
+	    if(typeof isAdmin == "undefined") {
+		textarea.addEventListener("input", (ev) => {
+		    console.log("updateed");
+		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
+//		    sendAnswer();
+		});
+	    }
+	    elem.appendChild(textarea);
+	}
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+	wrapper.appendChild(elem);
+    });
+    // Si l'on nous a aussi envoyé les stats, on les affiche.
+    console.log("stats", stats);
+    if(stats) 
+	showStats(stats);
 });
 
 /*********************************************************************/
@@ -122,22 +136,34 @@ socket.on('newQuestion', function (reponse, correction) {
 /*********************************************************************/
 
 //socket.on('correction', function (correction) {
-correct = function (correction) {
-    console.log(correction);
-//    document.querySelectorAll(".reponse").forEach(function (elem) {elem.style.boxShadow="0 0 8px 10px red"});
-    //	      document.querySelector("#rep"+correction.correct).style.boxShadow="0 0 8px 15px green";
-//    if(document.querySelector("#r"+correction.correctAnswer))
-//	document.querySelector("#r"+correction.correctAnswer).style.boxShadow="0 0 8px 15px green";
-    var total = 0;
-    correction.anonStats.forEach(function (v) { total += v.count });
-    total=Math.max(total,1);
-    correction.anonStats.forEach(function (v) {
-	if(v.answer!=-1) {
-//	    console.log("#rep"+v.answer);
-	    document.querySelector("#r"+v.answer).style.background =
-	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+v.count)/total*100./*-5*/)+"%,#F5F5DC "+((0.+v.count)/total*100.)+"%)";
-	}
+showStats = function (stats) {
+    console.log("stats", stats);
+//    let total = 0;
+    //stats.forEach(function (v) { total += v.count });
+    let total = Math.max(stats.length,1);
+    //total=Math.max(total,1);
+    count=[];
+    stats.forEach(function (v) {
+	console.log("yoo", JSON.parse(v.answer))
+	tab_rep_one_student = JSON.parse(v.answer)
+	tab_rep_one_student.forEach((rep) => {
+	    n_answer = rep.n
+	    console.log("n_answer", n_answer);
+	    if(count[n_answer])
+		count[n_answer]++
+	    else
+		count[n_answer]=1
+	});
     });
+    console.log(count, total);
+    count.forEach((c,i) => {
+	document.querySelector("#r"+i).style.background =
+	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+c)/total*100./*-5*/)+"%,#F5F5DC "+((0.+c)/total*100.)+"%)";	
+    });
+//	if(n_answer != -1) {
+//	    console.log("#rep"+v.answer);
+//	}
+//    });
 }//);
 
 /*********************************************************************/
@@ -152,27 +178,49 @@ function sendQuestionPlease() {
 /*                 pour envoyer son choix de reponse                 */
 /*********************************************************************/
 
-if(typeof isAdmin == "undefined") {
-    var reponses=document.querySelectorAll(".reponse");
-    for(var vari=0;vari<reponses.length;vari++) {
-	reponses[vari].addEventListener("click",chooseAnswer);
-    };
+function chooseAnswer(i, elem, update) {
+    if(currentQuestionOfStudent.type!="multi") {
+	var reponse=document.querySelector(".reponse.selected");
+	if(reponse) {
+	    reponse.classList.replace('selected', 'notSelected');
+	};
+	if(i>-1) {
+	    a = document.querySelector("#r"+i);
+	    a.classList.replace("notSelected", "selected");
+	}
+    }
+    else {
+	a = document.querySelector("#r"+i);
+	if(update) {
+	    a.classList.remove("notSelected");
+	    a.classList.add("selected");
+	}
+	else {
+	    a.classList.toggle("notSelected");
+	    a.classList.toggle("selected");
+	}
+    }
+    sendAnswer();
 }
 
-function chooseAnswer(i, elem) {
-    answer = {};
-    answer.n = i;
-    textarea =  elem.querySelector("textarea")
-    answer.text = textarea ? textarea.value : "";
-    socket.emit("chosenAnswer", answer);
-    var reponse=document.querySelector(".reponse.selected");
-    if(reponse) {
-	reponse.classList.replace('selected', 'notSelected');
-    };
+/*function updateAnswer(i, elem) {
     if(i>-1) {
 	a = document.querySelector("#r"+i);
 	a.classList.replace("notSelected", "selected");
     }
-}
+    sendAnswer();
+}*/
 
+	
+function sendAnswer() {
+    reponses = []
+    document.querySelectorAll(".reponse.selected").forEach((elem) => {
+	let atom = {}
+	atom.n = parseInt(elem.id.split("r")[1]);
+	textarea =elem.querySelector("textarea");
+	atom.text = textarea ? textarea.value : "";
+	reponses.push(atom);
+    });
+    socket.emit("chosenAnswer", reponses);
+}
 

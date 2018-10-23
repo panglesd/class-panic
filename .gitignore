@@ -111,3 +111,4 @@ flycheck_*.el
 
 # directory configuration
 .dir-locals.el
+/MathJax/

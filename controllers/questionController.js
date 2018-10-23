@@ -31,10 +31,12 @@ renderManageQuestion = function(user, course, question, set, msgs, req, res) {
 			     {
 				 reponses : [{
 				     reponse: "",
-				     validity: false
+				     validity: "false",
+				     texted: false
 				 }],
-				 correct:0,
-				 enonce: ""
+				 enonce: "",
+				 description:"",
+				 type:"mono"
 			     })
 	    },
 	    course : function(callback) {
@@ -49,7 +51,8 @@ renderManageQuestion = function(user, course, question, set, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
+	    //	    console.log(results);
+	    console.log("question iiiiiiiiiiiiiiiiiis", question);
 	    res.render('manage_question', results)
 	});
 };
@@ -75,31 +78,34 @@ exports.question_update_get = function(req, res) {
 /*         Controlleurs POST pour modifier les questions     */
 /*************************************************************/
 
+function formatQuestionFromBody(body) {
+    let question = {
+	enonce : body.enonce,
+	correct : body.correct,
+	description : body.description,
+	type : body.multi ? "multi" : "mono"
+    }
+    let reponse = [];
+    let i=0;
+    while(body["value-reponse-"+i]) {
+	reponse[i]= {
+	    reponse: body["value-reponse-"+i] ,
+	    validity: body["correctness-"+i],
+	    texted: body["text-"+i]=="true" ? true : false,
+	};
+	if(reponse[i].texted) 
+	    reponse[i].correction = body["correction-"+i]
+	i++;
+    }
+    question.reponse = JSON.stringify(reponse);
+    return question
+}
 // Create
 
 exports.question_create_post = function(req, res) {
     if(req.subscription.canSetUpdate) {
-	question = {
-	    enonce : req.body.enonce,
-	    correct : req.body.correct,
-	    description : req.body.description
-	}
-	reponse = [];
-	i=0;
-	while(req.body[i]) {
-	    reponse[i]= {
-		reponse: req.body[i] ,
-		validity: false,
-		texted:req.body["text-"+i]=="true" ? true : false,
-	    };
-	    if(reponse[i].texted) 
-		reponse[i].correction=req.body["correction-"+i]
-	    i++;
-	}
-	
-	Question.questionCreate(req.session.user, question, reponse, req.set.id, function(err, info) {
-	    //	res.redirect(config.PATH+"/manage/set/"+req.params.idSet) ;
-	    //	req.params.id = req.params.idSet; // HORRIBLE HACK
+	let question = formatQuestionFromBody(req.body);
+	Question.questionCreate(req.session.user, question, req.set.id, function(err, info) {
 	    if(err) {
 		req.msgs.push("Impossible d'ajouter la question !");
 		SetController.set_manage(req, res);
@@ -120,24 +126,8 @@ exports.question_create_post = function(req, res) {
 
 exports.question_update_post = function(req, res) {
     if(req.subscription.canSetUpdate) {
-	question = {
-	    enonce : req.body.enonce,
-	    correct : req.body.correct,
-	    description : req.body.description
-	}
-	i=0
-	reponse = [];
-	while(req.body[i]) {
-	    reponse[i]= {
-		reponse: req.body[i] ,
-		validity: false,
-		texted:req.body["text-"+i]=="true" ? true : false
-	    };
-	    i++;
-	}
-	Question.questionUpdate(req.session.user, req.question.id, question, reponse, function(err, info) {
-	    //	res.redirect(config.PATH+"/manage/set/"+req.params.idSet);
-	    //	req.params.id = req.params.idSet; // HORRIBLE HACK
+	let question = formatQuestionFromBody(req.body);
+	Question.questionUpdate(req.session.user, req.question.id, question, function(err, info) {
 	    if(err) {
 		req.msgs.push("Impossible de mettre à jour la question !");
 		SetController.set_manage(req, res);
@@ -160,7 +150,7 @@ exports.question_delete_post = function(req, res) {
     if(req.subscription.canSetUpdate) {
 	Question.questionDelete(req.session.user, req.question.id,  function(err, id) {
 	    //	console.log(err);
-	    req.params.id = req.params.idSet; // HORRIBLE HACK
+//	    req.params.id = req.params.idSet; // HORRIBLE HACK
 	    if(err) {
 		req.msgs.push("Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !");
 		SetController.set_manage(req, res);

@@ -28,20 +28,57 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
+	<label><input name="multi" id="multi" style="vertical-align: middle;" type="checkbox">Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
-	    <li class="reponse <%= i==question.correct ? "true" : "" %>">
-		<span class="froom"> Réponse <%= i %> :</span>
-		<textarea  <%= subscription.canSetUpdate ? "" : "readonly" %> placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]" class="nreponse" name="<%= i %>" id="<%= i %>" style="width:100%"><%= reponsePossible.reponse %></textarea><div class="<%= reponsePossible.texted ? "texted" : "" %>"style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-<%= i %>" value="<%= reponsePossible.texted ? true : false %>"><span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span></div><textarea name="correction-<%= i %>" style="visibility:hidden; display:block; width:100%" placeholder="Vous pouvez rentrer la correction/justification/explication" ><% reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
-	    <% if(subscription.canSetUpdate) { %>
-		<div><ul><li style="display:inline-block; margin-left:20px;"><a class="room" onclick="removeElement(this)">Enlever cette réponse</a></li><li style="display:inline-block; margin-left:20px;" onclick="setTrue(this)">Choisir comme réponse correcte</li></ul></div>
-	    <% } %>
+	    <li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
+	<!--    Regroupement des champs hidden   -->
+		<input type="hidden" class="texted-hidden" name="texted-<%= i %>" value="<%= reponsePossible.texted ? true : false %>">
+		<input type="hidden" class="correctness-hidden" name="correctness-<%= i %>" value="<%= reponsePossible.validity %>">
+	<!--    Numéro de réponse                -->
+		<span class="froom nreponse"> Réponse <%= i %> :</span>
+	<!--    Texte de la réponse              -->
+		<textarea
+		    <%= subscription.canSetUpdate ? "" : "readonly" %>
+		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
+		    class="value-reponse-textarea"
+		    name="value-reponse-<%= i %>"
+		    style="width:100%"><%= reponsePossible.reponse %></textarea>
+	<!--    Réponse custom ou non            -->
+		<div
+		    class="text <%= reponsePossible.texted ? "texted" : "" %>"
+		    style="text-align:left;margin:3px;">
+		    <span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span>
+		</div>
+		<textarea
+		    class="correction-textarea"
+		    name="correction-<%= i %>"
+		    style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%"
+		    placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
+	<!--    Boutons pour le management       -->
+		<% if(subscription.canSetUpdate) { %>
+		    <div>
+			<ul>
+			    <li style="display:inline-block; margin-right:20px;">
+				<a class="room remove">Enlever cette réponse</a>
+			    </li>
+			    <li class="set-true select <%= reponsePossible.validity=="true" ? "selected" : "" %>" >
+				Réponse juste
+			    </li>
+			    <li class="set-to_correct select <%= reponsePossible.validity=="to_correct" ? "selected" : "" %>" >
+				Réponse à corriger
+			    </li>
+			    <li class="set-false select <%= reponsePossible.validity=="false" ? "selected" : "" %>" >
+				Réponse fausse
+			    </li>
+			</ul>
+		    </div>
+		<% } %>
 	    </li>
 	    <% i++;
 	    }); %>
 	    <% if(subscription.canSetUpdate) { %>
 		<div  id="ajoutrep"></div>
 		<li onclick="addAnswer()" class="room"> <span class="froom">+</span></li>
-		<input name="correct" id="true" type="hidden" value="<%= question.correct %>">
 		<input type="submit" value="Enregistrer cette question">
 	    <% } %>
     </ul>
@@ -57,58 +94,31 @@ Utiliser $...$ pour mettre des maths.
 <% } %>
 <a href="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/">Revenir au set "<%= set.name %>"</a>
 <% if(subscription.canSetUpdate) { %>
+    <script src="/javascripts/question.js"></script>
     <script>
-     function toggleText(elem) {
-	 elem.classList.toggle("texted");
-	 value = elem.querySelector("input").value = elem.querySelector("input").value=="true" ? "false" : "true";
-	 elem.nextSibling.style.visibility = elem.nextSibling.style.visibility=="hidden" /* && elem.parentNode.classList.contains("true")*/ ? "visible" : "hidden";
-	 text = elem.querySelector("span")
-	 if(text.textContent == "Enlever le champs texte")
-	     text.textContent = "Ajouter un champs texte";
-	 else
-	     text.textContent = "Enlever le champs texte";
-     }
-     
-     function returnTextQuestion (i) {
-	 return '<div style="text-align:left;margin:3px;" onclick="toggleText(this)"><input type="hidden" name="text-'+i+'" value="false"><span>Ajouter un champs texte</span></div><textarea name="correction-'+i+'" style="visibility:hidden; display:block; width:100%" placeholder="Vous pouvez rentrer la correction/justification/explication" ></textarea>'
-     }
-     
-     function addAnswer () {
-	 a=document.querySelector("#listeQue");
-	 b = document.createElement("li");
-	 c=document.querySelector("#ajoutrep");
-	 d = document.querySelectorAll(".reponse");
-	 n=d.length;
-	 b.innerHTML="<span class=\"froom\"> Réponse "+(n)+" :</span><textarea placeholder=\"Ne sera pas interprété par markdown. Pour les maths, utiliser \\(...\\) ou \\[...\\]\" class=\"nreponse\" name=\""+n+"\" id=\""+n+"\" style=\"width:100%\"></textarea>"+returnTextQuestion(n)+"<div><ul><li style=\"display:inline-block; margin-left:20px;\"><a class=\"room\" onclick=\"removeElement(this)\">Enlever cette réponse</a></li><li style=\"display:inline-block; margin-left:20px;\" onclick=\"setTrue(this)\">Choisir comme réponse correcte</li></ul></div>";
-	 //     b.style="background-color:rgba(75,0,0,0.5)";
-	 b.classList.add("reponse");
-	 a.insertBefore(b,c);
-     }
-     
-     function setTrue(elem) {
-	 a=document.querySelector(".true");
-	 if (a)
-	     a.classList.remove("true");
-	 elem.parentNode.parentNode.parentNode.classList.add("true");
-	 //     document.querySelector("#true").value=elem.parentNode.parentNode.parentNode.querySelector("textarea").id;
-	 document.querySelector("#true").value=document.querySelector(".true textarea").id;
-     }
-     
-     function renumber() {
-	 i=0;
-	 q = document.querySelectorAll(".nreponse");
-	 q.forEach(function (elem) {  
-	     elem.previousElementSibling.innerHTML = "Réponse "+ i + " :";
-	     elem.name=""+i;
-	     elem.id=""+i;
-	     i++;
+     // ICI ajouter les events listener
+     function addReponseListener(div) {
+	 div.querySelector(".select.set-true").addEventListener("click", (ev) => {
+	     setValue("true", div);
 	 });
-	 document.querySelector("#true").value=document.querySelector(".true textarea").id;
+	 div.querySelector(".select.set-false").addEventListener("click", (ev) => {
+	     setValue("false", div);
+	 });
+	 div.querySelector(".select.set-to_correct").addEventListener("click", (ev) => {
+	     setValue("to_correct", div);
+	 });
+	 div.querySelector(".text").addEventListener("click", (ev) => {
+	     toggleText(div);
+	 });
+	 div.querySelector(".remove").addEventListener("click", (ev) => {
+	     removeElement(div);
+	 });	 
      }
-     function removeElement(elem) {
-	 elem.parentNode.parentNode.parentNode.parentNode.remove();
-	 renumber();
-     }
+     document.querySelectorAll(".reponse").forEach((div) => {
+//	 let div2 = div;
+	 addReponseListener(div);
+	 console.log(div)
+     });
     </script>
 <% } %>
 <%- include('admin_footer'); -%>

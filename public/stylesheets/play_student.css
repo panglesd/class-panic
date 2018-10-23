@@ -59,9 +59,12 @@ html {
     color:black;
 }
 
-.faux {
+.reponse.false {
     box-shadow:0 0 8px 10px red;
 }
-.vrai {
+.reponse.true {
     box-shadow:0 0 8px 10px green;
+}
+.reponse.to_correct {
+    box-shadow:0 0 8px 10px black;
 }

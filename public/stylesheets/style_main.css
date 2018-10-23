@@ -99,7 +99,7 @@ li.room div, li.question div, li.reponse div {
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;  
 }
 
-li.reponse {
+li.reponse.false {
     background-color:rgba(75,0,0,0.5)
 }
 li.reponse.true {
@@ -274,4 +274,28 @@ table input[type=submit]{
 
 p {
     margin:5px;
+}
+
+input[type=checkbox] {
+    vertical-align:middle;
+}
+
+.select {
+    display:inline-block;
+    margin-left:8px;
+    margin-right:8px;
+    padding:8px;
+}
+.select.selected {
+    border: 1px solid white;
+    border-radius:5px;
+}
+.select.set-true {
+    color:green
+}
+.select.set-false {
+    color:red
+}
+.select.set-to_correct {
+    color:white
 }

@@ -1,4 +1,4 @@
-bdd = require("./bdd");
+var bdd = require("./bdd");
 var async = require('async');
 
 var Room = require("./room");
@@ -34,20 +34,14 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 	bdd.query("SELECT * from subscription WHERE userID = ? AND courseID = (SELECT courseID FROM rooms WHERE id = ?)", [user.id, room.id], (err_subs, subs_array) => {
 	    subscription = subs_array[0];
 	    console.log(err_subs);
-	    console.log("subs", subs_array);
-	    console.log(this.sql);
-	    if(!subscription.isTDMan) {
-		if(room.status=="pending") {
-		    bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
-			if(answ[0].count>0) 
-			    bdd.query("UPDATE `poll` SET `response`= ?, `responseText` = ? WHERE `roomID`= ? AND `pseudo`= ?", [newAnswer.n, newAnswer.text, room.id, user.pseudo], callback);
-			else {
-			    bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`responseText`,`roomID`) VALUES (?, ?, ?, ?)", [user.pseudo, newAnswer.n, newAnswer.text, room.id], callback);
-			}
-		    });
-		}
-		else
-		    callback();
+	    if(!subscription.isTDMan && room.status == "pending") {
+		bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
+		    if(answ[0].count>0) 
+			bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?", [JSON.stringify(newAnswer), room.id, user.pseudo], callback);
+		    else {
+			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)", [user.pseudo, JSON.stringify(newAnswer), room.id], callback);
+		    }
+		});
 	    }
 	    else
 		callback();
@@ -60,29 +54,16 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 /***********************************************************************/
 
 exports.getStatsFromRoomID = function (roomID, callback) {
-    async.parallel(
-	{
-	    anonStats : function (callback) {
-		bdd.query("SELECT response AS answer,COUNT(response) AS count FROM `poll` WHERE `roomID` = ? GROUP BY response", [roomID], function(err, row) {callback(err,row)});
-	    },
-	    correctAnswer : function (callback) {
-		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
-	    }
-	},
-	callback);
-    
+    bdd.query("SELECT response AS answer FROM `poll` WHERE `roomID` = ?", [roomID], function(err, row) {
+	callback(err,row)
+    });
 }
+
 exports.getStatsFromOwnedRoomID = function (roomID, callback) {
-    async.parallel(
-	{
-	    namedStats : function (callback) {
-		bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`, `poll`.`responseText`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {/*console.log(row);*/ callback(err, row)});
-	    },
-	    correctAnswer : function (callback) {
-		exports.questionFromRoomID(roomID, function (err, q) { callback(err, q.correct)});
-	    }
-	},
-	callback);
+    bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {
+	/*console.log(row);*/
+	callback(err, row)
+    });
 }
 
 /***********************************************************************/
@@ -125,7 +106,7 @@ exports.nextQuestionFromRoomID = function (roomID, callback) {
 
 exports.flushOldPlayers = function (roomID, callback) {
     bdd.query("DELETE FROM `poll` WHERE  ADDTIME(`last_activity`, '0 3:0:0')<NOW() AND `roomID` = ?", [roomID], function () {
-	bdd.query("UPDATE `poll` SET `response`=-1, `responseText`=\"\" WHERE `roomID`= ? ", [roomID], callback);
+	bdd.query("UPDATE `poll` SET `response`=\"[]\" WHERE `roomID`= ? ", [roomID], callback);
     });
 }
 
@@ -142,7 +123,7 @@ exports.enterRoom = function (user, room, callback) {
 	User.getSubscription(user, course, (err_subs, subscription) => {
 	    if(!subscription.isTDMan) {
 		//    if(room.ownerID != user.id) 
-		bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, -1, ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
+		bdd.query("INSERT INTO `poll` (`pseudo`, `response`,`roomID`) VALUES(?, \"[]\", ?) ON DUPLICATE KEY UPDATE `response`=`response` ", [user.pseudo, room.id], callback);
 	    }
 	    else
 		callback();
