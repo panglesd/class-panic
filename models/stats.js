@@ -11,6 +11,7 @@ exports. getStats = function (filter, callback) {
 
     query = 'SELECT `stats`.id ' +
 	', blocID' +
+	', `users`.id as userID' +
 	', correct' +
 	', courseID' +
 	', customQuestion' +

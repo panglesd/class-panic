@@ -59,18 +59,25 @@ socketStats.on("newStats", (filter, res2) => {
 	data.customQuestion = JSON.parse(data.customQuestion);
 	data.enonce = data.customQuestion.enonce
 	data.response = JSON.parse(data.response)
+	data.room = JSON.parse(data.roomText)
+	data.set = JSON.parse(data.setText)
 //	data.response = [{n:1, text:"eo"},{n:3, text:"eablado"}]
 //	data.response = 2
 	console.log("now", data);
 	data.response.forEach((reponse, index) => {
+	    score = Math.random()
+	    innerHTML += "<tr style='background-color:rgba("+((1-score)*255)+","+(score*255) +",0,0.5)'>"
 	    if(index==0) {
-		innerHTML += "<tr><td rowspan='"+data.response.length+"'> " + data.fullName + "</td>" +
-		"<td rowspan='"+data.response.length+"'> " + data.enonce + "</td>"
-		    //		"<tr><td rowspan='"+data.response.length+"'> " + data.fullName + "</td>" +
+		innerHTML += "<td rowspan='"+data.response.length+"'  class='user' id='user-"+data.userID+"'> " + data.fullName + "</td>" +
+		    "<td rowspan='"+data.response.length+"' class='enonce' id='enonce-"+data.questionID+"'> " + data.enonce + "</td>"
+		//		"<tr><td rowspan='"+data.response.length+"'> " + data.fullName + "</td>" +
 	    }
 	    innerHTML += "<td> " + data.customQuestion.reponses[reponse.n].reponse +"</td>" +
 		"<td> " + reponse.text +"</td>"
 	    if(index==0) {
+		innerHTML += "<td rowspan='"+data.response.length+"' class='room' id='room-"+data.roomID+"'> " + data.room.name + "</td>";
+		console.log("data", data);
+		innerHTML += "<td rowspan='"+data.response.length+"' class='set' id='user-"+data.setID+"'> " + (typeof data.set != "undefined" ? data.set.name : "") + "</td>";
 		innerHTML += "<td rowspan='"+data.response.length+"'> " + data.correct + "</td>";
 		let d = new Date(Date.parse(data.time));
 		let options = {weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute:"numeric"};
@@ -80,7 +87,7 @@ socketStats.on("newStats", (filter, res2) => {
 	    innerHTML += "</tr>"
 	});
     })
-    table.innerHTML = "<tr><th>Nom</th><th>Énoncé</th><th>Réponse</th><th>Justification</th><th>Correction</th><th>Date</th></tr>"+
+    table.innerHTML = "<tr><th>Nom</th><th>Énoncé</th><th>Réponse</th><th>Justification</th><th>Salle</th><th>Set</th><th>Correction</th><th>Date</th></tr>"+
 	innerHTML
     wrapper.appendChild(table)
     
