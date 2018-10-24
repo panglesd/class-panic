@@ -77,7 +77,12 @@ exports.logStats = function (roomID,  callback) {
 	console.log(room);
 	async.parallel({
 	    set : function (callback) { Set.getByID(room.questionSet, callback) },
-	    question : function (callback) { Question.getByID(JSON.parse(room.question).id, callback) },
+	    question : function (callback) {
+		if(room.question.id)
+		    Question.getByID(room.question.id, callback)
+		else
+		    callback(null, {id:null})
+	    },
 	    room : function (callback) { callback(null, room) },
 	    course : function (callback) { Course.getByID(room.courseID, callback) }
 	}, (err, result) => {
@@ -86,14 +91,14 @@ exports.logStats = function (roomID,  callback) {
 		       result.room.id, JSON.stringify(result.room) ,
 		       result.question.id, JSON.stringify(result.question) ,
 		       result.course.id, JSON.stringify(result.course) ,
-		       room.question ];
+		       JSON.stringify(room.question) ];
 	    bdd.query(query, params, (err, res) => {
 		console.log(err);
 		blocID = res[1][0].blocID;
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
 			query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`) VALUES (?,?,?,?)";
-			bdd.query(query,[oneStat.id, Question.correctSubmission(JSON.parse(room.question), oneStat.reponse), blocID, JSON.stringify(oneStat.response)], (err, res) => {callback(err, res)})
+			bdd.query(query,[oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response], (err, res) => {callback(err, res)})
 		    }, (err) => {
 			console.log(err);
 			callback();

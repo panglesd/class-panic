@@ -111,7 +111,7 @@ module.exports = function (server, sessionMiddleware) {
 	    if(socket.roomID) {
 		Room.getByID(socket.roomID, function (err, room) {
 		    socket.room = room;
-		    socket.room.question = JSON.parse(socket.room.question)
+		    socket.room.question = socket.room.question
 		    next();
 		})
 	    }

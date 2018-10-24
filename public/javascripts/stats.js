@@ -54,15 +54,11 @@ socketStats.on("newStats", (filter, res2) => {
     wrapper = document.querySelector("#wrapper-stats");
     table = document.createElement("table");
     innerHTML = ""
-    res.forEach((data2) => {
+    res.forEach((data2, inde) => {
 	data = data2
 	data.customQuestion = JSON.parse(data.customQuestion);
 	data.enonce = data.customQuestion.enonce
-	console.log("before", data);
-	console.log("plain",data.response)
-	console.log("parsed",JSON.parse(data.response))
-	tmp = JSON.parse(JSON.parse(data.response))
-	data.response = tmp
+	data.response = JSON.parse(data.response)
 //	data.response = [{n:1, text:"eo"},{n:3, text:"eablado"}]
 //	data.response = 2
 	console.log("now", data);

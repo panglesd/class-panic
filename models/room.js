@@ -12,6 +12,7 @@ var Question = require("./question");
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
 	console.log(this.sql);
+	resu[0].question = JSON.parse(resu[0].question)
 	callback(err, resu[0])});
 };
 

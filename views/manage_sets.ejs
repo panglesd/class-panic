@@ -5,7 +5,7 @@
     <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
     <ul class="room">
 	<% setOwnedList.forEach(function(setQ) {
-	    if(setQ.ownerID == user.id) { %>
+	    if(setQ.owner == user.id) { %>
 	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/set/<%= setQ.id %>">
 		<li class="room">
 		    <span class="froom"><%= setQ.name %></span>
@@ -26,12 +26,12 @@
 	</a>
     </ul>
 <% } %>
-<% if(setOwnedList.find((setQ) => { return setQ.ownerID != user.id})) { %>
+<% if(setOwnedList.find((setQ) => { return setQ.owner != user.id})) { %>
     <h2> Les sets créés par d'autres</h2>
     <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
     <ul class="room">
 	<% setOwnedList.forEach(function(setQ) {
-	    if(setQ.ownerID != user.id) { %>
+	    if(setQ.owner != user.id) { %>
 	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/set/<%= setQ.id %>">
 		<li class="room">
 		    <span class="froom"><%= setQ.name %></span>
