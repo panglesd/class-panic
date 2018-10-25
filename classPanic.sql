@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le :  mar. 23 oct. 2018 à 08:20
+-- Généré le :  jeu. 25 oct. 2018 à 08:13
 -- Version du serveur :  10.1.36-MariaDB
 -- Version de PHP :  7.2.10
 
@@ -54,6 +54,11 @@ CREATE TABLE `poll` (
   `last_activity` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `roomID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `poll`
+--
+
 
 -- --------------------------------------------------------
 
@@ -163,15 +168,20 @@ CREATE TABLE `statsBloc` (
   `id` int(11) NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `setID` int(11) NOT NULL,
+  `setText` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `roomID` int(11) NOT NULL,
-  `questionID` int(11) NOT NULL,
+  `roomText` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `questionID` int(11) DEFAULT NULL,
+  `questionText` text COLLATE utf8mb4_unicode_ci,
   `courseID` int(11) NOT NULL,
+  `courseText` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `customQuestion` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `statsBloc`
 --
+
 
 -- --------------------------------------------------------
 
@@ -189,13 +199,16 @@ CREATE TABLE `subscription` (
   `canSetUpdate` tinyint(1) NOT NULL,
   `canSetCreate` tinyint(1) NOT NULL,
   `canSetDelete` tinyint(1) NOT NULL,
-  `canSubscribe` tinyint(1) NOT NULL
+  `canSubscribe` tinyint(1) NOT NULL,
+  `canOwnRoom` tinyint(1) NOT NULL,
+  `canAllRoom` tinyint(1) NOT NULL,
+  `canOwnSet` tinyint(1) NOT NULL,
+  `canAllSet` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `subscription`
 --
-
 
 
 -- --------------------------------------------------------
@@ -314,7 +327,7 @@ ALTER TABLE `courses`
 -- AUTO_INCREMENT pour la table `poll`
 --
 ALTER TABLE `poll`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=540;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=626;
 
 --
 -- AUTO_INCREMENT pour la table `questions`
@@ -338,13 +351,13 @@ ALTER TABLE `setDeQuestion`
 -- AUTO_INCREMENT pour la table `stats`
 --
 ALTER TABLE `stats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT pour la table `statsBloc`
 --
 ALTER TABLE `statsBloc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT pour la table `users`
