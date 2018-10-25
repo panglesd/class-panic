@@ -4,6 +4,7 @@ var socketCC = io.connect(server+'/cc');
 let currentQuestionOfAdmin;
 var currentQuestionOfStudent;
 var currentQuestionOfCC;
+var currentList;
 var md = new markdownit({
     html:         false,        // Enable HTML tags in source
     xhtmlOut:     false,        // Use '/' to close single tags (<br />)
@@ -135,8 +136,8 @@ socketCC.on('newQuestion', function (reponse) {
     if((temp = document.querySelector("li.currentQuestion"))) {
 	temp.classList.remove("currentQuestion");
     }
-    if(document.querySelector("li#q"+reponse.id))
-	document.querySelector("li#q"+reponse.id).classList.add("currentQuestion");
+    if(document.querySelector("li#q-"+reponse.id))
+	document.querySelector("li#q-"+reponse.id).classList.add("currentQuestion");
 
     // On stocke la question
     currentQuestionOfCC = reponse;
@@ -221,7 +222,7 @@ socketCC.on('newQuestion', function (reponse) {
 	});
 
 
-//    socketCC.emit("sendStatsPlease");
+    socketCC.emit("sendList");
 });
 
 /*********************************************************************/
@@ -229,29 +230,41 @@ socketCC.on('newQuestion', function (reponse) {
 /*********************************************************************/
 
 socketCC.on('newList', function (questionList) {
-    console.log(questionList);
-    let container = document.querySelector("#qWrapper");
-    questionList.forEach((question) => {
-	console.log(question);
-    });
-    let ul = document.createElement("ul");
-    ul.id = "chooseQFromSet";
-    ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
-    questionList.forEach(function (question, index) {
-	console.log(question);
-	let li = document.createElement("li");
-	li.id = "q-" + question.id;
-	if(question.questionID)
-	    li.classList.add("answered");
-	if(question.id == currentQuestionOfCC.id)
-	    li.classList.add("currentQuestion");
-	li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
-	li.class = ""+(question.id == currentQuestionOfCC.id);
-	li.textContent = question.enonce;
-	ul.appendChild(li);
-    });
-    let old = document.querySelector("#chooseQFromSet");
-    old.parentNode.replaceChild(ul,old);
+    console.log("questionList", questionList);
+    console.log("currentList", currentList);
+    if(!currentList) {
+	currentList = questionList;
+	let container = document.querySelector("#qWrapper");
+	questionList.forEach((question) => {
+	    console.log(question);
+	});
+	let ul = document.createElement("ul");
+	ul.id = "chooseQFromSet";
+	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
+	questionList.forEach(function (question, index) {
+	    console.log(question);
+	    let li = document.createElement("li");
+	    li.id = "q-" + question.id;
+	    li.classList.add("q-");
+	    if(question.questionID)
+		li.classList.add("answered");
+	    if(question.id == currentQuestionOfCC.id)
+		li.classList.add("currentQuestion");
+	    li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
+	    li.class = ""+(question.id == currentQuestionOfCC.id);
+	    li.textContent = question.enonce;
+	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+	    ul.appendChild(li);
+	});
+	let old = document.querySelector("#chooseQFromSet");
+	old.parentNode.replaceChild(ul,old);
+    }
+    else {
+//	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+//	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
+//	console.log(currentQuestionOfCC.id);
+//	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
+    }
 });
 
 /*********************************************************************/

@@ -49,7 +49,7 @@ module.exports = function(io) {
 				socket.room = res;
 				socket.join(socket.room.id);
 				tools.sendQuestionFromIndex(socket, socket.room, 3, function (err) {if(err) throw err;});
-				tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+//				tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
 			    }
 			});
 		    });
@@ -62,8 +62,12 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('changeToQuestion', function (i) {
-	    tools.sendQuestionFromIndex(socket, socket.room, i, function (err) {if(err) throw err;});
-	    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+	    tools.sendQuestionFromIndex(socket, socket.room, i, function (err) {
+//		console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		if(err) throw err;
+//		console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+//		tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+	    });
 	});
 	
 	/******************************************/

@@ -45,6 +45,7 @@ module.exports = function (io) {
     tools.sendListQuestion = function (user, socket, room, callback) {
 	game.questionListForCC(user, room.id, function (err, question) {
 	    socket.emit("newList", question);
+	    console.log("oooooooooooooooo");
 	    callback();
 	});
     };
@@ -55,6 +56,7 @@ module.exports = function (io) {
 		delete(rep.validity);
 	    });
 	    socket.emit("newQuestion", question);
+	    callback();
 	});
     };
 
