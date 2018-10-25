@@ -34,45 +34,6 @@ router.use(function (req, res, next) {
     }
 });
 
-/*************************************************************/
-/*         Routes for the game                               */
-/*************************************************************/
-
-// GET request for showing room list.
-//router.get('/room', room_controller.room_list);
-
-
-// GET request for showing subscribed courses list.
-//router.get('/course', course_controller.courses_list);
-
-// GET request for subscribing to a courses.
-//router.get('/subscribe', course_controller.courses_subscribe);
-
-// GET request for showing a course.
-//router.get('/course/:idCourse', course_controller.course);
-
-
-
-
-// POST request for showing room list.
-//router.post('/room', room_controller.room_list);
-
-
-
-
-
-
-
-
-
-
-//router.post('/course/:idCourse/admin/:id', game_controller.room_admin);
-
-
 router.use("/course", courseRouter);
-
-
-// GET request for admining a room.
-//router.get('/course/:idCourse/admin/:id', game_controller.room_admin);
 
 module.exports = router;

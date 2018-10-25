@@ -53,6 +53,7 @@ app.use((req, res, next) => {
     next();
 });
 
+
 app.use(config.PATH, allVisibleRouter);
 
 app.use(config.PATH, userVisibleRouter);
