@@ -1,6 +1,6 @@
 var bdd = require("./bdd");
 var async = require('async');
-
+var exports;
 var Room = require("./room");
 var Question = require("./question");
 var User = require("./user");
@@ -13,17 +13,23 @@ var Course = require("./course");
 
 exports.questionFromRoomID = function (roomID, callback) {
     bdd.query("SELECT question FROM rooms WHERE id = ?", roomID, function(err, row) {
-	callback(err,JSON.parse(row[0].question))
+	callback(err,JSON.parse(row[0].question));
     });
-}
+};
 
 exports.questionOwnedFromRoomID = function (user, roomID, callback) {
-    bdd.query("SELECT question FROM rooms WHERE id = ? AND ownerID = ?", [roomID, user.id], function(err, row) { callback(err, JSON.parse(row[0].question))})
-}
+    bdd.query("SELECT question FROM rooms WHERE id = ? AND ownerID = ?", [roomID, user.id], function(err, row) {
+	callback(err, JSON.parse(row[0].question));
+    });
+};
 
 exports.questionControlledFromRoomID = function (user, roomID, callback) {
-    bdd.query("SELECT question FROM rooms WHERE id = ? AND (courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1) OR courseID IN (SELECT id FROM courses WHERE ownerID = ?))", [roomID, user.id,user.id], function(err, row) { console.log(this.sql);console.log(row[0].question);callback(err, JSON.parse(row[0].question))})
-}
+    bdd.query("SELECT question FROM rooms WHERE id = ? AND (courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1) OR courseID IN (SELECT id FROM courses WHERE ownerID = ?))", [roomID, user.id,user.id], function(err, row) {
+	console.log(this.sql);
+	console.log(row[0].question);
+	callback(err, JSON.parse(row[0].question));
+    });
+};
 
 /***********************************************************************/
 /*       Enregistrer la réponse d'un utilisateur dans une room         */
@@ -32,14 +38,19 @@ exports.questionControlledFromRoomID = function (user, roomID, callback) {
 exports.registerAnswer = function (user, room, newAnswer, callback) {
     Room.getByID(room.id, function (err, room) {
 	bdd.query("SELECT * from subscription WHERE userID = ? AND courseID = (SELECT courseID FROM rooms WHERE id = ?)", [user.id, room.id], (err_subs, subs_array) => {
-	    subscription = subs_array[0];
+	    let subscription = subs_array[0];
 	    console.log(err_subs);
 	    if(!subscription.isTDMan && room.status == "pending") {
-		bdd.query("SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?", [room.id, user.pseudo], function(err, answ) {
+		let query = "SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?";
+		bdd.query(query, [room.id, user.pseudo], function(err, answ) {
 		    if(answ[0].count>0) 
-			bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?", [JSON.stringify(newAnswer), room.id, user.pseudo], callback);
+			bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?",
+				  [JSON.stringify(newAnswer), room.id, user.pseudo],
+				  callback);
 		    else {
-			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)", [user.pseudo, JSON.stringify(newAnswer), room.id], callback);
+			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)",
+				  [user.pseudo, JSON.stringify(newAnswer), room.id],
+				  callback);
 		    }
 		});
 	    }
@@ -55,14 +66,14 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 
 exports.getStatsFromRoomID = function (roomID, callback) {
     bdd.query("SELECT response AS answer FROM `poll` WHERE `roomID` = ?", [roomID], function(err, row) {
-	callback(err,row)
+	callback(err,row);
     });
 }
 
 exports.getStatsFromOwnedRoomID = function (roomID, callback) {
     bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {
 	/*console.log(row);*/
-	callback(err, row)
+	callback(err, row);
     });
 }
 

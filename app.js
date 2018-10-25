@@ -18,7 +18,7 @@ var app = express();
 var server = require('http').Server(app);
 
 
-var mysql = require('mysql')
+var mysql = require('mysql');
  
 var optionsMySQL = require('./credentials').optionsMySQL;
  

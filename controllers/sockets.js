@@ -9,7 +9,6 @@ var game = require('../models/game');
 var async = require('async');
 
 
-
 module.exports = function (server, sessionMiddleware) {
 
     var io = require('socket.io')(server);
@@ -50,7 +49,7 @@ module.exports = function (server, sessionMiddleware) {
 		    question.reponses.forEach((reponse) => {
 			delete(reponse.validity);
 			if(reponse.texted)
-			    delete(reponse.correction)
+			    delete(reponse.correction);
 		    });
 //		    delete(question.correct);
 		    socket.emit("newQuestion", question);
