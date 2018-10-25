@@ -10,7 +10,7 @@ var Question = require("./question");
 // By ID
 
 exports.getByID = function(courseID, callback) {
-    console.log(courseID);
+//    console.log(courseID);
     bdd.query("SELECT * FROM `courses` WHERE `id` = ?", [courseID], function (err, resu) {
 	callback(err, resu[0]);
     });
@@ -106,7 +106,9 @@ exports.subscribeTDMan = function(studentID, courseID, permission, callback) {
 	      permission.canAllSet,
 	      permission.canSubscribe
 	     ];
-    bdd.query(query, params, (err, res) => {console.log(this.sql);console.log(err, res);callback(err, res)});
+    bdd.query(query, params, (err, res) => {// console.log(this.sql);
+	// console.log(err, res);
+	callback(err, res);});
 }
 exports.unSubscribeStudent = function(studentID, courseID, callback) {
     query = "DELETE FROM subscription WHERE courseID = ? AND userID = ?";

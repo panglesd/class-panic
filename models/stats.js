@@ -75,7 +75,7 @@ exports. getStats = function (filter, callback) {
 
 exports.logStats = function (roomID,  callback) {
     Room.getByID(roomID, (err, room) => {
-	console.log(room);
+//	console.log(room);
 	async.parallel({
 	    set : function (callback) { Set.getByID(room.questionSet, callback) },
 	    question : function (callback) {

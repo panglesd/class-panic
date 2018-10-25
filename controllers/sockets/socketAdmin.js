@@ -18,7 +18,7 @@ module.exports = function(io) {
     
     io.of('/admin').on('connection', function(socket) {
 
-	console.log("CONNECTION");
+//	console.log("CONNECTION");
 	
 	/******************************************/
 	/*  Middlesware de socket                 */

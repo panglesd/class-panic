@@ -43,7 +43,7 @@ exports.listOwnedByRoomID = function (user, id, callback) {
 }
 
 exports.listByCourseID = function (courseID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ", [courseID], function(err, qList) {
+    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ORDER BY indexSet", [courseID], function(err, qList) {
 	callback(err, qList);
     });
 }
@@ -56,12 +56,35 @@ exports.listByCourseID = function (courseID, callback) {
 
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
-	//	console.log(rows);
-	console.log(err, questionId);
 	q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
-//	q.reponses.forEach(function(rep) { delete rep.validity });
 	callback(err, q)
+    });
+}
+
+exports.getByIndex = function (questionIndex, roomID, callback) {
+    bdd.query("SELECT * FROM `questions` WHERE `indexSet` = ? AND class = (SELECT questionSet FROM rooms WHERE id = ?)", [questionIndex, roomID], function (err, rows) {
+	console.log(err);
+	q = rows[0];
+	q.reponses = JSON.parse(q.reponses);
+	callback(err, q);
+    });
+}
+
+exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
+    let query = 
+	"SELECT enonce, questionID, questions.id as id, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse  FROM "+
+	  "questions LEFT OUTER JOIN "+
+	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser " +
+	  "ON statsOfUser.questionID = questions.id WHERE indexSet = ?";
+    bdd.query(query, [user.id, roomID, questionIndex], function(err, row) {
+	console.log(err);
+	let q = row[0];
+	console.log(q);
+	q.allResponses = JSON.parse(q.allResponses);
+	if(q.userResponse)
+	    q.userResponse = JSON.parse(q.userResponse);
+	callback(err, q);
     });
 }
 
@@ -150,9 +173,9 @@ exports.questionUpdate = function (user, questionID, newQuestion, callback) {
 /***********************************************************************/
 
 exports.correctSubmission = function(question, submission) {
-    console.log("queztion", question);
-   console.log("queztion", question.type);
-    console.log("submission", submission);
+//    console.log("queztion", question);
+//   console.log("queztion", question.type);
+//    console.log("submission", submission);
     switch(/*[*/question.type/*, question.strategy]*/) {
     case "multi":
 	return "faux"

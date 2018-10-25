@@ -11,7 +11,7 @@ var Question = require("./question");
 
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
-	console.log(this.sql);
+//	console.log(this.sql);
 	resu[0].question = JSON.parse(resu[0].question)
 	callback(err, resu[0])});
 };
@@ -89,7 +89,7 @@ exports.create = function (user, newRoom, courseID, callback) {
 	    if(question) 
 		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`) VALUES (?, ?, ?, ?, "pending", ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question), courseID], function(err, rows) {
 		    console.log(err);
-		    console.log(this.sql);
+//		    console.log(this.sql);
 		    callback(err, rows);
 		});
 	    else 
@@ -107,12 +107,12 @@ exports.delete = function (user, room, callback) {
 //Update
 
 exports.update = function (user, room, newRoom, callback) {
-    console.log([newRoom.name, newRoom.questionSet, room.id, user.id]);
+//    console.log([newRoom.name, newRoom.questionSet, room.id, user.id]);
     Question.getFirstOfSet(newRoom.questionSet, (err, question) => {
 	bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ?, id_currentQuestion = ? WHERE `id` = ? AND `ownerID` = ?',
 		  [newRoom.name, newRoom.questionSet, room.id, user.id, question.id],
 		  (err, res) => {
-		      console.log(err, this.sql);
+//		      console.log(err, this.sql);
 		      callback(err, res)
 		  });
     });

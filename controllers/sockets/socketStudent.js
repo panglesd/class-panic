@@ -53,7 +53,7 @@ module.exports = function(io) {
 			if(subscription) {
 			    socket.room = res;
 			    socket.roomID = res.id;
-			    console.log("user enter room");
+//			    console.log("user enter room");
 			    socket.join(newRoom);
 			    //		console.log("socket.request.session.user is ",socket.request.session.user);
 			    game.enterRoom(socket.request.session.user, socket.room, function (err) {
@@ -88,8 +88,8 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('chosenAnswer', function (answer) {
-	    console.log("answer is", answer);
-	    console.log("room is", socket.room);
+//	    console.log("answer is", answer);
+//	    console.log("room is", socket.room);
 	    if(answer.length == 0 || socket.room.question.type == "multi")
 		game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		    tools.sendOwnedStats(socket.room);

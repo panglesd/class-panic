@@ -50,7 +50,7 @@ router.use('/:courseID/', function (req, res, next) {
 		if(subscription) {
 		    req.subscription = subscription;
 		    req.course = course;
-		    console.log(subscription)
+		    console.log(subscription);
 //		    if(req.subscription.isTDMan)
 			next();
 //		    else
@@ -66,7 +66,7 @@ router.use('/:courseID/', function (req, res, next) {
     });
 });
 
-router.get('/:courseID/log', (req, res) => {console.log(req.course)})
+router.get('/:courseID/log', (req, res) => {console.log(req.course);});
 
 
    /**********************************************************/
@@ -123,6 +123,8 @@ router.use("/:courseID/set", setRouter);
 
 // GET request for entering a room.
 router.get('/:courseID/play/:roomID', game_controller.room_enter);
+// GET request for cc in a room.
+router.get('/:courseID/cc/:roomID', game_controller.room_cc);
 // GET request for admining a room.
 router.get('/:courseID/control/:roomID', game_controller.room_admin);
 

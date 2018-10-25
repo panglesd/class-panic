@@ -57,18 +57,18 @@ socket.on('newQuestion', function (reponse, stats) {
     currentQuestionOfStudent=reponse;
     
     // On écrit l'énoncé là où il faut. MathJax rendered.
-    enonce = document.querySelector("#question");
+    let enonce = document.querySelector("#question");
     enonce.textContent=reponse.enonce;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
 
     // On nettoie les réponses précédentes
-    wrapper = document.querySelector("#wrapperAnswer");
+    let wrapper = document.querySelector("#wrapperAnswer");
     while (wrapper.firstChild) {
 	wrapper.removeChild(wrapper.firstChild);
     }
 
     // Si besoin est, on rajoute la description
-    descr = document.querySelector("#description");
+    let descr = document.querySelector("#description");
     if(reponse.description)
 	descr.style.visibility="visible";
     else
@@ -82,7 +82,7 @@ socket.on('newQuestion', function (reponse, stats) {
     // Pour chaque nouvelle réponse :
     reponse.reponses.forEach(function (rep, index) {
 	// Création de l'élément HTML vide
-	elem = document.createElement('div');
+	let elem = document.createElement('div');
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
 	if(rep.validity)
@@ -99,19 +99,19 @@ socket.on('newQuestion', function (reponse, stats) {
 		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
 	    });
 	// Création de l'élément contenant l'énoncé de la réponse
-	span = document.createElement("span");
+	let span = document.createElement("span");
 	elem.innerHTML = "";
 	span.innerHTML = md.render(rep.reponse);
 	console.log(span, rep.reponse);
 	span.classList.add("markdown");
-	elem.appendChild(span)
+	elem.appendChild(span);
 	// Si besoin, ajout d'un textarea
 	if(rep.texted) {
-	    textarea = document.createElement("textarea");
-	    textarea.style.width="100%"
-	    textarea.style.display="block"
+	    let textarea = document.createElement("textarea");
+	    textarea.style.width="100%";
+	    textarea.style.display="block";
 	    if(rep.correction)
-		textarea.textContent=rep.correction
+		textarea.textContent=rep.correction;
 	    // Ajout d'un event listener pour le textarea
 	    if(typeof isAdmin == "undefined") {
 		textarea.addEventListener("input", (ev) => {
@@ -136,23 +136,23 @@ socket.on('newQuestion', function (reponse, stats) {
 /*********************************************************************/
 
 //socket.on('correction', function (correction) {
-showStats = function (stats) {
+function showStats(stats) {
     console.log("stats", stats);
 //    let total = 0;
     //stats.forEach(function (v) { total += v.count });
     let total = Math.max(stats.length,1);
     //total=Math.max(total,1);
-    count=[];
+    let count=[];
     stats.forEach(function (v) {
-	console.log("yoo", JSON.parse(v.answer))
-	tab_rep_one_student = JSON.parse(v.answer)
+	console.log("yoo", JSON.parse(v.answer));
+	let tab_rep_one_student = JSON.parse(v.answer);
 	tab_rep_one_student.forEach((rep) => {
-	    n_answer = rep.n
+	    let n_answer = rep.n;
 	    console.log("n_answer", n_answer);
 	    if(count[n_answer])
-		count[n_answer]++
+		count[n_answer]++;
 	    else
-		count[n_answer]=1
+		count[n_answer]=1;
 	});
     });
     console.log(count, total);
@@ -185,12 +185,12 @@ function chooseAnswer(i, elem, update) {
 	    reponse.classList.replace('selected', 'notSelected');
 	};
 	if(i>-1) {
-	    a = document.querySelector("#r"+i);
+	    let a = document.querySelector("#r"+i);
 	    a.classList.replace("notSelected", "selected");
 	}
     }
     else {
-	a = document.querySelector("#r"+i);
+	let a = document.querySelector("#r"+i);
 	if(update) {
 	    a.classList.remove("notSelected");
 	    a.classList.add("selected");
@@ -213,11 +213,11 @@ function chooseAnswer(i, elem, update) {
 
 	
 function sendAnswer() {
-    reponses = []
+    let reponses = [];
     document.querySelectorAll(".reponse.selected").forEach((elem) => {
-	let atom = {}
+	let atom = {};
 	atom.n = parseInt(elem.id.split("r")[1]);
-	textarea =elem.querySelector("textarea");
+	let textarea = elem.querySelector("textarea");
 	atom.text = textarea ? textarea.value : "";
 	reponses.push(atom);
     });

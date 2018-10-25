@@ -99,7 +99,7 @@ renderRooms = function(user, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-	    console.log(results);
+//	    console.log(results);
 	    res.render('manage_rooms', results)
 	});
 };
@@ -142,7 +142,7 @@ exports.room_create_post = function(req, res) {
 		//	    res.redirect(config.PATH+'/manage/room');
 		//	    console.log(req.body);
 		if(err) {
-		    console.log("err is", err)
+//		    console.log("err is", err)
 		    req.msgs.push("Impossible de créer la room !");
 		    courseController.course_manage(req,res);
 		}

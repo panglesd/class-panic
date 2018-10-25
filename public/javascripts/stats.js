@@ -1,9 +1,9 @@
 var socketStats = io.connect(server+'/stats');
 
 function update() {
-    filter = {};
+    let filter = {};
     
-    list = ["studentNumber",
+    let list = ["studentNumber",
 	    "studentName",
 	    "courseID",
 	    "roomID",
@@ -18,7 +18,7 @@ function update() {
 	console.log(window[cond]);
 	console.log(window[cond].value);
 	if(window[cond].value)
-	    filter[cond] = window[cond].value
+	    filter[cond] = window[cond].value;
     });
     socketStats.emit("stats", filter);
     
@@ -26,9 +26,9 @@ function update() {
 }
 
 socketStats.on("newStats", (filter, res2) => {
-    res=res2
+    let res=res2;
     console.log("on a reçu :", filter, res);
-    wrapper = document.querySelector("#wrapper-stats");
+    let wrapper = document.querySelector("#wrapper-stats");
     wrapper.innerHTML = "<table>";
 /*    res.forEach((data) => {
 	data.customQuestion = JSON.parse(data.customQuestion);
@@ -52,43 +52,44 @@ socketStats.on("newStats", (filter, res2) => {
     });
     table.setData(res);*/
     wrapper = document.querySelector("#wrapper-stats");
-    table = document.createElement("table");
-    innerHTML = ""
+    let table = document.createElement("table");
+    let innerHTML = "";
     res.forEach((data2, inde) => {
-	data = data2
+	let data = data2;
 	data.customQuestion = JSON.parse(data.customQuestion);
-	data.enonce = data.customQuestion.enonce
-	data.response = JSON.parse(data.response)
-	data.room = JSON.parse(data.roomText)
-	data.set = JSON.parse(data.setText)
+	data.enonce = data.customQuestion.enonce;
+	data.response = JSON.parse(data.response);
+	data.room = JSON.parse(data.roomText);
+	data.set = JSON.parse(data.setText);
 //	data.response = [{n:1, text:"eo"},{n:3, text:"eablado"}]
 //	data.response = 2
 	console.log("now", data);
 	if(data.response.length==0) {
-	    innerHTML += "<tr style='background-color:rgba("+((1-score)*255)+","+(score*255) +",0,0.5)'>"
+	    let score = Math.random();
+	    innerHTML += "<tr style='background-color:rgba("+((1-score)*255)+","+(score*255) +",0,0.5)'>";
 	    innerHTML += "<td  class='user'  studentNumber='"+data.studentNumber+"' id='user-"+data.userID+"'> " + data.fullName + "<span class='studentNumber' id='studentNumber-"+data.studentNumber+"'></span></td>" +
-		"<td class='enonce' id='enonce-"+data.questionID+"'> " + data.enonce + "</td>"
+		"<td class='enonce' id='enonce-"+data.questionID+"'> " + data.enonce + "</td>";
 	    innerHTML += "<td> Aucune réponse </td>" +
-		"<td></td>"
+		"<td></td>";
 	    innerHTML += "<td class='room' id='room-"+data.roomID+"'> " + data.room.name + "</td>";
 	    console.log("data", data);
 	    innerHTML += "<td class='set' id='set-"+data.setID+"'> " + (typeof data.set != "undefined" ? data.set.name : "") + "</td>";
 	    innerHTML += "<td> " + data.correct + "</td>";
 	    let d = new Date(Date.parse(data.time));
 	    let options = {weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute:"numeric"};
-	    innerHTML += "<td> " + d.toLocaleDateString('fr-FR', options) + "</td>"
-	    innerHTML += "</tr>"
+	    innerHTML += "<td> " + d.toLocaleDateString('fr-FR', options) + "</td>";
+	    innerHTML += "</tr>";
 	}
 	data.response.forEach((reponse, index) => {
-	    score = Math.random()
-	    innerHTML += "<tr style='background-color:rgba("+((1-score)*255)+","+(score*255) +",0,0.5)'>"
+	    let score = Math.random();
+	    innerHTML += "<tr style='background-color:rgba("+((1-score)*255)+","+(score*255) +",0,0.5)'>";
 	    if(index==0) {
 		innerHTML += "<td rowspan='"+data.response.length+"'  class='user'  id='user-"+data.userID+"'> " + data.fullName + "<span class='studentNumber' id='studentNumber-"+data.studentNumber+"'></span></td> " +
-		    "<td rowspan='"+data.response.length+"' class='enonce' id='enonce-"+data.questionID+"'> " + data.enonce + "</td>"
+		    "<td rowspan='"+data.response.length+"' class='enonce' id='enonce-"+data.questionID+"'> " + data.enonce + "</td>";
 		//		"<tr><td rowspan='"+data.response.length+"'> " + data.fullName + "</td>" +
 	    }
 	    innerHTML += "<td> " + data.customQuestion.reponses[reponse.n].reponse +"</td>" +
-		"<td> " + reponse.text +"</td>"
+		"<td> " + reponse.text +"</td>";
 	    if(index==0) {
 		innerHTML += "<td rowspan='"+data.response.length+"' class='room' id='room-"+data.roomID+"'> " + data.room.name + "</td>";
 		console.log("data", data);

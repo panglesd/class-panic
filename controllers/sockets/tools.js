@@ -42,6 +42,22 @@ module.exports = function (io) {
 	});
     };
     
+    tools.sendListQuestion = function (user, socket, room, callback) {
+	game.questionListForCC(user, room.id, function (err, question) {
+	    socket.emit("newList", question);
+	    callback();
+	});
+    };
+
+    tools.sendQuestionFromIndex = function (socket, room, index, callback)  {
+	Question.getByIndexCC(index,socket.request.session.user, room.id, (err, question) => {
+	    question.allResponses.forEach((rep) => {
+		delete(rep.validity);
+	    });
+	    socket.emit("newQuestion", question);
+	});
+    };
+
     tools.broadcastRoomQuestion = function (room, callback) {
 //	console.log("room", room);
 	tools.sendRoomOwnedQuestion(null, io.of("/admin").to(room.id), room, () => {

@@ -74,7 +74,7 @@ router.get('/:roomID/delete', (req,res) => {res.redirect('../');});
     if(req.subscription.canRoomUpdate)
 	next();
     else
-	res.redirect(config.PATH);
+AAAA	res.redirect(config.PATH);
 });*/
 router.post('/:roomID/update', room_controller.room_update_post);
 router.get('/:roomID/update', (req,res) => {res.redirect('./');});

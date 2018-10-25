@@ -75,9 +75,9 @@ module.exports = function(io) {
 	});
 
 	socket.on('subscribeListTDMan', function (courseID, studentList, permission) {
-	    console.log("we got this pemission", permission);
-	    console.log("socket.course.ownerID",socket.course.ownerID);
-	    console.log("socket.request.session.user.id",socket.request.session.user.id);
+//	    console.log("we got this pemission", permission);
+//	    console.log("socket.course.ownerID",socket.course.ownerID);
+//	    console.log("socket.request.session.user.id",socket.request.session.user.id);
 	    if(socket.course.ownerID == socket.request.session.user.id) {
 		//	    console.log("studentList is", studentList);
 		async.forEach(studentList,

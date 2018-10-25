@@ -1,6 +1,5 @@
 var bdd = require("./bdd");
 var async = require('async');
-var exports;
 var Room = require("./room");
 var Question = require("./question");
 var User = require("./user");
@@ -17,6 +16,13 @@ exports.questionFromRoomID = function (roomID, callback) {
     });
 };
 
+exports.questionListForCC = function (user, roomID, callback) {
+    bdd.query("SELECT enonce, questionID, questions.id as id, indexSet FROM questions LEFT OUTER JOIN (SELECT questionID FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser ON statsOfUser.questionID = questions.id ORDER BY indexSet", [user.id, roomID], function(err, row) {
+	console.log(err);
+	callback(err, row);
+    });
+};
+
 exports.questionOwnedFromRoomID = function (user, roomID, callback) {
     bdd.query("SELECT question FROM rooms WHERE id = ? AND ownerID = ?", [roomID, user.id], function(err, row) {
 	callback(err, JSON.parse(row[0].question));
@@ -25,8 +31,8 @@ exports.questionOwnedFromRoomID = function (user, roomID, callback) {
 
 exports.questionControlledFromRoomID = function (user, roomID, callback) {
     bdd.query("SELECT question FROM rooms WHERE id = ? AND (courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1) OR courseID IN (SELECT id FROM courses WHERE ownerID = ?))", [roomID, user.id,user.id], function(err, row) {
-	console.log(this.sql);
-	console.log(row[0].question);
+//	console.log(this.sql);
+//	console.log(row[0].question);
 	callback(err, JSON.parse(row[0].question));
     });
 };
