@@ -1,7 +1,7 @@
 <%- include('admin_header', {active:"sets"}); -%>
 
 <% if(subscription.canOwnSet) { %>
-    <h2> Vos sets</h2>
+    <h2>Vos sets de questions</h2>
     <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
     <ul class="room">
 	<% setOwnedList.forEach(function(setQ) {
@@ -50,7 +50,7 @@
 <% if(subscription.canOwnSet) { %>
     <div class="windowContainer">
 	<div class="window" id="win">
-	    <h2> Créer un nouveau cours</h2>
+	    <h2> Créer un nouveau set de questions</h2>
 	    <form action="<%= config.PATH %>/course/<%= course.id %>/set/create" method="post" id="formNewSet">
 		<p>
 		    <input type='text' name="name" placeholder='Nom du nouveau set'>

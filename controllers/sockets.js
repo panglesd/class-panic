@@ -73,6 +73,8 @@ module.exports = function (server, sessionMiddleware) {
     /*                 Fonction pour les statistiques                         */
     /**************************************************************************/
 
+    require("./sockets/socketStats")(io);
+
     return io;
     
 };

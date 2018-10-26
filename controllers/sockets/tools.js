@@ -41,25 +41,6 @@ module.exports = function (io) {
 	    callback();
 	});
     };
-    
-    tools.sendListQuestion = function (user, socket, room, callback) {
-	game.questionListForCC(user, room.id, function (err, question) {
-	    socket.emit("newList", question);
-	    console.log("oooooooooooooooo");
-	    callback();
-	});
-    };
-
-    tools.sendQuestionFromIndex = function (socket, room, index, callback)  {
-	Question.getByIndexCC(index,socket.request.session.user, room.id, (err, question) => {
-	    question.allResponses.forEach((rep) => {
-		delete(rep.validity);
-	    });
-	    socket.emit("newQuestion", question);
-	    callback();
-	});
-    };
-
     tools.broadcastRoomQuestion = function (room, callback) {
 //	console.log("room", room);
 	tools.sendRoomOwnedQuestion(null, io.of("/admin").to(room.id), room, () => {
@@ -80,6 +61,30 @@ module.exports = function (io) {
 	});
     };
 
+    /*************************************************************************/
+    /*             Tools pour le CC                                          */
+    /*************************************************************************/
+
+    tools.sendListQuestion = function (user, socket, room, callback) {
+	game.questionListForCC(user, room.id, function (err, question) {
+	    socket.emit("newList", question);
+	    console.log("oooooooooooooooo");
+	    callback();
+	});
+    };
+
+    tools.sendQuestionFromIndex = function (socket, room, index, callback)  {
+	Question.getByIndexCC(index,socket.request.session.user, room.id, (err, question) => {
+	    question.allResponses.forEach((rep) => {
+		delete(rep.validity);
+		if(rep.texted) {
+		    delete(rep.correction);
+		}
+	    });
+	    socket.emit("newQuestion", question);
+	    callback();
+	});
+    };
 
     return tools;
 };

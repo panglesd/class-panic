@@ -39,8 +39,10 @@ router.use('/:questionID/', function (req, res, next) {
 	Question.getByID(parseInt(req.params.questionID), (err, question) => {
 	    if(!err) {
 		req.question = question;
-		if(question.setID != req.set.id)
+		if(question.class != req.set.id) {
 		    res.redirect(config.PATH);
+		    console.log("this redirection");
+		}
 		else
 		    next();
 	    }

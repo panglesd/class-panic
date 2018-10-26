@@ -14,7 +14,23 @@ Description : <textarea <%= course.ownerID == user.id ? "" : "readonly" %>  name
 <h2>Travailler</h2>
 <ul class="room">
     <% roomList.forEach(function(room) { %>
-	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%= subscription.isTDMan ? "control" : "play"%>/<%= room.id %>">
+	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%
+									 if(room.type == "live") {
+									     if(subscription.isTDMan) {
+               									 %>control<%
+	         							     }
+						                             else {
+										  %>play<%				      
+								             }
+									 }
+									 else if (room.type == "cc") {
+									     if (subscription.isTDMan) {
+									        %>correct<%
+									     } else {
+									        %>cc<%
+									     }
+								        }
+									%>/<%= room.id %>">
 	    <li class="room">
 		<span class="froom"><%= room.name %></span>
 		<ul>

@@ -17,7 +17,6 @@ var app = express();
 
 var server = require('http').Server(app);
 
-
 var mysql = require('mysql');
  
 var optionsMySQL = require('./credentials').optionsMySQL;
@@ -36,7 +35,6 @@ app.use(sessionMiddleware);
 var io = require("./controllers/sockets.js")(server, sessionMiddleware);
 app.io = io;
 
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -53,13 +51,11 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.use(config.PATH, allVisibleRouter);
 
 app.use(config.PATH, userVisibleRouter);
 
 // app.use(config.PATH, adminVisibleRouter);
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

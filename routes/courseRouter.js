@@ -44,13 +44,13 @@ router.get('/', course_controller.course_manage_all);
 
 router.use('/:courseID/', function (req, res, next) {
     Course.getByID(parseInt(req.params.courseID), (err, course) => {
-	console.log(parseInt(req.params.courseID));
+//	console.log(parseInt(req.params.courseID));
 	if(!err) {
 	    User.getSubscription(req.session.user, course, (err, subscription) => {
 		if(subscription) {
 		    req.subscription = subscription;
 		    req.course = course;
-		    console.log(subscription);
+//		    console.log(subscription);
 //		    if(req.subscription.isTDMan)
 			next();
 //		    else

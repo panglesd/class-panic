@@ -13,18 +13,18 @@ exports.userList = function (callback) {
 //	console.log(rows);
 	callback(rows);
     });
-}
+};
 
 exports.userListByFilter = function (filter, callback) {
 //    console.log("filter is", filter)
-    query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID, isTDMan FROM '+
+    let query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID, isTDMan FROM '+
 	( "users LEFT OUTER JOIN (SELECT * FROM subscription WHERE `courseID` = ? ) subs ON `users`.`id` = `subs`.`userID`")+
 	' WHERE 1=1 '+
 	(filter.name ? " AND fullName LIKE ?" : "") +
 	(filter.n_etu ? " AND studentNumber = ?" : "") +
 	(filter.promotion ? " AND promotion = ?" : "") +
 	(filter.institution ? " AND institution = ?" : "") ;
-    param = [filter.courseID ? filter.courseID : -1]
+    let param = [filter.courseID ? filter.courseID : -1];
     if(filter.name)
 	param.push("%"+filter.name+"%");
     if(filter.n_etu)
@@ -38,7 +38,7 @@ exports.userListByFilter = function (filter, callback) {
 //	console.log(err, rows);
 	callback(err, rows);
     });
-}
+};
 
 /***********************************************************************/
 /*       Getters pour les users : individu                             */
@@ -49,7 +49,7 @@ exports.userByID = function (userID, callback) {
 //	console.log(rows);
 	callback(rows);
     });
-}
+};
 
 /***********************************************************************/
 /*       Gestion CRUD des user                                         */
@@ -65,19 +65,19 @@ exports.create = function (user, callback) {
 	    callback(err,rows);
 	});
     });
-}
+};
 
 // Delete
 
 exports.userDelete = function (user, callback) {
-    bdd.query('DELETE FROM `users` WHERE `id` = ?', [room.id], callback)
-}
+    bdd.query('DELETE FROM `users` WHERE `id` = ?', [user.id], callback);
+};
 
 // Update
 
 exports.userUpdate = function (user, newUser, callback) {
-    bdd.query('UPDATE `users` SET `pseudo`= ? WHERE `id` = ?', [user.pseudo, user.id], callback)
-}
+    bdd.query('UPDATE `users` SET `pseudo`= ? WHERE `id` = ?', [user.pseudo, user.id], callback);
+};
 
 /***********************************************************************/
 /*       Verification pour la connection                               */
@@ -90,7 +90,7 @@ exports.userCheck = function(user, passwd, callback) {
 		  if(!results[0]) 
 		      callback(null, false);
 		  else {
-		      userC = results[0];
+		      let userC = results[0];
 		      bcrypt.compare(passwd, userC.password, function(err, res) {
 			  if(res)
 			      callback(err, userC);
@@ -157,7 +157,7 @@ exports.getSubscription = function(user, course, callback) {
 	});
     }
     else {
-	query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ?";
+	let query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ?";
 	bdd.query(query, [user.id, course.id], function (err, res) {
 //	    console.log(this.query);
 	    if(res) 
@@ -166,7 +166,7 @@ exports.getSubscription = function(user, course, callback) {
 		callback(err, null);
 	});
     }
-}
+};
 
 /*exports.canDo = function(user, filter, callback) {
     query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ? ";

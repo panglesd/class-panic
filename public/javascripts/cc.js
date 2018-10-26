@@ -1,3 +1,4 @@
+
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketCC = io.connect(server+'/cc');
@@ -54,7 +55,7 @@ socketCC.on('connect', () => {
 /*********************************************************************/
 
 function changeQuestionPlease() {
-    socketCC.emit("changeQuestionPlease");
+    socketCC.emit("changeToQuestion", currentQuestionOfCC.indexSet+1);
 }
 
 /*********************************************************************/
@@ -305,6 +306,6 @@ function sendAnswer() {
 	atom.text = textarea ? textarea.value : "";
 	reponses.push(atom);
     });
-    socketCC.emit("chosenAnswer", reponses);
+    socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
 }
 

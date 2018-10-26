@@ -13,10 +13,10 @@ socket.on('connect', () => {
 
 socket.on("users", (list) => {
     console.log(list) ;
-    wrap = document.querySelector("#wrapper-student-list");
-    ul = document.createElement("ul");
+    let wrap = document.querySelector("#wrapper-student-list");
+    let ul = document.createElement("ul");
     list.forEach((student) => {
-	li = document.createElement("li");
+	let li = document.createElement("li");
 	li.textContent = student.fullName+" ("+student.studentNumber+"), " + "eleve de "+student.institution+", promotion "+student.promotion+"/"+(student.promotion+1);
 	if (student.courseID)
 	    li.style.color="red";
@@ -36,14 +36,14 @@ socket.on("users", (list) => {
 });
 
 function callSearch() {
-     name = document.querySelector("#name").value;
-     n_etu = document.querySelector("#n_etu").value;
-     promotion = document.querySelector("#promotion").value;
-     institution = document.querySelector("#institution").value;
+     let name = document.querySelector("#name").value;
+     let n_etu = document.querySelector("#n_etu").value;
+     let promotion = document.querySelector("#promotion").value;
+     let institution = document.querySelector("#institution").value;
      searchStudent(name, n_etu, promotion, institution);
  }
 function searchStudent(name, n_etu, promotion, institution) {
-    search = {
+    let search = {
 	name:name,
 	n_etu:n_etu,
 	promotion:promotion,

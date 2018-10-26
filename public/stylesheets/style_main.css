@@ -42,6 +42,7 @@ html {
     color:rgb(220,220,220);
 }
 h1 {
+    font-weight: normal;
     border-bottom: aliceblue 1px solid;
 }
 h1 div {
@@ -54,11 +55,13 @@ h1, h2 {
     font-size:1.5em;
     margin:10px;
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
+    font-weight: normal;
     margin:40px;
 }
 .froom {
     display:inline-block;
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
+    font-weight: normal;
     font-size: 3em;
     margin-bottom: 10px;
 }

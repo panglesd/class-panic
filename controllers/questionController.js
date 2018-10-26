@@ -14,15 +14,21 @@ var async = require('async');
 
 // render de manage_question.ejs
 
-renderManageQuestion = function(user, course, question, set, msgs, req, res) {
+var renderManageQuestion = function(user, course, question, set, msgs, req, res) {
     async.parallel(
 	{
-	    title: function(callback) { callback(null, "Big Sister: Gérer vos sets de questions")},
-	    config: function(callback) { callback(null, config) },	
+	    title: function(callback) {
+		callback(null, "Big Sister: Gérer vos sets de questions");
+	    },
+	    config: function(callback) {
+		callback(null, config);
+	    },	
 	    user: function (callback) {
 		callback(null, user);
 	    },
-	    newQuestion: function(callback) { callback(null, typeof question == "undefined")},
+	    newQuestion: function(callback) {
+		callback(null, typeof question == "undefined");
+	    },
 	    question: function (callback) {
 		if(typeof question != "undefined")
 		    callback(null, question);
@@ -37,17 +43,19 @@ renderManageQuestion = function(user, course, question, set, msgs, req, res) {
 				 enonce: "",
 				 description:"",
 				 type:"mono"
-			     })
+			     });
 	    },
 	    course : function(callback) {
-		callback(null, course)
+		callback(null, course);
 	    },
 	    subscription: function(callback) {
 		callback(null, req.subscription);
 	    },
-	    title: function(callback) { callback(null, "Class Panic: Modification d'un set")},
+	    title: function(callback) {
+		callback(null, "Class Panic: Modification d'un set");
+	    },
 	    set: function (callback) {
-		callback(null, set)
+		callback(null, set);
 	    }
 	},
 	function (err, results) {
@@ -84,7 +92,7 @@ function formatQuestionFromBody(body) {
 	correct : body.correct,
 	description : body.description,
 	type : body.multi ? "multi" : "mono"
-    }
+    };
     let reponse = [];
     let i=0;
     while(body["value-reponse-"+i]) {
@@ -94,11 +102,11 @@ function formatQuestionFromBody(body) {
 	    texted: body["text-"+i]=="true" ? true : false,
 	};
 	if(reponse[i].texted) 
-	    reponse[i].correction = body["correction-"+i]
+	    reponse[i].correction = body["correction-"+i];
 	i++;
     }
     question.reponse = JSON.stringify(reponse);
-    return question
+    return question;
 }
 // Create
 

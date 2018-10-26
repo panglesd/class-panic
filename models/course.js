@@ -60,18 +60,18 @@ exports.ownedList = function (user, callback) {
     bdd.query('SELECT * FROM courses WHERE `ownerID` = ?', [user.id], function(err, rows) {
 	callback(err, rows);
     });
-}
+};
 
 // By Name
 
 exports.getByName= function (courseName, callback) {
-    bdd.query("SELECT * FROM `courses` WHERE `name` = ?", [courseName], function (err, rows) { callback(rows[0]) });
-}
+    bdd.query("SELECT * FROM `courses` WHERE `name` = ?", [courseName], function (err, rows) { callback(rows[0]); });
+};
 
 exports.students = function(user, courseID, callback) {
     query = "SELECT * FROM subscription INNER JOIN users ON userID= users.id WHERE courseID = ? ORDER BY fullName";
     bdd.query(query, [courseID], callback);
-}
+};
 
 
 

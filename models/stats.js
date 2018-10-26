@@ -77,29 +77,29 @@ exports.logStats = function (roomID,  callback) {
     Room.getByID(roomID, (err, room) => {
 //	console.log(room);
 	async.parallel({
-	    set : function (callback) { Set.getByID(room.questionSet, callback) },
+	    set : function (callback) { Set.getByID(room.questionSet, callback); },
 	    question : function (callback) {
 		if(room.question.id)
-		    Question.getByID(room.question.id, callback)
+		    Question.getByID(room.question.id, callback);
 		else
-		    callback(null, {id:null})
+		    callback(null, {id:null});
 	    },
-	    room : function (callback) { callback(null, room) },
-	    course : function (callback) { Course.getByID(room.courseID, callback) }
+	    room : function (callback) { callback(null, room); },
+	    course : function (callback) { Course.getByID(room.courseID, callback); }
 	}, (err, result) => {
-	    query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`, `customQuestion`) VALUES (?,?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
-	    params = [ result.set.id, JSON.stringify(result.set),
+	    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`, `customQuestion`) VALUES (?,?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
+	    let params = [ result.set.id, JSON.stringify(result.set),
 		       result.room.id, JSON.stringify(result.room) ,
 		       result.question.id, JSON.stringify(result.question) ,
 		       result.course.id, JSON.stringify(result.course) ,
 		       JSON.stringify(room.question) ];
 	    bdd.query(query, params, (err, res) => {
 		console.log(err);
-		blocID = res[1][0].blocID;
+		let blocID = res[1][0].blocID;
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
 			query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`) VALUES (?,?,?,?)";
-			bdd.query(query,[oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response], (err, res) => {callback(err, res)})
+			bdd.query(query,[oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response], (err, res) => {callback(err, res);});
 		    }, (err) => {
 			console.log(err);
 			callback();
@@ -108,5 +108,5 @@ exports.logStats = function (roomID,  callback) {
 	    });
 	});
     });
-}
+};
 
