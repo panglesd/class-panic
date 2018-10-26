@@ -22,7 +22,7 @@ socket.on("users", (list) => {
 	    li.style.color="red";
 	if (student.isTDMan)
 	    li.style.color="green";
-	if (student.id == courseID)
+	if (student.id == course.ownerID)
 	    li.style.color="orange";
 	
 	li.id = student.id;
