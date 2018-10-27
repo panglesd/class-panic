@@ -84,21 +84,21 @@ function formatQuestionFromBody(body) {
 	correct : body.correct,
 	description : body.description,
 	type : body.multi ? "multi" : "mono"
-    }
+    };
     let reponse = [];
     let i=0;
     while(body["value-reponse-"+i]) {
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
-	    texted: body["text-"+i]=="true" ? true : false,
+	    texted: body["texted-"+i]=="true" ? true : false,
 	};
 	if(reponse[i].texted) 
-	    reponse[i].correction = body["correction-"+i]
+	    reponse[i].correction = body["correction-"+i];
 	i++;
     }
     question.reponse = JSON.stringify(reponse);
-    return question
+    return question;
 }
 // Create
 
