@@ -95,7 +95,7 @@ function formatQuestionFromBody(body) {
     };
     let reponse = [];
     let i=0;
-    while(body["value-reponse-"+i]) {
+    while(typeof body["value-reponse-"+i] != "undefined") {
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
