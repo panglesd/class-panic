@@ -99,7 +99,7 @@ function formatQuestionFromBody(body) {
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
-	    texted: body["text-"+i]=="true" ? true : false,
+	    texted: body["texted-"+i]=="true" ? true : false,
 	};
 	if(reponse[i].texted) 
 	    reponse[i].correction = body["correction-"+i];
