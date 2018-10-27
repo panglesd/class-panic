@@ -133,6 +133,8 @@ exports.getFirstOfSet = function (setID, callback) {
 // Création
 
 exports.questionCreate = function (user, question, setID, callback) {
+    console.log("question = ", question);
+    
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	if(er)

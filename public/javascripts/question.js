@@ -43,12 +43,12 @@ function returnHTMLQuestion (i) {
 }
 
 function addAnswer () {
-    ul = document.querySelector("#listeQue");
-    li = document.createElement("li");
-    liButton = document.querySelector("#ajoutrep");
-    n = document.querySelectorAll(".reponse").length;
+    let ul = document.querySelector("#listeQue");
+    let li = document.createElement("li");
+    let liButton = document.querySelector("#ajoutrep");
+    let n = document.querySelectorAll(".reponse").length;
     li.innerHTML=returnHTMLQuestion(n);
-    li.classList.add("reponse", "false")
+    li.classList.add("reponse", "false");
     ul.insertBefore(li,liButton);
     addReponseListener(li);
 }
@@ -57,11 +57,11 @@ function addAnswer () {
 // Avoir ou non un champs texte dans la réponse
 
 function toggleText(elem) {
-    text = elem.querySelector(".text");
+    let text = elem.querySelector(".text");
     text.classList.toggle("texted");
-    value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
+    let value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
     elem.querySelector(".correction-textarea").style.visibility = elem.querySelector(".correction-textarea").style.visibility=="hidden" ? "visible" : "hidden";
-    text_string = text.querySelector("span")
+    let text_string = text.querySelector("span");
     if(text_string.textContent == "Enlever le champs texte")
 	text_string.textContent = "Ajouter un champs texte";
     else
@@ -81,15 +81,13 @@ function setValue(value, elem) {
 // Pour la numérotation des réponses et des names
 
 function renumber() {
-    i=0;
-    q = document.querySelectorAll(".reponse");
-    q.forEach(function (elem) {  
+    let q = document.querySelectorAll(".reponse");
+    q.forEach(function (elem, i) {  
 	elem.querySelector(".nreponse").innerHTML = "Réponse "+ i + " :";
 	elem.querySelector(".value-reponse-textarea").name="value-reponse-"+i;
 	elem.querySelector(".texted-hidden").name="texted-"+i;
 	elem.querySelector(".correctness-hidden").name="correctness-"+i;
 	elem.querySelector(".correction-textarea").name="correction-"+i;
-	i++;
     });
 }
 

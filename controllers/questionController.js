@@ -87,6 +87,7 @@ exports.question_update_get = function(req, res) {
 /*************************************************************/
 
 function formatQuestionFromBody(body) {
+    console.log("body = ", body);
     let question = {
 	enonce : body.enonce,
 	correct : body.correct,
