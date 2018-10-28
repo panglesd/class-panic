@@ -73,7 +73,7 @@ exports.getByIndex = function (questionIndex, roomID, callback) {
 
 exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
     let query = 
-	"SELECT enonce, questionID, questions.id as id, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse  FROM "+
+	"SELECT enonce, questionID, questions.id as id, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
 	  "questions LEFT OUTER JOIN "+
 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
@@ -139,8 +139,8 @@ exports.questionCreate = function (user, question, setID, callback) {
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	if(er)
 	    console.log(er);
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`) VALUES (?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID()",
-		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type],
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?,?,?); SELECT LAST_INSERT_ID()",
+		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef],
 		  function (err, r) {console.log(err); callback(err, r[0]);});
     });
 };
@@ -164,8 +164,8 @@ exports.questionDelete = function (user, questionID, callback) {
 
 exports.questionUpdate = function (user, questionID, newQuestion, callback) {
     let i=0;
-    bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?  WHERE `id` = ?",
-	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, questionID], callback);
+    bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `strategy` = ?, `coef` = ? WHERE `id` = ?",
+	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], callback);
 };
 
 

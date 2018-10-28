@@ -92,7 +92,9 @@ function formatQuestionFromBody(body) {
 	enonce : body.enonce,
 	correct : body.correct,
 	description : body.description,
-	type : body.multi ? "multi" : "mono"
+	type : body.multi ? "multi" : "mono",
+	strategy: body.strategy,
+	coef: body.coef
     };
     let reponse = [];
     let i=0;

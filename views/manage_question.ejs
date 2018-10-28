@@ -31,7 +31,19 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
-	<label><input <%- canModify ? "" : "onclick='return false'" %> name="multi" id="multi" style="vertical-align: middle;" type="checkbox" <%= question.type == "multi" ? "checked" : "" %>>Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><!--<label style="margin-left:10px;"><input type="checkbox">Correction automatique</label>-->
+	<label><input <%- canModify ? "" : "onclick='return false'" %> name="multi" id="multi" style="vertical-align: middle;" type="checkbox" <%= question.type == "multi" ? "checked" : "" %>>Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><br>
+	<label>Comment corriger la question ?
+	    <select <%- canModify ? "" : "onclick='return false'" %> name="strategy" id="strategy" >
+		<option <%= question.strategy == "manual" ? "selected" : "" %>  value="manual">Manuellement</option>
+		<option <%= question.strategy == "all_or_0" ? "selected" : "" %> value="all_or_0">Death Mode</option>
+		<option <%= question.strategy == "QCM" ? "selected" : "" %>  value="QCM">QCM style</option>
+	    </select><br>
+	    <div> Description de comment corriger </div> <br>
+	    Coefficient :
+	    <select <%- canModify ? "" : "onclick='return false'" %> name="coef" id="coef">
+		<% for(let i=1; i<10; i++){%><option <%= question.coef == i ? "selected" : ""%>><%= i %></option> <% } %>
+	    </select>
+	</label>
 	<% i = 0 ; question.reponses.forEach( function(reponsePossible) { %>
 	    <li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
 	<!--    Regroupement des champs hidden   -->
