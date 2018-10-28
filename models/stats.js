@@ -9,7 +9,7 @@ var async = require('async');
 
 exports. getStats = function (filter, callback) {
 
-    query = 'SELECT `stats`.id ' +
+    let query = 'SELECT `stats`.id ' +
 	', blocID' +
 	', `users`.id as userID' +
 	', correct' +
@@ -33,7 +33,7 @@ exports. getStats = function (filter, callback) {
 	', userID' +
 	' FROM `stats` INNER JOIN `statsBloc` ON `stats`.`blocID` = `statsBloc`.`id` INNER JOIN  `users` ON `users`.id = `stats`.userID WHERE `roomID` IN (SELECT id FROM `rooms` WHERE 1=1) ';
     
-    param = []
+    let param = []
     //    if(filter.courseID) {
     query += " AND `roomID` IN (SELECT id FROM `rooms` WHERE courseID = ?) ";
     param.push(filter.courseID);
@@ -66,7 +66,7 @@ exports. getStats = function (filter, callback) {
 	callback(err, rows);
     });
 
-}
+};
 
 
 /***********************************************************************/
@@ -89,17 +89,17 @@ exports.logStats = function (roomID,  callback) {
 	}, (err, result) => {
 	    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`, `customQuestion`) VALUES (?,?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
 	    let params = [ result.set.id, JSON.stringify(result.set),
-		       result.room.id, JSON.stringify(result.room) ,
-		       result.question.id, JSON.stringify(result.question) ,
-		       result.course.id, JSON.stringify(result.course) ,
-		       JSON.stringify(room.question) ];
+			   result.room.id, JSON.stringify(result.room) ,
+			   result.question.id, /*JSON.stringify(result.question)*/ JSON.stringify(room.question) ,
+			   result.course.id, JSON.stringify(result.course) ,
+			   JSON.stringify(room.question) ];
 	    bdd.query(query, params, (err, res) => {
 		console.log(err);
 		let blocID = res[1][0].blocID;
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
-			query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`) VALUES (?,?,?,?)";
-			bdd.query(query,[oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response], (err, res) => {callback(err, res);});
+			query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`) VALUES (?,?,?,?,?)";
+			bdd.query(query,[oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response, result.question.strategy], (err, res) => {callback(err, res);});
 		    }, (err) => {
 			console.log(err);
 			callback();
