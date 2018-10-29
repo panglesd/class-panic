@@ -1,8 +1,9 @@
 
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
-var socketCC = io.connect(server+'/cc');
+var socketCC = io.connect(server+'/ccAdmin');
 var currentQuestionOfCC;
+var currentStudent;
 var currentList;
 var md = new markdownit({
     html:         false,        // Enable HTML tags in source
@@ -44,16 +45,16 @@ md.use(markdownitMathjax());
 /*********************************************************************/
 
 // On informe le serveur dans quel room on est
-socketCC.on('connect', () => {
-    socketCC.emit("chooseRoom", roomID);
-});
+//socketCC.on('connect', () => {
+//    socketCC.emit("chooseRoom", roomID);
+//});
 
 /*********************************************************************/
 /*                 lorsque l'on veut changer de question             */
 /*********************************************************************/
 
 function changeQuestionPlease() {
-    socketCC.emit("changeToQuestion", currentQuestionOfCC.indexSet+1);
+    socketCC.emit("changeToQuestion", 2, currentQuestionOfCC.indexSet+1);
 }
 
 /*********************************************************************/
@@ -61,15 +62,7 @@ function changeQuestionPlease() {
 /*********************************************************************/
 
 function sendOwnedQuestionPlease() {
-    socketCC.emit("sendQuestionPlease");
-}
-
-/*********************************************************************/
-/*                 lorsque l'on veut reveler les resultats           */
-/*********************************************************************/
-
-function revealResults() {
-    socketCC.emit("revealResults");
+    socketCC.emit("sendQuestionPlease", 2);
 }
 
 /*********************************************************************/
@@ -77,58 +70,16 @@ function revealResults() {
 /*********************************************************************/
 
 function gotoQuestion(i) {
-    socketCC.emit("changeToQuestion", i);
+    socketCC.emit("changeToQuestion", 2, i);
 }
-
-/*********************************************************************/
-/*                 lorsque l'on reçoit les nouvelles statistiques    */
-/*********************************************************************/
-
-// socketCC.on('newStats', function (newStats) {
-//     console.log(newStats);
-//     let ula = document.createElement("ul");
-//     ula.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
-//     newStats.forEach(function (stat) {
-// 	let li = document.createElement("li");
-// 	//li.id = stat.id;
-// 	li.innerHTML = '<div style="display:flex; justify-content: space-between;"></div>';
-// 	li.firstChild.innerText = stat.fullName;
-// 	ula.appendChild(li);
-// 	let ul = document.createElement("ul");
-// 	li.appendChild(ul);
-// 	JSON.parse(stat.response).forEach((ans) => {
-// 	    let li = document.createElement("li");
-// 	    let color="white";
-// 	    console.log("ans is", ans);
-// 	    if(ans.n>=0) {
-// 		if(currentQuestionOfAdmin.reponses[ans.n].validity == "true") 
-// 		    color="green";
-// 		else if(currentQuestionOfAdmin.reponses[ans.n].validity == "false") 
-// 		    color="red";
-// 		ans.response2 = currentQuestionOfAdmin.reponses[ans.n].reponse;
-// 	    }
-// 	    else 
-// 		ans.response2 = "?";
-// 	    li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*//*stat.fullName+*/' <span>'+ans.response2+' '+ans.text+'</span></div>';
-// 	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
-// 	    li.onclick = ((ev) => {console.log(ans);gotoQuestion(ans.indexSet);});
-// 	    ul.appendChild(li);
-// 	    console.log(ul);
-// 	});
-// 	console.log(li);
-//     });
-//     document.querySelector("#stats ul").innerHTML = ula.innerHTML;
-//     document.querySelector(".window").innerHTML = document.querySelector("#stats").outerHTML;
-// });
 
 /*********************************************************************/
 /*                 lorsque l'on reçoit une nouvelle question (admin) */
 /*********************************************************************/
 
-socketCC.on('newQuestion', function (reponse) {
+function afficheResponse (reponse) {
     console.log('newQuestion');
     console.log(reponse);
-    currentQuestionOfAdmin=reponse;
     currentQuestionOfCC=reponse;
     // On s'occupe du carré blanc
     let temp;
@@ -161,7 +112,7 @@ socketCC.on('newQuestion', function (reponse) {
     if(reponse.description)
 	descr.innerHTML = md.render(reponse.description);
     else
-	descr.innerHTML = reponse.description;
+	descr.textContent = reponse.description;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
 
     // Pour chaque nouvelle réponse :
@@ -215,14 +166,15 @@ socketCC.on('newQuestion', function (reponse) {
 	    let temp = document.querySelectorAll("#wrapperAnswer .reponse")[ans.n];
 	    temp.classList.remove("notSelected");
 	    temp.classList.add("selected");
-	    ta = temp.querySelector("textarea");
+	    let ta = temp.querySelector("textarea");
 	    if(ta)
 		ta.value = ans.text;
 	});
 
 
-    socketCC.emit("sendList");
-});
+    socketCC.emit("sendList", 2);
+    socketCC.emit("sendStudentList", 2);
+};
 
 /*********************************************************************/
 /*                 lorsque l'on reçoit la liste des question         */
@@ -241,8 +193,8 @@ socketCC.on('newList', function (questionList) {
 		notTheSame = true;
 	});
     // notTheSame vaut true ssi quelque chose a changé dans les énoncés. Si c'est le cas, on refait entièrement le menu
-    currentList = questionList;
     if(notTheSame) {
+	currentList = questionList;
 	let ul = document.createElement("ul");
 	ul.id = "chooseQFromSet";
 	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
@@ -251,10 +203,10 @@ socketCC.on('newList', function (questionList) {
 	    let li = document.createElement("li");
 	    li.id = "q-" + question.id;
 	    li.classList.add("q-");
-	    if(question.id == currentQuestionOfCC.id)
-		li.classList.add("currentQuestion");
+//	    if(question.id == currentQuestionOfCC.id)
+//		li.classList.add("currentQuestion");
 	    li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
-	    li.class = ""+(question.id == currentQuestionOfCC.id);
+//	    li.class = ""+(question.id == currentQuestionOfCC.id);
 	    li.textContent = question.enonce;
 	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	    ul.appendChild(li);
@@ -264,7 +216,7 @@ socketCC.on('newList', function (questionList) {
     }
     // Dans tous les cas, on refait le check des petites marques blanches
     document.querySelectorAll(".q-").forEach((elem, index) => {
-	if(questionList[index].answered)
+	if(questionList[index].questionID)
 	    elem.classList.add("answered");
 	else
 	    elem.classList.remove("answered");
@@ -313,7 +265,54 @@ function sendAnswer() {
 	atom.text = textarea ? textarea.value : "";
 	reponses.push(atom);
     });
-    socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
+//    socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
     console.log("reponses, currentQuestionOfCC.indexSet = ", reponses, currentQuestionOfCC.indexSet);
 }
 
+
+
+
+
+
+
+socketCC.on('newSubmission', function (submission) {
+    console.log("submission = ", submission);
+});
+
+
+
+
+
+socketCC.on('newUserList', function (questionList) {
+    console.log("questionList = ", questionList);
+    currentList = questionList;
+    let ul = document.createElement("ul");
+    ul.id = "chooseSFromSet";
+    ul.innerHTML = '<li id="chooseStudentNext"> Choisir l\'élève à corriger :</li>';
+    questionList.forEach(function (student, index) {
+	console.log(student);
+	let li = document.createElement("li");
+	li.id = "s-" + student.id;
+	li.classList.add("s-");
+//	if(student.id == currentStudent.id)
+//	    li.classList.add("currentQuestion");
+//	li.addEventListener("click", () => { gotoQuestion(student.indexSet); });
+//	li.class = ""+(student.id == currentQuestionOfCC.id);
+	li.textContent = student.fullName;
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+	ul.appendChild(li);
+    });
+    let old = document.querySelector("#chooseSFromSet");
+	old.parentNode.replaceChild(ul,old);
+    // Dans tous les cas, on refait le check des petites marques blanches
+    document.querySelectorAll(".s-").forEach((elem, index) => {
+//	if(questionList[index].questionID)
+	    elem.classList.add("answered");
+//	else
+//	    elem.classList.remove("answered");
+    });
+//	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+//	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
+//	console.log(currentQuestionOfCC.id);
+//	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
+});

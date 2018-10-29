@@ -127,6 +127,8 @@ router.get('/:courseID/play/:roomID', game_controller.room_enter);
 router.get('/:courseID/cc/:roomID', game_controller.room_cc);
 // GET request for admining a room.
 router.get('/:courseID/control/:roomID', game_controller.room_admin);
+// GET request for admining a room.
+router.get('/:courseID/correct/:roomID', game_controller.room_cc_admin);
 
 
 

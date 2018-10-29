@@ -12,8 +12,8 @@ var Question = require("./question");
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
 //	console.log(this.sql);
-	resu[0].question = JSON.parse(resu[0].question)
-	callback(err, resu[0])});
+	resu[0].question = JSON.parse(resu[0].question);
+	callback(err, resu[0]);});
 };
 
 exports.getOwnedByID = function(user, roomID, callback) {
@@ -138,4 +138,4 @@ exports.setStatusForRoomID = function (roomID, status, callback) {
     });
 }
 
-module.export = []
+module.export = [];

@@ -80,14 +80,18 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-	    if(answer.length == 0 || socket.room.question.type == "multi")
-		game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
+//	    console.log("answer, questionIndex = ", answer, questionIndex);
+//	    console.log("socket.room.question.type = ", socket.room.question.type);
+	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		if(answer.length == 0 || question.type == "multi")
+		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
 //		    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
-		});
-	    else
-		game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, [answer[0]], function () {
-//		    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
-		});
+		    });
+		else
+		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, [answer[0]], function () {
+			//		    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+		    });
+	    });
 	});
 
 	

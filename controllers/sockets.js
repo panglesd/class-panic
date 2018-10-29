@@ -50,6 +50,7 @@ module.exports = function (server, sessionMiddleware) {
     /**************************************************************************/
     
     require("./sockets/socketCC")(io);
+    require("./sockets/socketCCCorrect")(io);
     
     /**************************************************************************/
     /*                 Fonction pour gérer les admins                         */

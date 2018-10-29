@@ -18,9 +18,9 @@ exports.room_enter = function(req, res) {
 		//		Course.getByID(req.params.idCourse, callback);
 		callback(null, req.course);
 	    },
-	    config : function(callback) { /*console.log(config);*/ callback(null, config) },	
+	    config : function(callback) { /*console.log(config);*/ callback(null, config); },	
 	    room : function (callback) {
-		Room.getByID(req.params.roomID, (err, res) => {callback(err, res) })
+		Room.getByID(req.params.roomID, (err, res) => {callback(err, res); });
 	    }
 	},
 	function (err, results) {
@@ -42,23 +42,23 @@ exports.room_admin = function(req, res) {
 		server : function(callback) {
 		    callback(null, req.protocol + '://' + req.get('host') );
 		},
-		config : function(callback) { callback(null, config) },	
+		config : function(callback) { callback(null, config); },	
 		course: function(callback) {
 		    //		Course.getByID(req.params.idCourse, callback);
 		    callback(null, req.course);
 		},
 		room : function (callback) {
-		    Room.getByID(req.params.roomID, callback)
+		    Room.getByID(req.params.roomID, callback);
 //		    Room.getByID( req.params.id, callback)
 		},
 		set : function (callback) {
-		    Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b)});
+		    Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b);});
 		},
 		roomList : function (callback) {
 		    Room.listOfCourse(req.course.id, callback);
 		},
 		roomOwnedList :  function (callback) {
-		    Room.ownedList(req.session.user, function (r) { callback(null, r) });
+		    Room.ownedList(req.session.user, function (r) { callback(null, r); });
 		},
 		setOwnedList :  function (callback) {
 		    Set.setOwnedList(req.session.user, req.course.id, callback);
@@ -86,23 +86,23 @@ exports.room_cc = function(req, res) {
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
-	    config : function(callback) { callback(null, config) },	
+	    config : function(callback) { callback(null, config); },	
 	    course: function(callback) {
 		//		Course.getByID(req.params.idCourse, callback);
 		callback(null, req.course);
 	    },
 	    room : function (callback) {
-		Room.getByID(req.params.roomID, callback)
+		Room.getByID(req.params.roomID, callback);
 		//		    Room.getByID( req.params.id, callback)
 	    },
 	    set : function (callback) {
-		Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b)});
+		Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b);});
 	    },
 	    roomList : function (callback) {
 		Room.listOfCourse(req.course.id, callback);
 	    },
 	    roomOwnedList :  function (callback) {
-		Room.ownedList(req.session.user, function (r) { callback(null, r) });
+		Room.ownedList(req.session.user, function (r) { callback(null, r); });
 	    },
 	    setOwnedList :  function (callback) {
 		Set.setOwnedList(req.session.user, req.course.id, callback);
@@ -111,5 +111,46 @@ exports.room_cc = function(req, res) {
 	function (err, results) {
 //	    console.log(results);
 	    res.render('play_CC', results);
+	});
+};
+
+// Controlleur pour cc admin une room
+
+exports.room_cc_admin = function(req, res) {
+    //    if(req.subscription.isTDMan) {
+    //    if(true) {
+    async.parallel(
+	{
+	    user : function (callback) {
+		callback(null, req.session.user);
+	    },
+	    server : function(callback) {
+		callback(null, req.protocol + '://' + req.get('host') );
+	    },
+	    config : function(callback) { callback(null, config); },	
+	    course: function(callback) {
+		//		Course.getByID(req.params.idCourse, callback);
+		callback(null, req.course);
+	    },
+	    room : function (callback) {
+		Room.getByID(req.params.roomID, callback);
+		//		    Room.getByID( req.params.id, callback)
+	    },
+	    set : function (callback) {
+		Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b);});
+	    },
+	    roomList : function (callback) {
+		Room.listOfCourse(req.course.id, callback);
+	    },
+	    roomOwnedList :  function (callback) {
+		Room.ownedList(req.session.user, function (r) { callback(null, r); });
+	    },
+	    setOwnedList :  function (callback) {
+		Set.setOwnedList(req.session.user, req.course.id, callback);
+	    }
+	},
+	function (err, results) {
+//	    console.log(results);
+	    res.render('play_CC_admin', results);
 	});
 };

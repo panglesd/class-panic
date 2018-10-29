@@ -80,7 +80,7 @@ exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
     bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
 	console.log(err);
 	let q = row[0];
-	console.log(q);
+//	console.log(q);
 	q.allResponses = JSON.parse(q.allResponses);
 	if(q.userResponse)
 	    q.userResponse = JSON.parse(q.userResponse);
@@ -174,15 +174,39 @@ exports.questionUpdate = function (user, questionID, newQuestion, callback) {
 /*       Correction des questions                                      */
 /***********************************************************************/
 
-exports.correctSubmission = function(question, submission) {
+exports.correctSubmission = function(question, submission, strategy) {
 //    console.log("queztion", question);
 //   console.log("queztion", question.type);
 //    console.log("submission", submission);
-    switch(/*[*/question.type/*, question.strategy]*/) {
-    case "multi":
-	return "faux";
-    case "mono":
-	return "juste";
+    switch(/*[*/strategy/*, question.strategy]*/) {
+    case "manual":
+	return "unknown";
+    case "QCM":
+	let tot = 0;
+	let visited = [];
+	submission.forEach((rep) => {
+	    if(!visited[rep.n]) {
+		if(question.reponses[rep.n].validity=="true")
+		    tot++;
+		if(question.reponses[rep.n].validity=="false")
+		    tot--;
+	    }
+	    visited[rep.n]=true;
+	});
+	let max = 0;
+	question.reponses.forEach((rep)=> {
+	    if (rep.validity == "true")
+		max++;
+	});
+	return ""+(tot*1./(max ? max : 1));
+    case "all_or_0":
+	if(!submission[0])
+	    return "0";
+	if(submission.validity == "true")
+	    return "1";
+	if(submission.validity == "false")
+	    return "0";
+	return "unknwon";
     }
     
     

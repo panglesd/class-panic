@@ -17,21 +17,29 @@ exports.questionFromRoomID = function (roomID, callback) {
 };
 
 exports.questionListForCC = function (user, roomID, callback) {
-    let query = 
+/*    let query = 
 	"SELECT enonce, questionID, questions.id as id, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse  FROM "+
 	"questions LEFT OUTER JOIN "+
 	"(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser " +
-	"ON statsOfUser.questionID = questions.id WHERE indexSet = ?";
+	"ON statsOfUser.questionID = questions.id WHERE indexSet = ?";*/
     let query2 =
-	"SELECT enonce, questionID, questions.id as id, indexSet FROM"+
+	"SELECT enonce, questionID, questions.id as id, indexSet, `statsOfUser`.response FROM"+
 	" questions LEFT OUTER JOIN "+
-	"(SELECT questionID FROM stats INNER JOIN statsBloc ON "+
+	"(SELECT questionID, response FROM stats INNER JOIN statsBloc ON "+
 	"statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser "+
 	"ON statsOfUser.questionID = questions.id WHERE questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet";
 
-    bdd.query(query2, [user.id, roomID, roomID], function(err, row) {
+    bdd.query(query2, [user.id, roomID, roomID], function(err, rows) {
 	console.log(err);
-	callback(err, row);
+	rows.forEach((row) => {
+	    if(row.questionID){
+		row.response = JSON.parse(row.response);
+		row.answered = row.response.length > 0;
+	    }
+	    else
+		row.answered = false;
+	});
+	callback(err, rows);
     });
 };
 
@@ -92,28 +100,35 @@ exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callb
 	    if(result.subscription && result.room.status == "pending") {
 		let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?";
 		bdd.query(query, [result.room.id, user.id, result.question.id], function(err, answ) {
-		    console.log("err flatStats", err, answ);		    
-		    if(answ[0]) 
-			bdd.query("UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
-				  "UPDATE `stats` SET `response` = ? WHERE userID = ? AND blocID = ?",
-				  [room.id, result.question.id, JSON.stringify(newAnswer), user.id, answ[0].blocID, result.question.id],
-				  (err, res) => {console.log(err, res);console.log(this.sql);callback();});
+//		    console.log("err flatStats", err, answ);		    
+		    if(answ[0])  {
+			console.log("result.question = ", result.question);
+			let toLog = bdd.query("UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
+					      "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?",
+					      [room.id, result.question.id, JSON.stringify(newAnswer), result.question.strategy, Question.correctSubmission(result.question, newAnswer, result.question.strategy), user.id, answ[0].blocID], (err, res) => {
+//						  console.log(err, res);
+//						  console.log(toLog.sql);
+						  callback();
+					      });
+		    }
 		    else {
-			let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`, `customQuestion`) VALUES (?,?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
+			let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
 			let params = [ result.set.id, JSON.stringify(result.set),
 				       room.id, JSON.stringify(room) ,
 				       result.question.id, JSON.stringify(result.question) ,
-				       result.course.id, JSON.stringify(result.course) ,
-				       JSON.stringify(result.question) ];
+				       result.course.id, JSON.stringify(result.course) //,
+				       /*JSON.stringify(result.question)*/ ];
 			bdd.query(query, params, (err, tabID) => {
 			    let blocID = tabID[1][0].blocID;
-			    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`) VALUES (?,?,?,?)";
-			    console.log("query2", tabID);
-			    bdd.query(query2,[user.id, Question.correctSubmission(result.question, newAnswer), blocID, JSON.stringify(newAnswer)], (err, res) => {callback(err, res);});
+			    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
+			    let params2 = [user.id, Question.correctSubmission(result.question, newAnswer, result.question.strategy), blocID, JSON.stringify(newAnswer), result.question.strategy, JSON.stringify(result.question)];
+//			    console.log("query2", tabID);
+			    bdd.query(query2, params2, (err, res) => {
+//				console.log("erreur is", err, res);
+				callback(err, res);
+			    });
 			});
-		    }
-		    
-		    
+		    }		    
 		});
 	    }
 	    else

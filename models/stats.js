@@ -33,7 +33,7 @@ exports. getStats = function (filter, callback) {
 	', userID' +
 	' FROM `stats` INNER JOIN `statsBloc` ON `stats`.`blocID` = `statsBloc`.`id` INNER JOIN  `users` ON `users`.id = `stats`.userID WHERE `roomID` IN (SELECT id FROM `rooms` WHERE 1=1) ';
     
-    let param = []
+    let param = [];
     //    if(filter.courseID) {
     query += " AND `roomID` IN (SELECT id FROM `rooms` WHERE courseID = ?) ";
     param.push(filter.courseID);
@@ -87,19 +87,21 @@ exports.logStats = function (roomID,  callback) {
 	    room : function (callback) { callback(null, room); },
 	    course : function (callback) { Course.getByID(room.courseID, callback); }
 	}, (err, result) => {
-	    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`, `customQuestion`) VALUES (?,?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
+	    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
 	    let params = [ result.set.id, JSON.stringify(result.set),
 			   result.room.id, JSON.stringify(result.room) ,
 			   result.question.id, /*JSON.stringify(result.question)*/ JSON.stringify(room.question) ,
-			   result.course.id, JSON.stringify(result.course) ,
-			   JSON.stringify(room.question) ];
+			   result.course.id, JSON.stringify(result.course) //,
+			   /*JSON.stringify(room.question)*/ ];
 	    bdd.query(query, params, (err, res) => {
 		console.log(err);
 		let blocID = res[1][0].blocID;
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
-			query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`) VALUES (?,?,?,?,?)";
-			bdd.query(query,[oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response, result.question.strategy], (err, res) => {callback(err, res);});
+			let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
+			let params = [oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response, result.question.strategy, JSON.stringify(room.question)];
+			bdd.query(query,params, (err, res) => {callback(err, res);});
+			console.log("result.question.strategy = ", result.question.strategy);
 		    }, (err) => {
 			console.log(err);
 			callback();
@@ -110,3 +112,27 @@ exports.logStats = function (roomID,  callback) {
     });
 };
 
+/***********************************************************************/
+/*       Récupérer la liste des réponses d'une room                    */
+/***********************************************************************/
+
+exports.studentListForCC = function(user, roomID, callback) {
+    let query = "SELECT userID, pseudo, fullName, studentNumber FROM users INNER JOIN flatStats ON userID = `users`.id WHERE roomID = ? GROUP BY userID";
+    let params = [roomID];
+    bdd.query(query, params, (err, rows) => {
+	console.log(err, rows);
+	callback(err, rows);
+    });
+};
+
+exports.getSubmission = function(userID, roomID, questionID, callback) {
+    let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
+    let params = [userID, roomID, questionID];
+    let a = bdd.query(query, params, (err, res) => {
+	console.log(err, a.sql);
+	if(res)
+	    callback(err, res[0]);
+	else
+	    callback(err, res);
+    });
+};

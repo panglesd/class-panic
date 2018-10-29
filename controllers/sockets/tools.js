@@ -68,7 +68,16 @@ module.exports = function (io) {
     tools.sendListQuestion = function (user, socket, room, callback) {
 	game.questionListForCC(user, room.id, function (err, question) {
 	    socket.emit("newList", question);
-	    console.log("oooooooooooooooo");
+//	    console.log("oooooooooooooooo");
+	    callback();
+	});
+    };
+
+    tools.sendListStudents = function (user, socket, room, callback) {
+	Stats.studentListForCC(user, room.id, function (err, question) {
+	    console.log("listStudents = ", question);
+	    socket.emit("newUserList", question);
+//	    console.log("oooooooooooooooo");
 	    callback();
 	});
     };
@@ -82,6 +91,15 @@ module.exports = function (io) {
 		}
 	    });
 	    socket.emit("newQuestion", question);
+	    callback();
+	});
+    };
+
+    tools.sendAnswer = function (socket, room, studentID, questionID, callback)  {
+	console.log("studentID = ", studentID);
+	console.log("sendAnswer");
+	Stats.getSubmission(studentID, room.id, questionID, (err, submission) => {
+	    socket.emit("newSubmission", submission);
 	    callback();
 	});
     };

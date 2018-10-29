@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>title</title>
+    <link rel="stylesheet" href="/stylesheets/css_reset.css">
+    <link rel="stylesheet" href="/stylesheets/play_student.css">
+    <link rel="stylesheet" href="/stylesheets/play_admin.css">
+    <script type="text/javascript"
+	    src="/MathJax/MathJax.js"> 
+     MathJax.Hub.Config({
+	 jax: ["input/TeX","input/MathML","input/AsciiMath","output/CommonHTML"],
+	 extensions: ["tex2jax.js","mml2jax.js","asciimath2jax.js","MathMenu.js","MathZoom.js","AssistiveMML.js", "a11y/accessibility-menu.js"],
+	 TeX: {
+	     extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+	 },
+	 tex2jax: {
+	     inlineMath: [['$','$'], ['\\(','\\)']],
+	     processEscapes: true
+	 }
+     });
+    </script>
+    
+
+    <script src="/javascripts/markdown-it.js"></script>
+    <script src="/javascripts/markdown-it-mathjax.js"></script>
+    <script src="/javascripts/highlight.pack.js"></script>
+    
+    <link rel="stylesheet" href="/stylesheets/highlight/atelier-forest-dark.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap-lessed.css">
+    
+  </head>
+  <body>
+      <div id="answerContainer">
+	<div id="question"></div>
+	<div class="markdown" id="description">
+	</div>
+	<div id="wrapperAnswer">
+	</div>
+	  <div id="leave"><a href="<%= config.PATH %>/course/<%= room.courseID %>">Quitter la salle</a></div>
+      </div>
+      <div id="controlPanel" class="lili">
+	  <div class="controlPanel" id="nextQuestion">Passer à la question suivante</div>
+	  <ul id="chooseQFromSet">
+	      
+	  </ul>
+	  <div class="controlPanel" id="nextStudent">Passer à l'élève suivant</div>
+	  <ul id="chooseSFromSet">
+	      <li> Choisir l'élève à corriger </li>
+	  </ul>
+      </div>
+      <div id="nbVoters"> </div>
+      <div class="windowContainer">
+	  <div class="window">
+	  </div>
+      </div>
+      <script src="/socket.io/socket.io.js">
+      </script>
+      <script>
+       var server = "<%= server %>";
+       var roomID = <%= room.id %>;
+      </script>
+      <!-- <script src="/javascripts/student.js"></script> -->
+      <script src="/javascripts/cc_admin.js"></script> 
+      <script>
+
+	     /*********************************************************************/
+	     /*                 Mise en place des event listeners                 */
+	     /*********************************************************************/
+	
+       /*        document.querySelector("#reveal").addEventListener("click", revealResults);*/
+       document.querySelector("#nextQuestion").addEventListener("click", changeQuestionPlease);
+       document.querySelector(".windowContainer").addEventListener("click", (ev) => {
+	   if(ev.target.classList.contains("windowContainer")) {
+	       document.querySelector(".windowContainer").classList.remove("shown");
+	   }
+       });
+      </script>
+  </body>
+</html>
