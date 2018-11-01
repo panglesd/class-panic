@@ -43,10 +43,10 @@
 }
     
 
-#reveal, #nextQuestion, #chooseQuestion, #chooseQuestionNext {
+#reveal, #nextQuestion, #chooseQuestion, #nextStudent, #chooseQuestionNext, #chooseStudentNext {
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;
 }
-#reveal, #nextQuestion{
+#reveal, #nextQuestion, #nextStudent{
     cursor:pointer;
 }
 #controlPanel li {

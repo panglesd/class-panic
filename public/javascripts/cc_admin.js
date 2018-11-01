@@ -4,7 +4,9 @@
 var socketCC = io.connect(server+'/ccAdmin');
 var currentQuestionOfCC;
 var currentStudent;
+var currentStudentList;
 var currentList;
+var currentSubmission;
 var md = new markdownit({
     html:         false,        // Enable HTML tags in source
     xhtmlOut:     false,        // Use '/' to close single tags (<br />)
@@ -45,24 +47,16 @@ md.use(markdownitMathjax());
 /*********************************************************************/
 
 // On informe le serveur dans quel room on est
-//socketCC.on('connect', () => {
-//    socketCC.emit("chooseRoom", roomID);
-//});
+socketCC.on('connect', () => {
+    socketCC.emit("sendStudentList", roomID);
+});
 
 /*********************************************************************/
 /*                 lorsque l'on veut changer de question             */
 /*********************************************************************/
 
 function changeQuestionPlease() {
-    socketCC.emit("changeToQuestion", 2, currentQuestionOfCC.indexSet+1);
-}
-
-/*********************************************************************/
-/*                 pour redemander d'envoyer la question             */
-/*********************************************************************/
-
-function sendOwnedQuestionPlease() {
-    socketCC.emit("sendQuestionPlease", 2);
+    socketCC.emit("changeToQuestion", roomID, currentQuestionOfCC.indexSet+1);
 }
 
 /*********************************************************************/
@@ -70,27 +64,43 @@ function sendOwnedQuestionPlease() {
 /*********************************************************************/
 
 function gotoQuestion(i) {
-    socketCC.emit("changeToQuestion", 2, i);
+    socketCC.emit("changeToQuestion", roomID, i);
 }
 
 /*********************************************************************/
-/*                 lorsque l'on reçoit une nouvelle question (admin) */
+/*                 demander une submission en particulier            */
+/*********************************************************************/
+
+function sendSubmission() {
+    socketCC.emit("sendAnswer", roomID, currentStudent.userID, currentQuestionOfCC.id);
+}
+
+/*********************************************************************/
+/*                 Modifier une validity d'une answer                */
+/*********************************************************************/
+
+function setValidity(i, validity) {
+    socketCC.emit("setValidity", roomID, currentStudent.userID, currentQuestionOfCC.id, i, validity);
+}
+
+/*********************************************************************/
+/*                 pour afficher une question                        */
 /*********************************************************************/
 
 function afficheResponse (reponse) {
     console.log('newQuestion');
     console.log(reponse);
-    currentQuestionOfCC=reponse;
+
     // On s'occupe du carré blanc
     let temp;
-    if((temp = document.querySelector("li.currentQuestion"))) {
+    if((temp = document.querySelector("#chooseQFromSet li.currentQuestion"))) {
 	temp.classList.remove("currentQuestion");
     }
     if(document.querySelector("li#q-"+reponse.id))
 	document.querySelector("li#q-"+reponse.id).classList.add("currentQuestion");
 
     // On stocke la question
-    currentQuestionOfCC = reponse;
+    //    currentQuestionOfCC = reponse;
 
     // On écrit l'énoncé là où il faut. MathJax rendered.
     let enonce = document.querySelector("#question");
@@ -122,18 +132,10 @@ function afficheResponse (reponse) {
 	let elem = document.createElement('div');
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
-//	if(rep.validity)
-//	    elem.classList.add(rep.validity);
+	if(rep.validity)
+	    elem.classList.add(rep.validity);
 	elem.id = "r"+index;
 
-	// Si besoin est, ajout d'un event listener
-	elem.addEventListener("click", function (ev) {
-	    //		chooseAnswer(index, event.currentTarget);
-	    if(ev.target.tagName != "TEXTAREA")
-		chooseAnswer(index, elem, false);
-	    else
-		chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
-	});
 	// Création de l'élément contenant l'énoncé de la réponse
 	let span = document.createElement("span");
 	elem.innerHTML = "";
@@ -143,37 +145,44 @@ function afficheResponse (reponse) {
 	elem.appendChild(span);
 	// Si besoin, ajout d'un textarea
 	if(rep.texted) {
-	    let textarea = document.createElement("textarea");
+	    let textarea = document.createElement("div");
 	    textarea.style.width="100%";
 	    textarea.style.display="block";
+	    textarea.style.color = "green";
+	    textarea.style.fontSize="medium";
 	    if(rep.correction)
-		textarea.textContent=rep.correction;
+		textarea.textContent="Correction : "+rep.correction;
 	    // Ajout d'un event listener pour le textarea
-	    if(typeof isAdmin == "undefined") {
+/*	    if(typeof isAdmin == "undefined") {
 		textarea.addEventListener("input", (ev) => {
 		    console.log("updateed");
 		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
 //		    sendAnswer();
 		});
-	    }
+		}*/
 	    elem.appendChild(textarea);
 	}
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+	let button = document.createElement("button");
+	button.addEventListener("click",(ev) => {
+	    setValidity(index,"true");
+	});
+	let button2 = document.createElement("button");
+	button2.addEventListener("click",(ev) => {
+	    setValidity(index,"false");
+	});
+	button.textContent = "Forcer à juste";
+	button2.textContent = "Forcer à faux";
+	elem.appendChild(button);
+	elem.appendChild(button2);
 	wrapper.appendChild(elem);
     });
-    if(reponse.userResponse)
-	reponse.userResponse.forEach((ans) => {
-	    let temp = document.querySelectorAll("#wrapperAnswer .reponse")[ans.n];
-	    temp.classList.remove("notSelected");
-	    temp.classList.add("selected");
-	    let ta = temp.querySelector("textarea");
-	    if(ta)
-		ta.value = ans.text;
-	});
-
-
-    socketCC.emit("sendList", 2);
-    socketCC.emit("sendStudentList", 2);
+    let elem = document.createElement('div');
+    elem.classList.add("reponse");
+    elem.classList.add("notSelected");
+    elem.innerHTML = "Stratégie de correction : <select><option>"+reponse.strategy+"</option></select> ";
+    elem.innerHTML += "Note finale : <span id='note'>N/A</span>";
+    wrapper.appendChild(elem);
 };
 
 /*********************************************************************/
@@ -205,7 +214,12 @@ socketCC.on('newList', function (questionList) {
 	    li.classList.add("q-");
 //	    if(question.id == currentQuestionOfCC.id)
 //		li.classList.add("currentQuestion");
-	    li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
+	    li.addEventListener("click", () => {
+//		console.log("sdfggfeer");
+		//		gotoQuestion(question.indexSet);
+		currentQuestionOfCC = currentList[index];
+		sendSubmission();
+	    });
 //	    li.class = ""+(question.id == currentQuestionOfCC.id);
 	    li.textContent = question.enonce;
 	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
@@ -215,90 +229,78 @@ socketCC.on('newList', function (questionList) {
 	old.parentNode.replaceChild(ul,old);
     }
     // Dans tous les cas, on refait le check des petites marques blanches
-    document.querySelectorAll(".q-").forEach((elem, index) => {
+/*    document.querySelectorAll(".q-").forEach((elem, index) => {
 	if(questionList[index].questionID)
 	    elem.classList.add("answered");
 	else
 	    elem.classList.remove("answered");
-    });
-//	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-//	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
-//	console.log(currentQuestionOfCC.id);
-//	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
+    });*/
+    if(!currentQuestionOfCC)
+	currentQuestionOfCC = currentList[0];
+    console.log("currentQuestionOfCC = ", currentQuestionOfCC);
+    sendSubmission();
 });
 
 /*********************************************************************/
-/*                 pour envoyer son choix de reponse                 */
+/*                 pour afficher une question                        */
 /*********************************************************************/
 
-function chooseAnswer(i, elem, update) {
-    if(currentQuestionOfCC.type!="multi") {
-	var reponse=document.querySelector(".reponse.selected");
-	if(reponse) {
-	    reponse.classList.replace('selected', 'notSelected');
-	};
-	if(i>-1) {
-	    let a = document.querySelector("#r"+i);
-	    a.classList.replace("notSelected", "selected");
+function affSubmission(submission) {
+    JSON.parse(submission.response).forEach((rep) => {
+	console.log("rep = ", rep);
+	let repElem = document.querySelector("#r"+rep.n);
+	repElem.classList.replace("notSelected","selected");
+	if(submission.customQuestion.allResponses[rep.n].texted) {
+	    let textarea = document.createElement("textarea");
+	    textarea.style.width="100%";
+	    textarea.readOnly = true;
+	    textarea.style.display="block";
+	    textarea.textContent=rep.text;
+	    repElem.insertBefore(textarea,repElem.querySelector("div").nextSibling);
 	}
-    }
-    else {
-	let a = document.querySelector("#r"+i);
-	if(update) {
-	    a.classList.remove("notSelected");
-	    a.classList.add("selected");
-	}
-	else {
-	    a.classList.toggle("notSelected");
-	    a.classList.toggle("selected");
-	}
-    }
-    sendAnswer();
-}
-
-function sendAnswer() {
-    let reponses = [];
-    document.querySelectorAll(".reponse.selected").forEach((elem) => {
-	let atom = {};
-	atom.n = parseInt(elem.id.split("r")[1]);
-	let textarea = elem.querySelector("textarea");
-	atom.text = textarea ? textarea.value : "";
-	reponses.push(atom);
     });
-//    socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
-    console.log("reponses, currentQuestionOfCC.indexSet = ", reponses, currentQuestionOfCC.indexSet);
 }
 
-
-
-
-
-
+/*********************************************************************/
+/*                 Lors de la reception d'une soumission             */
+/*********************************************************************/
 
 socketCC.on('newSubmission', function (submission) {
     console.log("submission = ", submission);
+    submission.customQuestion = JSON.parse(submission.customQuestion);
+    submission.customQuestion.allResponses = submission.customQuestion.reponses;
+    currentSubmission = submission;
+    afficheResponse(submission.customQuestion);
+    affSubmission(submission);
 });
 
+/*********************************************************************/
+/*                 Lors de la reception d'une soumission             */
+/*********************************************************************/
 
-
-
-
-socketCC.on('newUserList', function (questionList) {
-    console.log("questionList = ", questionList);
-    currentList = questionList;
+socketCC.on('newUserList', function (studentList) {
+    console.log("studentList = ", studentList);
     let ul = document.createElement("ul");
     ul.id = "chooseSFromSet";
     ul.innerHTML = '<li id="chooseStudentNext"> Choisir l\'élève à corriger :</li>';
-    questionList.forEach(function (student, index) {
+    studentList.forEach(function (student, index) {
 	console.log(student);
 	let li = document.createElement("li");
 	li.id = "s-" + student.id;
 	li.classList.add("s-");
-//	if(student.id == currentStudent.id)
-//	    li.classList.add("currentQuestion");
-//	li.addEventListener("click", () => { gotoQuestion(student.indexSet); });
-//	li.class = ""+(student.id == currentQuestionOfCC.id);
 	li.textContent = student.fullName;
+	li.onclick = (ev) => {
+	    currentStudent = currentStudentList[index];
+	    // On s'occupe du carré blanc
+	    let temp;
+	    if((temp = document.querySelector("#chooseSFromSet li.currentQuestion"))) {
+		temp.classList.remove("currentQuestion");
+	    }
+	    if(document.querySelector("li#s-"+currentStudent.id))
+		document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
+	    
+	    sendSubmission();
+	};
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
     });
@@ -306,13 +308,22 @@ socketCC.on('newUserList', function (questionList) {
 	old.parentNode.replaceChild(ul,old);
     // Dans tous les cas, on refait le check des petites marques blanches
     document.querySelectorAll(".s-").forEach((elem, index) => {
-//	if(questionList[index].questionID)
-	    elem.classList.add("answered");
-//	else
-//	    elem.classList.remove("answered");
+	//	if(studentList[index].questionID)
+	//	    elem.classList.add("answered");
+	//	else
+	//	    elem.classList.remove("answered");
     });
-//	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-//	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
-//	console.log(currentQuestionOfCC.id);
-//	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
+    //	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+    //	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
+    //	console.log(currentQuestionOfCC.id);
+    //	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
+    currentStudentList = studentList;
+    if(!currentStudent) {
+	currentStudent = studentList[0];
+    }
+    console.log("doit");
+    document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
+    console.log('document.querySelecto = ', document.querySelector("li#s-"+currentStudent.id).classList);
+    console.log("studentList[0].userID = ", studentList[0].userID);
+    socketCC.emit("sendList", roomID, currentStudent.userID);
 });

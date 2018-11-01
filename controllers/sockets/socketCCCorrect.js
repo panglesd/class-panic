@@ -69,6 +69,20 @@ module.exports = function(io) {
 	});
 	
 	/******************************************/
+	/*                                         */
+	/******************************************/
+	
+	socket.on('setValidity', function (roomID, studentID, questionID, i, validity) {
+	    console.log("studentID = ", studentID);
+	    tools.setValidity(socket.room, studentID, questionID, i, validity, function (err) {
+		if(err) throw err;
+		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
+		    if(err) throw err;
+		});
+	    });
+	});
+	
+	/******************************************/
 	/*  Un admin me demande la liste des questions*/
 	/******************************************/
 	
@@ -79,7 +93,7 @@ module.exports = function(io) {
 
 	socket.on('sendStudentList', function () {
 	    //	    console.log("socket list on room", socket.room);
-	    console.log("champions ?");
+//	    console.log("champions ?");
 	    tools.sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	});
 	

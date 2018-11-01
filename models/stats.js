@@ -1,5 +1,6 @@
 var bdd = require("./bdd");
 var Game = require("./game");
+var User = require("./user");
 var Set = require("./set");
 var Course = require("./course");
 var Question = require("./question");
@@ -117,22 +118,89 @@ exports.logStats = function (roomID,  callback) {
 /***********************************************************************/
 
 exports.studentListForCC = function(user, roomID, callback) {
-    let query = "SELECT userID, pseudo, fullName, studentNumber FROM users INNER JOIN flatStats ON userID = `users`.id WHERE roomID = ? GROUP BY userID";
-    let params = [roomID];
-    bdd.query(query, params, (err, rows) => {
-	console.log(err, rows);
-	callback(err, rows);
+    //    let query = "SELECT userID, pseudo, fullName, studentNumber FROM users INNER JOIN flatStats ON userID = `users`.id WHERE roomID = ? GROUP BY userID";
+    Room.getByID(roomID, (err, room) => {
+	console.log("room = ", room);
+	Course.students(room.courseID, (err, stList) => {
+	    callback(err, stList);
+	});
+//	callback(err, []);
+    });
+//    let params = [roomID];
+//    bdd.query(query, params, (err, rows) => {
+//	console.log(err, rows);
+//	callback(err, rows);
+//    });
+};
+
+function tryGetSubmission(userID, roomID, questionID, callback) {
+    console.log("tryGetSubmission is called");
+    let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
+    let params = [userID, roomID, questionID];
+    let a = bdd.query(query, params, (err, res) => {
+//	console.log(err, a.sql, res);
+	callback(err, res[0]);
     });
 };
 
 exports.getSubmission = function(userID, roomID, questionID, callback) {
-    let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
-    let params = [userID, roomID, questionID];
-    let a = bdd.query(query, params, (err, res) => {
-	console.log(err, a.sql);
-	if(res)
-	    callback(err, res[0]);
+    tryGetSubmission(userID, roomID, questionID, (err, subm) => {
+	if(subm)
+	    callback(err, subm);
 	else
-	    callback(err, res);
+	    exports.fillSubmissions(userID, roomID, () => {
+		exports.getSubmission(userID, roomID, questionID, callback);
+	    });
+    });
+};
+
+exports.fillSubmissions = function(userID, roomID, callback) {
+    console.log("fillSubmission is called");
+    console.log("userID = ", userID);
+    User.userByID(userID, (err, user) => {
+	console.log("user111 is", user);
+	Room.getByID(roomID, (err, room) => {
+//	    console.log("room = ", room);
+	    Question.listBySetID(room.questionSet, (err, qList) => {
+//		console.log("qList = ", qList);
+		async.forEach(qList, (question, callback2) => {
+		    tryGetSubmission(userID, roomID, question.id, (err, subm) => {
+//			console.log("subm = ", subm);
+
+			if(!subm){
+			    console.log("user is = ", user);
+			    Game.registerAnswerCC(user, room, question.indexSet, [], callback2);
+			}
+			else
+			    callback2();
+		    });
+		}, () => {
+		    console.log("finished fillSubmission");
+		    callback();
+		});
+	    });
+	});
+    });
+};
+// = function(userID, roomID, questionID, callback) {
+exports.setValidity = function(roomID, userID, questionID, i, validity, callback) {
+    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+	subm.customQuestion = JSON.parse(subm.customQuestion);
+	console.log("subm = ", subm);
+	
+	subm.customQuestion.reponses[i].validity = validity;
+	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
+	let params2 = [roomID, userID, questionID];
+	bdd.query(query2, params2, (err, res) => {
+	    let query = "UPDATE stats SET customQuestion = ? WHERE blocID = ?";
+	    let params = [JSON.stringify(subm.customQuestion), res[0].id];
+	    let q = bdd.query(query, params, (err, res) => {
+		if (err) {
+		    console.log("err = ", err);
+		    console.log(q.sql);
+		}
+		callback(err, res);
+	    });
+	});
     });
 };

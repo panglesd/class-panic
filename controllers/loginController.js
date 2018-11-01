@@ -42,11 +42,11 @@ exports.user_create_post = function(req, res) {
     Users.create(req.body, function (err, rows) {
 	if(err) {
 	    //	    console.log(err);
-	    req.msgs.push("Impossible de créer votre compte : sans doute le pseudo est-il déjà utilisé.")
+	    req.msgs.push("Impossible de créer votre compte : sans doute le pseudo est-il déjà utilisé.");
 	    res.render('signin', {config: config, msgs: req.msgs});
 	}
 	else {
-	    res.redirect(config.PATH)
+	    res.redirect(config.PATH);
 	}
     });
 };
@@ -56,7 +56,7 @@ exports.user_create_post = function(req, res) {
 exports.login_post = function(req, res) {
     Users.userCheck(req.body.login, req.body.password, function (err, user) {
 	if (!user) {
-	    req.msgs.push("Connexion impossible, vérifiez vos identifiants")
+	    req.msgs.push("Connexion impossible, vérifiez vos identifiants");
 	    res.render('login', {config: config, msgs: req.msgs});
 	}
 	else {

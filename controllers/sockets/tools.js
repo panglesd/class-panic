@@ -75,7 +75,7 @@ module.exports = function (io) {
 
     tools.sendListStudents = function (user, socket, room, callback) {
 	Stats.studentListForCC(user, room.id, function (err, question) {
-	    console.log("listStudents = ", question);
+//	    console.log("listStudents = ", question);
 	    socket.emit("newUserList", question);
 //	    console.log("oooooooooooooooo");
 	    callback();
@@ -96,7 +96,7 @@ module.exports = function (io) {
     };
 
     tools.sendAnswer = function (socket, room, studentID, questionID, callback)  {
-	console.log("studentID = ", studentID);
+//	console.log("studentID = ", studentID);
 	console.log("sendAnswer");
 	Stats.getSubmission(studentID, room.id, questionID, (err, submission) => {
 	    socket.emit("newSubmission", submission);
@@ -104,5 +104,9 @@ module.exports = function (io) {
 	});
     };
 
+    tools.setValidity = function(room, studentID, questionID, i, validity, callback) {
+	Stats.setValidity(room.id, studentID, questionID, i, validity, callback);
+    };
+    
     return tools;
 };

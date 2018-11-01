@@ -47,7 +47,7 @@ exports.userListByFilter = function (filter, callback) {
 exports.userByID = function (userID, callback) {
     bdd.query('SELECT * FROM users WHERE id = ?', [userID],  function(err, rows) {
 //	console.log(rows);
-	callback(rows);
+	callback(err, rows[0]);
     });
 };
 

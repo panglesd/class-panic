@@ -36,14 +36,14 @@ html {
 }
 
 .selected {
+    font-weight:bold;
     box-shadow: 10px 10px 8px black;
     margin-left:15px;
     margin-right:15px;
 }
 .notSelected {
-    //    transform: scale(0.7, 0.7);
-    margin-left:60px;
-    margin-right:60px;
+    margin-left:80px;
+    margin-right:80px;
 }
 #leave {
     position: absolute;

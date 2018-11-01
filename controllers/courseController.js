@@ -181,7 +181,7 @@ exports.subscribe_list = function(req, res) {
 		callback(null, req.course);
 	    },
 	    students :  function (callback) {
-		Course.students(req.session.user, req.course.id, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
+		Course.students(req.course.id, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
 	    },
 	    msgs : function(callback) {
 		callback(null, "");
