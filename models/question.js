@@ -175,10 +175,10 @@ exports.questionUpdate = function (user, questionID, newQuestion, callback) {
 /***********************************************************************/
 
 exports.correctSubmission = function(question, submission, strategy) {
-    console.log("queztion = ", question);
-    console.log("strategy = ", strategy);
+//    console.log("queztion = ", question);
+//    console.log("strategy = ", strategy);
 //   console.log("queztion", question.type);
-    console.log("submission = ", submission);
+//    console.log("submission = ", submission);
     switch(/*[*/strategy/*, question.strategy]*/) {
     case "manual":
 	if(question.mark)
@@ -188,20 +188,31 @@ exports.correctSubmission = function(question, submission, strategy) {
 	let tot = 0;
 	let visited = [];
 	submission.forEach((rep) => {
-	    if(!visited[rep.n]) {
+	    console.log("Myvalidity = ",question.reponses[rep.n].validity);
+	    if(!visited[rep.n] && tot != "unkown") {
+		console.log("we are here");
 		if(question.reponses[rep.n].validity=="true")
 		    tot++;
 		if(question.reponses[rep.n].validity=="false")
 		    tot--;
+		if(question.reponses[rep.n].validity=="to_correct"){
+		    console.log("we are there");
+		    tot = "unknown";
+		}
 	    }
 	    visited[rep.n]=true;
 	});
 	let max = 0;
 	question.reponses.forEach((rep)=> {
-	    if (rep.validity == "true")
+	    if (rep.validity == "true" && max != "unknown")
 		max++;
+	    if (rep.validity == "to_correct")
+		max = "unknown";
 	});
-	return ""+(tot*1./(max ? max : 1));
+	if(max == "unknown" || tot == "unknown")
+	    return "unknown";
+	else
+	    return ""+(tot*1./(max ? max : 1));
     case "all_or_0":
 	if(!submission[0])
 	    return "0";

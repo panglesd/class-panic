@@ -27,7 +27,7 @@ module.exports = function(io) {
 	
 	socket.use(function (packet, next) {
 	    console.log("packet is", packet[0]);
-	    console.log("arg is", packet[1], packet[2]);
+//	    console.log("arg is", packet[1], packet[2]);
 	    // On vérifie que le TDMan est bien un TDMan
 	    if(packet[1])
 		async.waterfall([
@@ -62,7 +62,7 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendAnswer', function (roomID, studentID, questionID) {
-	    console.log("studentID = ", studentID);
+//	    console.log("studentID = ", studentID);
 	    tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
 		if(err) throw err;
 	    });
@@ -73,22 +73,24 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('setValidity', function (roomID, studentID, questionID, i, validity) {
-	    console.log("studentID = ", studentID);
+//	    console.log("studentID = ", studentID);
 	    tools.setValidity(socket.room, studentID, questionID, i, validity, function (err) {
 		if(err) throw err;
-		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
-		    if(err) throw err;
-		});
+		tools.sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+//		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
+//		    if(err) throw err;
+//		});
 	    });
 	});
 	socket.on('setStrategy', function (roomID, studentID, questionID, strategy, mark) {
-	    console.log("strategy = ", strategy);
-	    console.log("mark = ", mark);
+//	    console.log("strategy = ", strategy);
+//	    console.log("mark = ", mark);
 	    Stats.setStrategy(roomID, studentID, questionID, [strategy, mark], (err) => {
 		if(err) throw err;
-		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
-		    if(err) throw err;
-		});		
+		tools.sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+//		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
+//		    if(err) throw err;
+//		});		
 	    });
 	});
 	
@@ -97,9 +99,9 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendList', function (roomID, studentID) {
-	    console.log("this arg : ", socket.room, studentID);
+//	    console.log("this arg : ", socket.room, studentID);
 	    User.userByID(studentID, (err, user) => {
-		console.log("user is ",user);
+//		console.log("user is ",user);
 		tools.sendListQuestion(user, socket, socket.room, function() {});
 	    });
 	});

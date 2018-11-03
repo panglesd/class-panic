@@ -39,7 +39,7 @@ exports.questionListForCC = function (user, roomID, callback) {
 	    else
 		row.answered = false;
 	});
-	console.log("avant =", rows);
+//	console.log("avant =", rows);
 	callback(err, rows);
     });
 };
@@ -103,7 +103,7 @@ exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callb
 		bdd.query(query, [result.room.id, user.id, result.question.id], function(err, answ) {
 //		    console.log("err flatStats", err, answ);		    
 		    if(answ[0])  {
-			console.log("result.question = ", result.question);
+//			console.log("result.question = ", result.question);
 			let toLog = bdd.query("UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
 					      "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?",
 					      [room.id, result.question.id, JSON.stringify(newAnswer), result.question.strategy, Question.correctSubmission(result.question, newAnswer, result.question.strategy), user.id, answ[0].blocID], (err, res) => {

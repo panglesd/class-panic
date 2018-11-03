@@ -67,9 +67,9 @@ module.exports = function (io) {
 
     tools.sendListQuestion = function (user, socket, room, callback) {
 	game.questionListForCC(user, room.id, function (err, question) {
-	    console.log("apres = ", question);
+//	    console.log("apres = ", question);
 	    socket.emit("newList", question);
-	    console.log("oooooooooooooooo");
+//	    console.log("oooooooooooooooo");
 	    callback();
 	});
     };

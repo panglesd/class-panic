@@ -122,15 +122,35 @@ exports.studentListForCC = function(user, roomID, callback) {
     Room.getByID(roomID, (err, room) => {
 	console.log("room = ", room);
 	Course.students(room.courseID, (err, stList) => {
-	    callback(err, stList);
+	    async.forEach(stList, (student, callback) => {
+		exports.grade(student, roomID, (err, grade) => {
+		    student.grade = grade;
+		    callback();
+		});
+	    }, (err) => {
+		callback(err, stList);		
+	    });
 	});
-//	callback(err, []);
     });
-//    let params = [roomID];
-//    bdd.query(query, params, (err, rows) => {
-//	console.log(err, rows);
-//	callback(err, rows);
-//    });
+};
+
+exports.grade = function(student, roomID, callback) {
+    let query = "SELECT * FROM flatStats WHERE roomID = ? AND userID = ?";
+    let params = [roomID, student.id];
+    bdd.query(query, params, (err, submList) => {
+	let tot = 0;
+	submList.forEach((subm) => {
+	    if (tot != "unknown" && subm.correct != "unknown") {
+		tot += parseFloat(subm.correct);
+	    }
+	    else
+		tot = "unknown";
+	});
+	if(tot != "unknown")
+	    callback(err, (tot)/(submList.length == 0 ? 1 : submList.length));	
+	else
+	    callback(err, tot);	
+});
 };
 
 function tryGetSubmission(userID, roomID, questionID, callback) {

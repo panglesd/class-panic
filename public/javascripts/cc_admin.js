@@ -112,115 +112,99 @@ function afficheResponse (reponse) {
     if(document.querySelector("li#q-"+reponse.id))
 	document.querySelector("li#q-"+reponse.id).classList.add("currentQuestion");
 
+    let notTheSame = typeof currentQuestionOfCC == "undefined";
+    notTheSame = notTheSame || !document.querySelector("#question");
+    notTheSame = notTheSame || document.querySelector("#question").textContent!=reponse.enonce;
+    
     // On stocke la question
     //    currentQuestionOfCC = reponse;
-
-    // On écrit l'énoncé là où il faut. MathJax rendered.
-    let enonce = document.querySelector("#question");
-    enonce.textContent=reponse.enonce;
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
-
-    // On nettoie les réponses précédentes
-    let wrapper = document.querySelector("#wrapperAnswer");
-    while (wrapper.firstChild) {
-	wrapper.removeChild(wrapper.firstChild);
-    }
-
-    // Si besoin est, on rajoute la description
-    let descr = document.querySelector("#description");
-    if(reponse.description)
-	descr.style.visibility="visible";
-    else
-	descr.style.visibility="hidden";
-    if(reponse.description)
-	descr.innerHTML = md.render(reponse.description);
-    else
-	descr.textContent = reponse.description;
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
-
-    // Pour chaque nouvelle réponse :
-
-    reponse.allResponses.forEach(function (rep, index) {
-	// Création de l'élément HTML vide
+    if(notTheSame) {
+	console.log("we change the question");
+	// On écrit l'énoncé là où il faut. MathJax rendered.
+	let enonce = document.querySelector("#question");
+	enonce.textContent=reponse.enonce;
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
+	
+	// On nettoie les réponses précédentes
+	let wrapper = document.querySelector("#wrapperAnswer");
+	while (wrapper.firstChild) {
+	    wrapper.removeChild(wrapper.firstChild);
+	}
+	
+	// Si besoin est, on rajoute la description
+	let descr = document.querySelector("#description");
+	if(reponse.description)
+	    descr.style.visibility="visible";
+	else
+	    descr.style.visibility="hidden";
+	if(reponse.description)
+	    descr.innerHTML = md.render(reponse.description);
+	else
+	    descr.textContent = reponse.description;
+	MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
+	
+	// Pour chaque nouvelle réponse :
+	
+	reponse.allResponses.forEach(function (rep, index) {
+	    // Création de l'élément HTML vide
+	    let elem = document.createElement('div');
+	    elem.classList.add("reponse");
+	    elem.classList.add("notSelected");
+	    if(rep.validity)
+		elem.classList.add(rep.validity);
+	    elem.id = "r"+index;
+	    
+	    // Création de l'élément contenant l'énoncé de la réponse
+	    let span = document.createElement("span");
+	    elem.innerHTML = "";
+	    span.innerHTML = md.render(rep.reponse);
+	    console.log(span, rep.reponse);
+	    span.classList.add("markdown");
+	    elem.appendChild(span);
+	    // Si besoin, ajout d'un textarea
+	    if(rep.texted) {
+		let textarea = document.createElement("div");
+		textarea.style.width="100%";
+		textarea.style.display="block";
+		textarea.style.color = "green";
+		textarea.style.fontSize="medium";
+		if(rep.correction)
+		    textarea.textContent="Correction : "+rep.correction;
+		// Ajout d'un event listener pour le textarea
+		/*	    if(typeof isAdmin == "undefined") {
+			    textarea.addEventListener("input", (ev) => {
+			    console.log("updateed");
+			    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
+			    //		    sendAnswer();
+			    });
+			    }*/
+		elem.appendChild(textarea);
+	    }
+	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+	    let button = document.createElement("button");
+	    button.addEventListener("click",(ev) => {
+		setValidity(index,"true");
+	    });
+	    let button2 = document.createElement("button");
+	    button2.addEventListener("click",(ev) => {
+		setValidity(index,"false");
+	    });
+	    button.textContent = "Forcer à juste";
+	    button2.textContent = "Forcer à faux";
+	    elem.appendChild(button);
+	    elem.appendChild(button2);
+	    wrapper.appendChild(elem);
+	});
 	let elem = document.createElement('div');
 	elem.classList.add("reponse");
 	elem.classList.add("notSelected");
-	if(rep.validity)
-	    elem.classList.add(rep.validity);
-	elem.id = "r"+index;
-
-	// Création de l'élément contenant l'énoncé de la réponse
-	let span = document.createElement("span");
-	elem.innerHTML = "";
-	span.innerHTML = md.render(rep.reponse);
-	console.log(span, rep.reponse);
-	span.classList.add("markdown");
-	elem.appendChild(span);
-	// Si besoin, ajout d'un textarea
-	if(rep.texted) {
-	    let textarea = document.createElement("div");
-	    textarea.style.width="100%";
-	    textarea.style.display="block";
-	    textarea.style.color = "green";
-	    textarea.style.fontSize="medium";
-	    if(rep.correction)
-		textarea.textContent="Correction : "+rep.correction;
-	    // Ajout d'un event listener pour le textarea
-/*	    if(typeof isAdmin == "undefined") {
-		textarea.addEventListener("input", (ev) => {
-		    console.log("updateed");
-		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
-//		    sendAnswer();
-		});
-		}*/
-	    elem.appendChild(textarea);
-	}
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
-	let button = document.createElement("button");
-	button.addEventListener("click",(ev) => {
-	    setValidity(index,"true");
-	});
-	let button2 = document.createElement("button");
-	button2.addEventListener("click",(ev) => {
-	    setValidity(index,"false");
-	});
-	button.textContent = "Forcer à juste";
-	button2.textContent = "Forcer à faux";
-	elem.appendChild(button);
-	elem.appendChild(button2);
-	wrapper.appendChild(elem);
-    });
-    let elem = document.createElement('div');
-    elem.classList.add("reponse");
-    elem.classList.add("notSelected");
-    elem.innerHTML = "Stratégie de correction : <select id='strategy'>" +
-	"<option value='all_or_0' "+("all_or_0"==reponse.strategy ? "selected>" : ">")+"all_or_0</option>"+
-	"<option value='QCM' "+("QCM"==reponse.strategy ? "selected>" : ">")+"QCM</option>"+
-	"<option value='manual' "+("manual"==reponse.strategy ? "selected>" : ">")+"manual</option>"+
-	"</select>";
-    if(reponse.strategy=="manual") {
-//	elem.innerHTML += "<input type='number' id='mark' min='-1' max='1' step='0.05'>";
-	let mark = document.createElement("input");
-	mark.id="mark";
-	mark.type = "number";
-	mark.min="-1";
-	mark.max="1";
-	mark.value = "1";
-	mark.step = "0.05";
-	elem.appendChild(mark);
-    }
-    elem.innerHTML += "Note finale : <span id='note'>"+"N/A"+"</span>";
-    let mark = elem.querySelector("#mark");
-    if(mark) {
-	mark.addEventListener("change", (ev) => {setStrategy();});
-	mark.value = reponse.mark;
-    }
-    let select = elem.querySelector("select");
-//    console.log("we add event listener for ", select);
-    select.addEventListener("change", (ev) => {
-//	console.log(ev, "updated");
-	let mark = document.querySelector("#mark");
-	if (select.value == "manual" && !mark) {
+	elem.innerHTML = "Stratégie de correction : <select id='strategy'>" +
+	    "<option value='all_or_0' "+("all_or_0"==reponse.strategy ? "selected>" : ">")+"all_or_0</option>"+
+	    "<option value='QCM' "+("QCM"==reponse.strategy ? "selected>" : ">")+"QCM</option>"+
+	    "<option value='manual' "+("manual"==reponse.strategy ? "selected>" : ">")+"manual</option>"+
+	    "</select>";
+	if(reponse.strategy=="manual") {
+	    //	elem.innerHTML += "<input type='number' id='mark' min='-1' max='1' step='0.05'>";
 	    let mark = document.createElement("input");
 	    mark.id="mark";
 	    mark.type = "number";
@@ -228,16 +212,44 @@ function afficheResponse (reponse) {
 	    mark.max="1";
 	    mark.value = "1";
 	    mark.step = "0.05";
-	    mark.value = 1;
-	    mark.addEventListener("change", (ev) => {setStrategy();});
-	    select.parentNode.insertBefore(mark, ev.target.nextSibling);
+	    elem.appendChild(mark);
 	}
-	else if(mark) {
-	    mark.parentNode.removeChild(mark);
+	elem.innerHTML += "Note finale : <span id='note'>"+"N/A"+"</span>";
+	let mark = elem.querySelector("#mark");
+	if(mark) {
+	    mark.addEventListener("input", (ev) => {console.log("change");setStrategy();});
+	    mark.value = reponse.mark;
 	}
-	setStrategy();
+	let select = elem.querySelector("select");
+	//    console.log("we add event listener for ", select);
+	select.addEventListener("change", (ev) => {
+	    //	console.log(ev, "updated");
+	    let mark = document.querySelector("#mark");
+	    if (select.value == "manual" && !mark) {
+		let mark = document.createElement("input");
+		mark.id="mark";
+		mark.type = "number";
+		mark.min="-1";
+		mark.max="1";
+		mark.value = "1";
+		mark.step = "0.05";
+//		mark.value = 1;
+		mark.addEventListener("change", (ev) => {setStrategy();});
+		select.parentNode.insertBefore(mark, ev.target.nextSibling);
+	    }
+	    else if(mark) {
+		mark.parentNode.removeChild(mark);
+	    }
+	    setStrategy();
+	});
+	wrapper.appendChild(elem);
+    }
+    reponse.allResponses.forEach(function (rep, index) {
+	if(rep.validity) {
+	    document.querySelector("#r"+index).classList.remove("to_correct", "true", "false");
+	    document.querySelector("#r"+index).classList.add(rep.validity);
+	}
     });
-    wrapper.appendChild(elem);
 };
 
 /*********************************************************************/
@@ -273,7 +285,8 @@ socketCC.on('newList', function (questionList) {
 //		console.log("sdfggfeer");
 		//		gotoQuestion(question.indexSet);
 		currentQuestionOfCC = currentList[index];
-		sendSubmission();
+		socketCC.emit("sendStudentList", roomID);
+		//		sendSubmission();
 	    });
 //	    li.class = ""+(question.id == currentQuestionOfCC.id);
 	    li.textContent = question.enonce;
@@ -297,7 +310,7 @@ socketCC.on('newList', function (questionList) {
 });
 
 /*********************************************************************/
-/*                 pour afficher une question                        */
+/*                 pour afficher une submission                      */
 /*********************************************************************/
 
 function affSubmission(submission) {
@@ -306,7 +319,11 @@ function affSubmission(submission) {
 	let repElem = document.querySelector("#r"+rep.n);
 	repElem.classList.replace("notSelected","selected");
 	if(submission.customQuestion.allResponses[rep.n].texted) {
-	    let textarea = document.createElement("textarea");
+	    let textarea
+	    if(repElem.querySelector("textarea"))
+		textarea = repElem.querySelector("textarea");
+	    else
+		textarea = document.createElement("textarea");
 	    textarea.style.width="100%";
 	    textarea.readOnly = true;
 	    textarea.style.display="block";
@@ -331,7 +348,7 @@ socketCC.on('newSubmission', function (submission) {
 });
 
 /*********************************************************************/
-/*                 Lors de la reception d'une soumission             */
+/*                 Lors de la reception d'une userList               */
 /*********************************************************************/
 
 socketCC.on('newUserList', function (studentList) {
@@ -354,8 +371,9 @@ socketCC.on('newUserList', function (studentList) {
 	    }
 	    if(document.querySelector("li#s-"+currentStudent.id))
 		document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
-	    socketCC.emit("sendList", roomID, currentStudent.userID);
-	    sendSubmission();
+//	    socketCC.emit("sendList", roomID, currentStudent.userID);
+	    socketCC.emit("sendStudentList", roomID);
+//	    sendSubmission();
 	};
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
@@ -364,8 +382,8 @@ socketCC.on('newUserList', function (studentList) {
 	old.parentNode.replaceChild(ul,old);
     // Dans tous les cas, on refait le check des petites marques blanches
     document.querySelectorAll(".s-").forEach((elem, index) => {
-	//	if(studentList[index].questionID)
-	//	    elem.classList.add("answered");
+	if(studentList[index].grade != "unknown")
+	    elem.textContent += " : " + (Math.round(studentList[index].grade*20*4)/4)+"/20";
 	//	else
 	//	    elem.classList.remove("answered");
     });
