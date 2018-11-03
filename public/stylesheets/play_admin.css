@@ -64,6 +64,9 @@ li.inactiveQuestion {
 #chooseQFromSet li:not(:first-child) {
     cursor:pointer;
 }
+#chooseSFromSet li:not(:first-child) {
+    cursor:pointer;
+}
 
 /*.juste {
     box-shadow: 0 0 8px 10px green;

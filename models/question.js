@@ -175,11 +175,14 @@ exports.questionUpdate = function (user, questionID, newQuestion, callback) {
 /***********************************************************************/
 
 exports.correctSubmission = function(question, submission, strategy) {
-//    console.log("queztion", question);
+    console.log("queztion = ", question);
+    console.log("strategy = ", strategy);
 //   console.log("queztion", question.type);
-//    console.log("submission", submission);
+    console.log("submission = ", submission);
     switch(/*[*/strategy/*, question.strategy]*/) {
     case "manual":
+	if(question.mark)
+	    return question.mark;
 	return "unknown";
     case "QCM":
 	let tot = 0;
@@ -202,11 +205,11 @@ exports.correctSubmission = function(question, submission, strategy) {
     case "all_or_0":
 	if(!submission[0])
 	    return "0";
-	if(submission.validity == "true")
+	if(question.reponses[submission[0].n].validity == "true")
 	    return "1";
-	if(submission.validity == "false")
+	if(question.reponses[submission[0].n].validity == "false")
 	    return "0";
-	return "unknwon";
+	return "unknown";
     }
     
     

@@ -81,14 +81,27 @@ module.exports = function(io) {
 		});
 	    });
 	});
+	socket.on('setStrategy', function (roomID, studentID, questionID, strategy, mark) {
+	    console.log("strategy = ", strategy);
+	    console.log("mark = ", mark);
+	    Stats.setStrategy(roomID, studentID, questionID, [strategy, mark], (err) => {
+		if(err) throw err;
+		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
+		    if(err) throw err;
+		});		
+	    });
+	});
 	
 	/******************************************/
 	/*  Un admin me demande la liste des questions*/
 	/******************************************/
 	
-	socket.on('sendList', function () {
-//	    console.log("socket list on room", socket.room);
-	    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+	socket.on('sendList', function (roomID, studentID) {
+	    console.log("this arg : ", socket.room, studentID);
+	    User.userByID(studentID, (err, user) => {
+		console.log("user is ",user);
+		tools.sendListQuestion(user, socket, socket.room, function() {});
+	    });
 	});
 
 	socket.on('sendStudentList', function () {

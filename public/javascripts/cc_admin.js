@@ -1,4 +1,4 @@
-
+var roomID;
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketCC = io.connect(server+'/ccAdmin');
@@ -82,14 +82,27 @@ function sendSubmission() {
 function setValidity(i, validity) {
     socketCC.emit("setValidity", roomID, currentStudent.userID, currentQuestionOfCC.id, i, validity);
 }
+function setStrategy() {
+    console.log("setStrategy is on!");
+    let strategy = document.querySelector("#strategy").value;
+    if(strategy == "manual") {
+	let val = parseFloat(document.querySelector("#mark").value);
+	val = Math.max(-1, val);
+	val = Math.min(1, val);
+	/*console.log("val is", val);*/
+	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestionOfCC.id, strategy, val);
+    }
+    else
+	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestionOfCC.id, strategy);
+}
 
 /*********************************************************************/
 /*                 pour afficher une question                        */
 /*********************************************************************/
 
 function afficheResponse (reponse) {
-    console.log('newQuestion');
-    console.log(reponse);
+    /*console.log('newQuestion');*/
+    /*console.log(reponse);*/
 
     // On s'occupe du carré blanc
     let temp;
@@ -180,8 +193,50 @@ function afficheResponse (reponse) {
     let elem = document.createElement('div');
     elem.classList.add("reponse");
     elem.classList.add("notSelected");
-    elem.innerHTML = "Stratégie de correction : <select><option>"+reponse.strategy+"</option></select> ";
-    elem.innerHTML += "Note finale : <span id='note'>N/A</span>";
+    elem.innerHTML = "Stratégie de correction : <select id='strategy'>" +
+	"<option value='all_or_0' "+("all_or_0"==reponse.strategy ? "selected>" : ">")+"all_or_0</option>"+
+	"<option value='QCM' "+("QCM"==reponse.strategy ? "selected>" : ">")+"QCM</option>"+
+	"<option value='manual' "+("manual"==reponse.strategy ? "selected>" : ">")+"manual</option>"+
+	"</select>";
+    if(reponse.strategy=="manual") {
+//	elem.innerHTML += "<input type='number' id='mark' min='-1' max='1' step='0.05'>";
+	let mark = document.createElement("input");
+	mark.id="mark";
+	mark.type = "number";
+	mark.min="-1";
+	mark.max="1";
+	mark.value = "1";
+	mark.step = "0.05";
+	elem.appendChild(mark);
+    }
+    elem.innerHTML += "Note finale : <span id='note'>"+"N/A"+"</span>";
+    let mark = elem.querySelector("#mark");
+    if(mark) {
+	mark.addEventListener("change", (ev) => {setStrategy();});
+	mark.value = reponse.mark;
+    }
+    let select = elem.querySelector("select");
+//    console.log("we add event listener for ", select);
+    select.addEventListener("change", (ev) => {
+//	console.log(ev, "updated");
+	let mark = document.querySelector("#mark");
+	if (select.value == "manual" && !mark) {
+	    let mark = document.createElement("input");
+	    mark.id="mark";
+	    mark.type = "number";
+	    mark.min="-1";
+	    mark.max="1";
+	    mark.value = "1";
+	    mark.step = "0.05";
+	    mark.value = 1;
+	    mark.addEventListener("change", (ev) => {setStrategy();});
+	    select.parentNode.insertBefore(mark, ev.target.nextSibling);
+	}
+	else if(mark) {
+	    mark.parentNode.removeChild(mark);
+	}
+	setStrategy();
+    });
     wrapper.appendChild(elem);
 };
 
@@ -191,8 +246,8 @@ function afficheResponse (reponse) {
 
 
 socketCC.on('newList', function (questionList) {
-    console.log("questionList", questionList);
-    console.log("currentList", currentList);
+//    console.log("questionList", questionList);
+//    console.log("currentList", currentList);
     // On vérifie si quelque chose a changé dans les énoncés.
     let notTheSame = typeof currentList == "undefined";
     notTheSame = notTheSame || currentList.length != questionList.length;
@@ -201,14 +256,14 @@ socketCC.on('newList', function (questionList) {
 	    if(question.enonce != currentList[index].enonce)
 		notTheSame = true;
 	});
+    currentList = questionList;
     // notTheSame vaut true ssi quelque chose a changé dans les énoncés. Si c'est le cas, on refait entièrement le menu
     if(notTheSame) {
-	currentList = questionList;
 	let ul = document.createElement("ul");
 	ul.id = "chooseQFromSet";
 	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
 	questionList.forEach(function (question, index) {
-	    console.log(question);
+//	    console.log(question);
 	    let li = document.createElement("li");
 	    li.id = "q-" + question.id;
 	    li.classList.add("q-");
@@ -229,15 +284,15 @@ socketCC.on('newList', function (questionList) {
 	old.parentNode.replaceChild(ul,old);
     }
     // Dans tous les cas, on refait le check des petites marques blanches
-/*    document.querySelectorAll(".q-").forEach((elem, index) => {
-	if(questionList[index].questionID)
+    document.querySelectorAll(".q-").forEach((elem, index) => {
+	if(questionList[index].correct != "unknown")
 	    elem.classList.add("answered");
 	else
 	    elem.classList.remove("answered");
-    });*/
+    });
     if(!currentQuestionOfCC)
 	currentQuestionOfCC = currentList[0];
-    console.log("currentQuestionOfCC = ", currentQuestionOfCC);
+//    console.log("currentQuestionOfCC = ", currentQuestionOfCC);
     sendSubmission();
 });
 
@@ -247,7 +302,7 @@ socketCC.on('newList', function (questionList) {
 
 function affSubmission(submission) {
     JSON.parse(submission.response).forEach((rep) => {
-	console.log("rep = ", rep);
+//	console.log("rep = ", rep);
 	let repElem = document.querySelector("#r"+rep.n);
 	repElem.classList.replace("notSelected","selected");
 	if(submission.customQuestion.allResponses[rep.n].texted) {
@@ -259,6 +314,7 @@ function affSubmission(submission) {
 	    repElem.insertBefore(textarea,repElem.querySelector("div").nextSibling);
 	}
     });
+    document.querySelector("#note").textContent = submission.correct+"/1";
 }
 
 /*********************************************************************/
@@ -266,7 +322,7 @@ function affSubmission(submission) {
 /*********************************************************************/
 
 socketCC.on('newSubmission', function (submission) {
-    console.log("submission = ", submission);
+//    console.log("submission = ", submission);
     submission.customQuestion = JSON.parse(submission.customQuestion);
     submission.customQuestion.allResponses = submission.customQuestion.reponses;
     currentSubmission = submission;
@@ -279,12 +335,12 @@ socketCC.on('newSubmission', function (submission) {
 /*********************************************************************/
 
 socketCC.on('newUserList', function (studentList) {
-    console.log("studentList = ", studentList);
+//    console.log("studentList = ", studentList);
     let ul = document.createElement("ul");
     ul.id = "chooseSFromSet";
     ul.innerHTML = '<li id="chooseStudentNext"> Choisir l\'élève à corriger :</li>';
     studentList.forEach(function (student, index) {
-	console.log(student);
+//	console.log(student);
 	let li = document.createElement("li");
 	li.id = "s-" + student.id;
 	li.classList.add("s-");
@@ -298,7 +354,7 @@ socketCC.on('newUserList', function (studentList) {
 	    }
 	    if(document.querySelector("li#s-"+currentStudent.id))
 		document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
-	    
+	    socketCC.emit("sendList", roomID, currentStudent.userID);
 	    sendSubmission();
 	};
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
@@ -321,9 +377,10 @@ socketCC.on('newUserList', function (studentList) {
     if(!currentStudent) {
 	currentStudent = studentList[0];
     }
-    console.log("doit");
+//    console.log("doit");
     document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
-    console.log('document.querySelecto = ', document.querySelector("li#s-"+currentStudent.id).classList);
-    console.log("studentList[0].userID = ", studentList[0].userID);
+//    console.log('document.querySelecto = ', document.querySelector("li#s-"+currentStudent.id).classList);
+//    console.log("studentList[0].userID = ", studentList[0].userID);
+    console.log("callling sendList");
     socketCC.emit("sendList", roomID, currentStudent.userID);
 });

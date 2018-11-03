@@ -23,12 +23,12 @@ exports.questionListForCC = function (user, roomID, callback) {
 	"(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser " +
 	"ON statsOfUser.questionID = questions.id WHERE indexSet = ?";*/
     let query2 =
-	"SELECT enonce, questionID, questions.id as id, indexSet, `statsOfUser`.response FROM"+
+	"SELECT enonce, questionID, questions.id as id, indexSet, `statsOfUser`.response,`statsOfUser`.correct FROM"+
 	" questions LEFT OUTER JOIN "+
-	"(SELECT questionID, response FROM stats INNER JOIN statsBloc ON "+
+	"(SELECT questionID, correct, response FROM stats INNER JOIN statsBloc ON "+
 	"statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser "+
 	"ON statsOfUser.questionID = questions.id WHERE questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet";
-
+//    console.log("params = ", [user.id, roomID, roomID]);
     bdd.query(query2, [user.id, roomID, roomID], function(err, rows) {
 	console.log(err);
 	rows.forEach((row) => {
@@ -39,6 +39,7 @@ exports.questionListForCC = function (user, roomID, callback) {
 	    else
 		row.answered = false;
 	});
+	console.log("avant =", rows);
 	callback(err, rows);
     });
 };
