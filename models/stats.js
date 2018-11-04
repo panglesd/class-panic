@@ -139,15 +139,21 @@ exports.grade = function(student, roomID, callback) {
     let params = [roomID, student.id];
     bdd.query(query, params, (err, submList) => {
 	let tot = 0;
+	let totCoef = 0;
 	submList.forEach((subm) => {
 	    if (tot != "unknown" && subm.correct != "unknown") {
+//		tot += parseFloat(subm.correct)*parseInt(subm.customQuestion.coef);
 		tot += parseFloat(subm.correct);
+		totCoef += parseInt(subm.customQuestion.coef);
+		console.log("subm.customQuestion.coef = ", subm.customQuestion.coef);
 	    }
 	    else
 		tot = "unknown";
 	});
+	console.log("totCoef",totCoef);
 	if(tot != "unknown")
-	    callback(err, (tot)/(submList.length == 0 ? 1 : submList.length));	
+	    callback(err, (tot)/(submList.length));	
+//	    callback(err, (tot)/(totCoef == 0 ? 1 : totCoef));	
 	else
 	    callback(err, tot);	
 });

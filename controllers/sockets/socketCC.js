@@ -15,6 +15,36 @@ var async = require('async');
 module.exports = function(io) {
     
     let tools = require('./tools.js')(io);
+
+    /******************************************/
+    /*  Outils spécifiques                    */
+    /******************************************/
+
+    function sendListQuestion(socket, callback) {
+	game.questionListForCC(socket.request.session.user, socket.room.id, function (err, questionList) {
+	    questionList.forEach((question) => {
+		delete(question.correct);
+//		if(question.texted)   // Pas besoin car on n'envoie pas les réponses possibles...
+//		    delete(question.correction);
+	    });
+	    socket.emit("newList", questionList);
+	    callback();
+	});
+    }
+
+    function sendQuestionFromIndex (socket, index, callback)  {
+	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
+	    question.allResponses.forEach((rep) => {
+		delete(rep.validity);
+		if(rep.texted) {
+		    delete(rep.correction);
+		}
+	    });
+	    socket.emit("newQuestion", question);
+	    callback();
+	});
+    };
+
     
     io.of('/cc').on('connection', function(socket) {
 
@@ -49,7 +79,7 @@ module.exports = function(io) {
 			    if(subscription) {
 				socket.room = res;
 				socket.join(socket.room.id);
-				tools.sendQuestionFromIndex(socket, socket.room, 0, function (err) {if(err) throw err;});
+				sendQuestionFromIndex(socket, 0, function (err) {if(err) throw err;});
 			    }
 			});
 		    });
@@ -62,7 +92,7 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('changeToQuestion', function (i) {
-	    tools.sendQuestionFromIndex(socket, socket.room, i, function (err) {
+	    sendQuestionFromIndex(socket, i, function (err) {
 		if(err) throw err;
 	    });
 	});
@@ -72,24 +102,23 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendList', function () {
-//	    console.log("socket list on room", socket.room);
-	    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+	    sendListQuestion(socket, function() {});
 	});
 	/******************************************/
 	/*  On m'envoie une reponse               */
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-//	    console.log("answer, questionIndex = ", answer, questionIndex);
-//	    console.log("socket.room.question.type = ", socket.room.question.type);
 	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		if(answer.length == 0 || question.type == "multi")
 		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
-//		    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+			sendListQuestion(socket, function() {});
+//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
 		    });
 		else
 		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, [answer[0]], function () {
-			//		    tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+			sendListQuestion(socket, function() {});
+//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
 		    });
 	    });
 	});

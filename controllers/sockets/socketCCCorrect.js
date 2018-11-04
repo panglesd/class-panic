@@ -15,7 +15,40 @@ var async = require('async');
 module.exports = function(io) {
     
     let tools = require('./tools.js')(io);
-    
+
+    /******************************************/
+    /*  Outils spécifiques                    */
+    /******************************************/
+
+/*    function sendListQuestion(socket, callback) {
+	game.questionListForCC(socket.request.session.user, socket.room.id, function (err, questionList) {
+	    socket.emit("newList", questionList);
+	    callback();
+	});
+    }
+
+    function sendQuestionFromIndex (socket, index, callback)  {
+	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
+	    socket.emit("newQuestion", question);
+	    callback();
+	});
+    };
+*/
+    function sendListStudents (user, socket, room, callback) {
+	Stats.studentListForCC(user, room.id, function (err, question) {
+	    socket.emit("newUserList", question);
+	    callback();
+	});
+    };
+
+    function sendAnswer (socket, room, studentID, questionID, callback)  {
+	console.log("sendAnswer");
+	Stats.getSubmission(studentID, room.id, questionID, (err, submission) => {
+	    socket.emit("newSubmission", submission);
+	    callback();
+	});
+    };
+
     io.of('/ccAdmin').on('connection', function(socket) {
 
 	
@@ -63,7 +96,7 @@ module.exports = function(io) {
 	
 	socket.on('sendAnswer', function (roomID, studentID, questionID) {
 //	    console.log("studentID = ", studentID);
-	    tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
+	    sendAnswer(socket, socket.room, studentID, questionID, function (err) {
 		if(err) throw err;
 	    });
 	});
@@ -74,23 +107,17 @@ module.exports = function(io) {
 	
 	socket.on('setValidity', function (roomID, studentID, questionID, i, validity) {
 //	    console.log("studentID = ", studentID);
-	    tools.setValidity(socket.room, studentID, questionID, i, validity, function (err) {
-		if(err) throw err;
-		tools.sendListStudents(socket.request.session.user, socket, socket.room, function() {});
-//		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
-//		    if(err) throw err;
-//		});
+	    Stats.setValidity(socket.room.id, studentID, questionID, i, validity,function (err) {
+		//	    tools.setValidity(socket.room, studentID, questionID, i, validity,
+		if(err) //throw err;
+		    console.error(err);
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	    });
 	});
 	socket.on('setStrategy', function (roomID, studentID, questionID, strategy, mark) {
-//	    console.log("strategy = ", strategy);
-//	    console.log("mark = ", mark);
 	    Stats.setStrategy(roomID, studentID, questionID, [strategy, mark], (err) => {
 		if(err) throw err;
-		tools.sendListStudents(socket.request.session.user, socket, socket.room, function() {});
-//		tools.sendAnswer(socket, socket.room, studentID, questionID, function (err) {
-//		    if(err) throw err;
-//		});		
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	    });
 	});
 	
@@ -101,15 +128,15 @@ module.exports = function(io) {
 	socket.on('sendList', function (roomID, studentID) {
 //	    console.log("this arg : ", socket.room, studentID);
 	    User.userByID(studentID, (err, user) => {
-//		console.log("user is ",user);
-		tools.sendListQuestion(user, socket, socket.room, function() {});
+		game.questionListForCC(user, socket.room.id, function (err, questionList) {
+		    socket.emit("newList", questionList);
+		});
+		
 	    });
 	});
 
 	socket.on('sendStudentList', function () {
-	    //	    console.log("socket list on room", socket.room);
-//	    console.log("champions ?");
-	    tools.sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+	    sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	});
 	
     });

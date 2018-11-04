@@ -61,53 +61,5 @@ module.exports = function (io) {
 	});
     };
 
-    /*************************************************************************/
-    /*             Tools pour le CC                                          */
-    /*************************************************************************/
-
-    tools.sendListQuestion = function (user, socket, room, callback) {
-	game.questionListForCC(user, room.id, function (err, question) {
-//	    console.log("apres = ", question);
-	    socket.emit("newList", question);
-//	    console.log("oooooooooooooooo");
-	    callback();
-	});
-    };
-
-    tools.sendListStudents = function (user, socket, room, callback) {
-	Stats.studentListForCC(user, room.id, function (err, question) {
-//	    console.log("listStudents = ", question);
-	    socket.emit("newUserList", question);
-//	    console.log("oooooooooooooooo");
-	    callback();
-	});
-    };
-
-    tools.sendQuestionFromIndex = function (socket, room, index, callback)  {
-	Question.getByIndexCC(index,socket.request.session.user, room.id, (err, question) => {
-	    question.allResponses.forEach((rep) => {
-		delete(rep.validity);
-		if(rep.texted) {
-		    delete(rep.correction);
-		}
-	    });
-	    socket.emit("newQuestion", question);
-	    callback();
-	});
-    };
-
-    tools.sendAnswer = function (socket, room, studentID, questionID, callback)  {
-//	console.log("studentID = ", studentID);
-	console.log("sendAnswer");
-	Stats.getSubmission(studentID, room.id, questionID, (err, submission) => {
-	    socket.emit("newSubmission", submission);
-	    callback();
-	});
-    };
-
-    tools.setValidity = function(room, studentID, questionID, i, validity, callback) {
-	Stats.setValidity(room.id, studentID, questionID, i, validity, callback);
-    };
-    
     return tools;
 };

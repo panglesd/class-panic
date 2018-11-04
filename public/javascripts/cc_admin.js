@@ -114,8 +114,7 @@ function afficheResponse (reponse) {
 
     let notTheSame = typeof currentQuestionOfCC == "undefined";
     notTheSame = notTheSame || !document.querySelector("#question");
-    notTheSame = notTheSame || document.querySelector("#question").textContent!=reponse.enonce;
-    
+    notTheSame = notTheSame || document.querySelector("#question").qid != reponse.id;//document.querySelector("#question").textContent!=reponse.enonce;
     // On stocke la question
     //    currentQuestionOfCC = reponse;
     if(notTheSame) {
@@ -123,6 +122,7 @@ function afficheResponse (reponse) {
 	// On écrit l'énoncé là où il faut. MathJax rendered.
 	let enonce = document.querySelector("#question");
 	enonce.textContent=reponse.enonce;
+	enonce.qid = reponse.id;
 	MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
 	
 	// On nettoie les réponses précédentes
@@ -214,7 +214,7 @@ function afficheResponse (reponse) {
 	    mark.step = "0.05";
 	    elem.appendChild(mark);
 	}
-	elem.innerHTML += "Note finale : <span id='note'>"+"N/A"+"</span>";
+	elem.innerHTML += "Note finale : <span id='note'>"+"N/A"+"</span> Coéf : <span id='coef'>"+"N/A"+"</span>";
 	let mark = elem.querySelector("#mark");
 	if(mark) {
 	    mark.addEventListener("input", (ev) => {console.log("change");setStrategy();});
@@ -332,6 +332,7 @@ function affSubmission(submission) {
 	}
     });
     document.querySelector("#note").textContent = submission.correct+"/1";
+    document.querySelector("#coef").textContent = submission.customQuestion.coef;
 }
 
 /*********************************************************************/

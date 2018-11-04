@@ -73,7 +73,7 @@ exports.getByIndex = function (questionIndex, roomID, callback) {
 
 exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
     let query = 
-	"SELECT enonce, questionID, questions.id as id, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
+	"SELECT enonce, questionID, questions.id as id, description, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
 	  "questions LEFT OUTER JOIN "+
 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
