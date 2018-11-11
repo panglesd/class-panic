@@ -1,0 +1,31 @@
+<%- include('admin_header', {active:"doc"}); -%>
+
+<%// if(subscription.canOwnSet) { %>
+<h2>Les documents du cours</h2>
+<!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
+<ul class="room">
+    <% docs.forEach(function(doc) { %>
+	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>">
+	    <li class="room">
+		<span class="froom"><%= doc.name %></span>
+		<!--	      <ul>		
+		     <li>Nombre de participants : <%=// room.number %></li>
+		     <li>Administrateur: <%=// room.owner %></li>
+		     </ul>-->
+		<!--		<div>
+		     <ul> <li> Voir / Modifier </li> </ul>
+		     </div> -->
+	    </li>
+	</a>
+    <% }); %>
+    <% if(true) { %>
+	<% //if(subscription.canAddDoc) { %>
+	<a class="room" onclick="document.querySelector('.windowContainer').classList.toggle('shown');window.scrollTo(0,0)">
+	    <li style="cursor:pointer; text-align:center;" class="room">
+		<span class="froom">+</span>
+	    </li>
+	</a>
+    <% } %>
+</ul>
+<%// } %>
+<%- include('admin_footer'); -%>
