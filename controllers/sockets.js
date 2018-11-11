@@ -76,6 +76,17 @@ module.exports = function (server, sessionMiddleware) {
 
     require("./sockets/socketStats")(io);
 
+    // tests
+
+    io.of("/test").on("connection", function(socket) {
+
+	socket.on("file", (file) => {
+	    console.log(file);
+	});
+	
+    });
+
+    
     return io;
     
 };

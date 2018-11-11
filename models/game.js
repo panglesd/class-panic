@@ -32,7 +32,7 @@ exports.questionListForCC = function (user, roomID, callback) {
 //    console.log("params = ", [user.id, roomID, roomID]);
     bdd.query(query2, [user.id, roomID, roomID], function(err, rows) {
 	console.log(err);
-	console.log("questionListForCC", rows);
+//	console.log("questionListForCC", rows);
 	rows.forEach((row) => {
 	    if(row.questionID){
 		row.response = JSON.parse(row.response);

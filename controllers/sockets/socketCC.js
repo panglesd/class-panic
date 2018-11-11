@@ -8,6 +8,10 @@ var Set = require('../../models/set');
 var game = require('../../models/game');
 var async = require('async');
 
+var fs = require("fs");
+var mkdirp = require("mkdirp");
+var sanit_fn = require("sanitize-filename");
+
 /**************************************************************************/
 /*                 Fonction pour gérer les Controles Continus             */
 /**************************************************************************/
@@ -109,17 +113,34 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
+//	    console.log("answer = ", answer);
 	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(answer.length == 0 || question.type == "multi")
-		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
-			sendListQuestion(socket, function() {});
-//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
-		    });
-		else
-		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, [answer[0]], function () {
-			sendListQuestion(socket, function() {});
-//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
-		    });
+		if(answer.length != 0 && question.type != "multi")
+		    answer = [answer[0]];
+		game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
+		    sendListQuestion(socket, function() {});
+		    //			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+		});
+	    });
+	});
+	/******************************************/
+	/*  On m'envoie une reponse avec un fichier*/
+	/******************************************/
+		
+	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
+	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		let path = "storage/user"+socket.request.session.user.id+"/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/answer"+n_ans+"/";
+		console.log("path = ", path);
+		mkdirp(path, (err) => {
+		    fileName = sanit_fn(fileName);
+		    if(fileName)
+			fs.writeFile(path+fileName, data, (err) => {
+			    if(err) throw err;
+			});
+		});
+		// if(answer.length != 0 && question.type != "multi")
+		//     answer = [answer[0]];
+		
 	    });
 	});
 
