@@ -8,10 +8,24 @@ var config = require("./../configuration");
 
 // Afficher la page de login
 
+function test() {
+    let a = 1;
+    let b = a+a;
+    let c = "salut";
+    let d = c+b;
+    let e = function() { return 5;};
+    let f = 1;
+}
+
+
+
+
+
 exports.login_get = function(req, res) {
     if(req.session.user){
 	res.redirect(config.PATH+"/course");
     }
+    test();
     res.render('login', {config: config, msgs: req.msgs});
 };
 

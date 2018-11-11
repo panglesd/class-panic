@@ -18,13 +18,15 @@ exports.getByID = function(roomID, callback) {
 
 exports.getOwnedByID = function(user, roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [roomID, user.id], function (err, resu) {
-	callback(err, resu[0])});
+	callback(err, resu[0]);
+    });
 };
 
 exports.getControllableByID = function(user, roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `rooms`.courseID IN (SELECT courseID FROM subscription WHERE userID= ? AND isTDMan=1) AND id = ?", [user.id, roomID], function (err, resu) {
 	console.log(err);
-	callback(err, resu[0])});
+	callback(err, resu[0]);
+    });
 };
 
 /***********************************************************************/
@@ -87,7 +89,7 @@ exports.create = function (user, newRoom, courseID, callback) {
 	}
 	else {
 	    if(question) 
-		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`) VALUES (?, ?, ?, ?, "pending", ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question), courseID], function(err, rows) {
+		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`) VALUES (?, ?, ?, ?, "closed", ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question), courseID], function(err, rows) {
 		    console.log(err);
 //		    console.log(this.sql);
 		    callback(err, rows);
@@ -101,19 +103,19 @@ exports.create = function (user, newRoom, courseID, callback) {
 // Delete
 
 exports.delete = function (user, room, callback) {
-    bdd.query('DELETE FROM `rooms` WHERE `id` = ? AND `ownerID` = ?', [room, user.id], callback)
-}
+    bdd.query('DELETE FROM `rooms` WHERE `id` = ? AND `ownerID` = ?', [room, user.id], callback);
+};
 
 //Update
 
 exports.update = function (user, room, newRoom, callback) {
 //    console.log([newRoom.name, newRoom.questionSet, room.id, user.id]);
     Question.getFirstOfSet(newRoom.questionSet, (err, question) => {
-	bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ?, id_currentQuestion = ? WHERE `id` = ? AND `ownerID` = ?',
-		  [newRoom.name, newRoom.questionSet, room.id, user.id, question.id],
+	bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ?, id_currentQuestion = ?, status = ? WHERE `id` = ? AND `ownerID` = ?',
+		  [newRoom.name, newRoom.questionSet,  question.id, newRoom.status, room.id, user.id],
 		  (err, res) => {
 //		      console.log(err, this.sql);
-		      callback(err, res)
+		      callback(err, res);
 		  });
     });
 }
@@ -123,7 +125,7 @@ exports.update = function (user, room, newRoom, callback) {
 /***********************************************************************/
 
 exports.getStatus = function (room, callback) {
-    bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);})
+    bdd.query('SELECT status FROM `rooms` WHERE `id` = ?', [room.id], function (err, r) { callback(err, r[0].status);});
 }
 
 exports.isOwnedBy= function (room, user, callback) {

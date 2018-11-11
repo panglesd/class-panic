@@ -120,7 +120,7 @@ exports.logStats = function (roomID,  callback) {
 exports.studentListForCC = function(user, roomID, callback) {
     //    let query = "SELECT userID, pseudo, fullName, studentNumber FROM users INNER JOIN flatStats ON userID = `users`.id WHERE roomID = ? GROUP BY userID";
     Room.getByID(roomID, (err, room) => {
-	console.log("room = ", room);
+//	console.log("room = ", room);
 	Course.students(room.courseID, (err, stList) => {
 	    async.forEach(stList, (student, callback) => {
 		exports.grade(student, roomID, (err, grade) => {
@@ -141,22 +141,27 @@ exports.grade = function(student, roomID, callback) {
 	let tot = 0;
 	let totCoef = 0;
 	submList.forEach((subm) => {
+	    let cQ = JSON.parse(subm.customQuestion);
+	    totCoef += parseInt(cQ.coef);
+	    console.log("totCoef = ", totCoef);
+	    
 	    if (tot != "unknown" && subm.correct != "unknown") {
+		tot += parseFloat(subm.correct)*parseInt(cQ.coef);
 //		tot += parseFloat(subm.correct)*parseInt(subm.customQuestion.coef);
-		tot += parseFloat(subm.correct);
-		totCoef += parseInt(subm.customQuestion.coef);
-		console.log("subm.customQuestion.coef = ", subm.customQuestion.coef);
+//		tot += parseFloat(subm.correct);
+//		console.log("subm.customQuestion.coef = ", subm.customQuestion.coef);
 	    }
 	    else
 		tot = "unknown";
 	});
 	console.log("totCoef",totCoef);
+	console.log("student",student.fullName);
 	if(tot != "unknown")
-	    callback(err, (tot)/(submList.length));	
-//	    callback(err, (tot)/(totCoef == 0 ? 1 : totCoef));	
+//	    callback(err, (tot)/(submList.length));	
+	    callback(err, (tot)/(totCoef == 0 ? 1 : totCoef));	
 	else
 	    callback(err, tot);	
-});
+    });
 };
 
 function tryGetSubmission(userID, roomID, questionID, callback) {

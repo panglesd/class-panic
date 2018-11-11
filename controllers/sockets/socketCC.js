@@ -73,7 +73,7 @@ module.exports = function(io) {
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    Room.getByID(parseInt(newRoom), function (err, res) {
-		if(res) {
+		if(res && res.status == "pending") {
 		    Course.getByID(res.courseID,(er, course) => {
 			User.getSubscription(socket.request.session.user, course, (err, subscription) => {
 			    if(subscription) {

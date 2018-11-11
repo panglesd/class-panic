@@ -34,6 +34,7 @@ module.exports = function(io) {
 	});
     };
 */
+
     function sendListStudents (user, socket, room, callback) {
 	Stats.studentListForCC(user, room.id, function (err, question) {
 	    socket.emit("newUserList", question);

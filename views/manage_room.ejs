@@ -17,6 +17,16 @@ Actuellement avec le set :
 	</option>
     <% }); %>
 </select>
+<br>
+Actuellement 
+<select <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="status">
+    <% ["closed", "pending"].forEach( function (status) { %>
+	<option value="<%= status %>" <%= room.status == status ? "selected" : ""%>>
+	    <%= status %>
+	</option>
+    <% }); %>
+</select>
+
 <% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <input type="submit" value="Modifier">
     </form>

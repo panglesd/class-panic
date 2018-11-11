@@ -114,3 +114,4 @@ flycheck_*.el
 /MathJax/
 /.tern-port
 /.tern-project
+/.indium.json

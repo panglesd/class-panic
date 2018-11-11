@@ -12,13 +12,14 @@
       <nav>
 	  <ul>
 	      <a href="<%= config.PATH %>/course"><li <%= active == "courses" ? "class=selected" : "" %>>Mes cours</li></a>
-	      <a href="<%= config.PATH %>/"><li <%= active == "etudiant" ? "class=selected" : "" %>>Mon compte</li></a>
+	      <!-- <a href="<%= config.PATH %>/"><li <%= active == "etudiant" ? "class=selected" : "" %>>Mon compte</li></a> -->
 	      <a id="leave" href="<%= config.PATH %>/logout"><li>Se d&eacute;connecter</li></a>
       </nav>
       <% if(typeof course != "undefined") { %>
-	  <nav>
+	  <nav class="left">
 	      <ul>
 		  <a href="<%= config.PATH %>/course/<%= course.id %>"><li <%= active == "course" ? "class=selected" : "" %>><%= course.name %></li></a>
+		  <a href="<%= config.PATH %>/course/<%= course.id %>/doc"><li <%= active == "doc" ? "class=selected" : "" %>>Documents</li></a>
 		  <% if(subscription.isTDMan) { %>
 		      <a href="<%= config.PATH %>/course/<%= course.id %>/room"><li <%= active == "rooms" ? "class=selected" : "" %>>Salles</li></a>
 		      <a href="<%= config.PATH %>/course/<%= course.id %>/set"><li <%= active == "sets" ? "class=selected" : "" %>>Questions</li></a>

@@ -2,20 +2,23 @@
 
 <h2>Se connecter à une scéance de question :</h2>
 <ul class="room">
-  <% roomList.forEach(function(room) { %>
-  <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%= subscription.isTDMan ? "admin" : "room"%>/<%= room.id %>">
-    <li class="room">
-      <span class="froom"><%= room.name %></span>
-      <ul>
-	<li>Nombre de participants : <%= //room.number %></li>
-	<li>Administrateur: <%=room.owner %></li>
-      </ul>
-      <div>
-	Rejoindre
-      </div>
-    </li>
-  </a>
-  <% });%>
+    <% roomList.forEach(function(room) { %>
+	<% if(room.status == "pending") { %>
+	    <%= JSON.stringify(room); %>
+	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%= subscription.isTDMan ? "admin" : "room"%>/<%= room.id %>">
+		<li class="room">
+		    <span class="froom"><%= room.name %></span>
+		    <ul>
+			<!-- <li>Nombre de participants : <%= //room.number %></li> -->
+			<li>Administrateur: <%=room.owner %></li>
+		    </ul>
+		    <div>
+			Rejoindre
+		    </div>
+		</li>
+	    </a>
+	<% } %>
+    <% });%>
 </ul>
 
 <h2> Se connecter au chat de ce cours </h2>

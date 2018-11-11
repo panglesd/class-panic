@@ -13,7 +13,7 @@ var courseController = require("./courseController");
 
 // Render rooms.ejs
 
-renderRooms = function(user, msgs, req, res) {
+let renderRooms = function(user, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
@@ -40,7 +40,7 @@ renderRooms = function(user, msgs, req, res) {
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-    renderRoomManage = function (user, course, room, msgs, req, res) {
+let renderRoomManage = function (user, course, room, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "Big Sister: Administrer "+room.name)},
@@ -71,7 +71,7 @@ renderRooms = function(user, msgs, req, res) {
 
 // Render manage_rooms.ejs
 
-    renderManageRooms = function(user, course, msgs, req, res) {
+let renderManageRooms = function(user, course, msgs, req, res) {
     async.parallel(
 	{
 	    title : function(callback) { callback(null, "Big Sister: ... une salle")},

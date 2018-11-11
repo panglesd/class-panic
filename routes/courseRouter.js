@@ -9,6 +9,7 @@ var game_controller = require('../controllers/gameController');
 var login_controller = require('../controllers/loginController');
 var course_controller = require('../controllers/courseController');
 var stats_controller = require('../controllers/statsController');
+var doc_controller = require('../controllers/docController');
 
 var config = require("../configuration");
 
@@ -16,7 +17,6 @@ var User = require('../models/user');
 var Course = require('../models/course');
 var Room = require('../models/room');
 var Set = require('../models/set');
-var config = require('../configuration');
 var async = require('async');
 
 var roomRouter = require('./roomRouter');
@@ -92,6 +92,10 @@ router.get('/:courseID/delete', (req,res) => {res.redirect('../');});
 });*/
 router.post('/:courseID/update', course_controller.course_update_post);
 router.get('/:courseID/update', (req,res) => {res.redirect('./');});
+
+
+router.get('/:courseID/doc/:docID', (req,res) => {doc_controller.doc_get(req, res);;});
+router.get('/:courseID/doc', (req,res) => {doc_controller.doc_list(req, res);;});
 
 // GET request for managing a particular course.
 router.get('/:courseID', course_controller.course_manage);

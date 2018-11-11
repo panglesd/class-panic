@@ -5,6 +5,7 @@ var Question = require("./question");
 var User = require("./user");
 var Set = require("./set");
 var Course = require("./course");
+var Stats = require("./stats");
 
 /***********************************************************************/
 /*       Récupérer la question active d'une room                       */
@@ -103,13 +104,13 @@ exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callb
 		let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?";
 		bdd.query(query, [result.room.id, user.id, result.question.id], function(err, answ) {
 //		    console.log("err flatStats", err, answ);		    
-		    if(answ[0])  {
+		    if(answ[0]) {
 //			console.log("result.question = ", result.question);
 			let toLog = bdd.query("UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
 					      "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?",
 					      [room.id, result.question.id, JSON.stringify(newAnswer), result.question.strategy, Question.correctSubmission(result.question, newAnswer, result.question.strategy), user.id, answ[0].blocID], (err, res) => {
 //						  console.log(err, res);
-//						  console.log(toLog.sql);
+						  //						  console.log(toLog.sql);
 						  callback();
 					      });
 		    }
@@ -127,7 +128,8 @@ exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callb
 //			    console.log("query2", tabID);
 			    bdd.query(query2, params2, (err, res) => {
 //				console.log("erreur is", err, res);
-				callback(err, res);
+				Stats.fillSubmissions(user.id, room.id,callback);
+//				callback(err, res);
 			    });
 			});
 		    }		    
