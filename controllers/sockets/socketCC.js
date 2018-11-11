@@ -129,18 +129,21 @@ module.exports = function(io) {
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
 	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		let path = "storage/user"+socket.request.session.user.id+"/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/answer"+n_ans+"/";
-		console.log("path = ", path);
-		mkdirp(path, (err) => {
-		    fileName = sanit_fn(fileName);
-		    if(fileName)
-			fs.writeFile(path+fileName, data, (err) => {
-			    if(err) throw err;
-			});
-		});
+		if(question.allResponses[n_ans].isFiled) {
+		    let path = "storage/user"+socket.request.session.user.id+"/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+/*"/answer"+n_ans+*/"/";
+		    console.log("path = ", path);
+		    mkdirp(path, (err) => {
+			fileName = sanit_fn(fileName);
+			if(fileName)
+			    fs.writeFile(path+fileName, data, (err) => {
+				if(err) throw err;
+				socket.emit("fileReceived");
+				// prévenir le client (et update bdd ?)
+			    });
+		    });
 		// if(answer.length != 0 && question.type != "multi")
 		//     answer = [answer[0]];
-		
+		}
 	    });
 	});
 

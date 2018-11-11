@@ -1,3 +1,6 @@
+# student filled storage
+storage/
+
 # credentials and configuration
 credentials.js
 configuration.js
