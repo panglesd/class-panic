@@ -60,7 +60,7 @@ exports.user_create_post = function(req, res) {
 	    res.render('signin', {config: config, msgs: req.msgs});
 	}
 	else {
-	    res.redirect(config.PATH);
+	    res.redirect(config.PATH+"/");
 	}
     });
 };
