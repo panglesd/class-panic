@@ -10,51 +10,52 @@ Description : <textarea <%= course.ownerID == user.id ? "" : "readonly" %>  name
     <input type="submit" value="Modifier">
     </form>
 <% }%>
-
-<h2>Travailler</h2>
-<ul class="room">
-    <% roomList.forEach(function(room) { %>
-	<% if(room.status == "pending" || (room.type == "cc" && subscription.isTDMan)) { %>
-	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%
-									     if(room.type == "live") {
-										 if(subscription.isTDMan) {
-               								     %>control<%
-	         								      }
-										      else {
-										      %>play<%				      
-											    }
-											    }
-											    else if (room.type == "cc") {
-												if (subscription.isTDMan) {
-											    %>correct<%
-												     } else {
-												     %>cc<%
-													 }
-													 }
-													 %>/<%= room.id %>">
-		<li class="room">
-		    <span class="froom"><%= room.name %></span>
-		    <ul>
-			<!-- <li>Nombre de participants : <%= //room.number %></li> -->
-			<li>Administrateur: <%=room.owner %></li>
-		    </ul>
-		    <div>
-			Rejoindre
-		    </div>
-		</li>
-	    </a>
+<% if(roomList.find((room) => {return room.status == "pending" || (room.type == "cc" && subscription.isTDMan)})){ %>
+    <h2>Travailler</h2>
+    <ul class="room">
+	<% roomList.forEach(function(room) { %>
+	    <% if(room.status == "pending" || (room.type == "cc" && subscription.isTDMan)) { %>
+		<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%
+										 if(room.type == "live") {
+										     if(subscription.isTDMan) {
+               									 %>control<%
+	         									  }
+											  else {
+											  %>play<%
+												}
+												}
+												else if (room.type == "cc") {
+												    if (subscription.isTDMan) {
+												%>correct<%
+													 } else {
+													 %>cc<%
+													     }
+													     }
+													     %>/<%= room.id %>">
+		    <li class="room">
+			<span class="froom"><%= room.name %></span>
+			<ul>
+			    <!-- <li>Nombre de participants : <%= //room.number %></li> -->
+			    <li>Administrateur: <%=room.owner %></li>
+			</ul>
+			<div>
+			    Rejoindre
+			</div>
+		    </li>
+		</a>
   <% };%>
   <% });%>
-</ul>
+    </ul>
+  <% } %>
 
 
-<% if(course.ownerID == user.id) { %>
-<h2>Ou le supprimer</h2>
+  <% if(course.ownerID == user.id) { %>
+      <h2>Ou le supprimer</h2>
 
-<form onsubmit="return confirm('Etes-vous sure de vouloir supprimer le cours <%=course.name%> ?');" action="<%= config.PATH %>/course/<%=course.id%>/delete" method="post">
-    Irréversible : <input type="submit" value="Supprimer le cours <%= course.name%>">
-</form>
-<% } %>
-<a style="display:block; margin:40px;" href="<%= config.PATH %>/course"> Retourner à la liste des cours </a>
+      <form onsubmit="return confirm('Etes-vous sure de vouloir supprimer le cours <%=course.name%> ?');" action="<%= config.PATH %>/course/<%=course.id%>/delete" method="post">
+	  Irréversible : <input type="submit" value="Supprimer le cours <%= course.name%>">
+      </form>
+  <% } %>
+  <a style="display:block; margin:40px;" href="<%= config.PATH %>/course"> Retourner à la liste des cours </a>
 
-<%- include('admin_footer'); -%>
+  <%- include('admin_footer'); -%>
