@@ -25,12 +25,12 @@ router.use(function (req, res, next) {
 	}
 	else {
 //	    console.log("refused");
-	    res.redirect(config.PATH);
+	    res.redirect(config.PATH+"/");
 	}
     }
     else {
 //	console.log("refused");
-	res.redirect(config.PATH);
+	res.redirect(config.PATH+"/");
     }
 });
 
