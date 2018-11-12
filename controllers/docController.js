@@ -58,10 +58,10 @@ exports.doc_list = function(req, res) {
 };
 
 let table_doc = [
-    "/home/panglesd/coursphp.pdf",
-    "/home/panglesd/coursphp2.pdf",
-    "/home/panglesd/coursphp3.pdf",
-    "/home/panglesd/coursphp5.pdf",    
+    "/home/panglesd/storage/cours1.pdf",
+    "/home/panglesd/storage/tp1.pdf",
+    "/home/panglesd/storage/cours2.pdf",
+    "/home/panglesd/storage/tp2.pdf",    
 ];
 function serveFile(req, res, path) {
     fs.readFile(path, (err, data) => {
