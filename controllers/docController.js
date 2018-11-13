@@ -6,6 +6,23 @@ var config = require('../configuration');
 var async = require('async');
 
 const fs = require('fs');
+const path = require('path');
+const mimeType = {
+  '.ico': 'image/x-icon',
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.json': 'application/json',
+  '.css': 'text/css',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
+  '.svg': 'image/svg+xml',
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.eot': 'appliaction/vnd.ms-fontobject',
+  '.ttf': 'aplication/font-sfnt'
+};
 
 /*************************************************************/
 /*         Controlleurs GET pour les docs                    */
@@ -57,21 +74,25 @@ exports.doc_list = function(req, res) {
 	});
 };
 
-let table_doc = [
-    "/home/panglesd/storage/cours1.pdf",
-    "/home/panglesd/storage/tp1.pdf",
-    "/home/panglesd/storage/cours2.pdf",
-    "/home/panglesd/storage/tp2.pdf",    
-];
-function serveFile(req, res, path) {
+let prefix_doc = "/home/panglesd/storage/";
+// [
+//     "/home/panglesd/storage/cours1.pdf",
+//     "/home/panglesd/storage/tp1.pdf",
+//     "/home/panglesd/storage/cours2.pdf",
+//     "/home/panglesd/storage/tp2.pdf",    
+// ];
+function serveFile(req, res, path, ext) {
     fs.readFile(path, (err, data) => {
-	res.setHeader('Content-type','application/pdf');
+	res.setHeader('Content-type', mimeType[ext] || 'text/plain' );
 	res.end(data);
     });    
 }
 
 exports.doc_get = function (req, res) {
     let docID = req.params.docID;
-    let path = table_doc[docID];
-    serveFile(res, res, path);
+    if(!["tp1.pdf", "tp2.pdf", "cours1.pdf", "cours2.pdf", "style.css"].includes(docID))
+	docID="cours1.pdf";
+    let pathname= prefix_doc+docID;
+    let ext = path.parse(pathname).ext;
+    serveFile(res, res, pathname, ext);
 };

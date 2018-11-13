@@ -4,20 +4,44 @@
 <h2>Les documents du cours</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
-    <% docs.forEach(function(doc) { %>
-	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>">
-	    <li class="room">
-		<span class="froom"><%= doc.name %></span>
-		<!--	      <ul>		
-		     <li>Nombre de participants : <%=// room.number %></li>
-		     <li>Administrateur: <%=// room.owner %></li>
-		     </ul>-->
-		<!--		<div>
-		     <ul> <li> Voir / Modifier </li> </ul>
-		     </div> -->
-	    </li>
-	</a>
-    <% }); %>
+    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/cours1.pdf">
+	<li class="room">
+	    <span class="froom"> Cours1.pdf (HTML) </span>
+	</li>
+    </a>
+    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/tp1.pdf">
+	<li class="room">
+	    <span class="froom">TP1.pdf</span>
+	    <div>
+		<ul> <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/style.css"> style.css</a> </li> </ul>
+	    </div> 
+	</li>
+    </a>
+    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/cours2.pdf">
+	<li class="room">
+	    <span class="froom"> Cours2.pdf (Formulaires)</span>
+	</li>
+    </a>
+    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/tp2.pdf">
+	<li class="room">
+	    <span class="froom">TP2.pdf</span>
+	</li>
+    </a>
+    <!-- 
+	 <% docs.forEach(function(doc) { %>
+	 <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>">
+	 <li class="room">
+	 <span class="froom"><%= doc.name %></span>
+	 <!--	      <ul>		
+	 <li>Nombre de participants : <%=// room.number %></li>
+	 <li>Administrateur: <%=// room.owner %></li>
+	 </ul>-->
+    <!--		<div>
+	 <ul> <li> Voir / Modifier </li> </ul>
+	 </div> -->
+    <!-- 	    </li>
+	 </a>
+	 <% }); %> -->
     <% if(true) { %>
 	<% //if(subscription.canAddDoc) { %>
 	<a class="room" onclick="document.querySelector('.windowContainer').classList.toggle('shown');window.scrollTo(0,0)">
