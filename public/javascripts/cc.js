@@ -144,7 +144,7 @@ socketCC.on('newQuestion', function (reponse) {
     // On écrit l'énoncé là où il faut. MathJax rendered.
     let enonce = document.querySelector("#question");
     enonce.textContent=reponse.enonce;
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
+//    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
 
     // On nettoie les réponses précédentes
     let wrapper = document.querySelector("#wrapperAnswer");
@@ -162,7 +162,7 @@ socketCC.on('newQuestion', function (reponse) {
 	descr.innerHTML = md.render(reponse.description);
     else
 	descr.innerHTML = reponse.description;
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
+//    MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
 
     // Pour chaque nouvelle réponse :
 
@@ -207,7 +207,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    }
 	    elem.appendChild(textarea);
 	}
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+//	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	wrapper.appendChild(elem);
     });
     if(reponse.userResponse)
@@ -256,7 +256,7 @@ socketCC.on('newList', function (questionList) {
 	    li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
 	    li.class = ""+(question.id == currentQuestionOfCC.id);
 	    li.textContent = question.enonce;
-	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+//	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	    ul.appendChild(li);
 	});
 	let old = document.querySelector("#chooseQFromSet");

@@ -101,14 +101,17 @@ exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callb
 	}, (err, result) => {
 	    console.log("err async", err);
 	    if(result.subscription && result.room.status == "pending") {
-		let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?";
-		bdd.query(query, [result.room.id, user.id, result.question.id], function(err, answ) {
+//		let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?";
+		let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND questionID = ?";
+		bdd.query(query, [result.room.id, result.question.id], function(err, answ) {
+//		bdd.query(query, [result.room.id, user.id, result.question.id], function(err, answ) {
 //		    console.log("err flatStats", err, answ);		    
 		    if(answ[0]) {
 //			console.log("result.question = ", result.question);
-			let toLog = bdd.query("UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
+			let toLog = bdd.query(//"UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
 					      "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?",
-					      [room.id, result.question.id, JSON.stringify(newAnswer), result.question.strategy, Question.correctSubmission(result.question, newAnswer, result.question.strategy), user.id, answ[0].blocID], (err, res) => {
+					      [// room.id, result.question.id,
+					       JSON.stringify(newAnswer), result.question.strategy, Question.correctSubmission(result.question, newAnswer, result.question.strategy), user.id, answ[0].blocID], (err, res) => {
 //						  console.log(err, res);
 						  //						  console.log(toLog.sql);
 						  callback();
