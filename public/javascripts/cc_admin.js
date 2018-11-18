@@ -123,7 +123,7 @@ function afficheResponse (reponse) {
 	let enonce = document.querySelector("#question");
 	enonce.textContent=reponse.enonce;
 	enonce.qid = reponse.id;
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
+//	MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
 	
 	// On nettoie les réponses précédentes
 	let wrapper = document.querySelector("#wrapperAnswer");
@@ -141,7 +141,7 @@ function afficheResponse (reponse) {
 	    descr.innerHTML = md.render(reponse.description);
 	else
 	    descr.textContent = reponse.description;
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
+//	MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
 	
 	// Pour chaque nouvelle réponse :
 	
@@ -180,7 +180,7 @@ function afficheResponse (reponse) {
 			    }*/
 		elem.appendChild(textarea);
 	    }
-	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+//	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	    let button = document.createElement("button");
 	    button.addEventListener("click",(ev) => {
 		setValidity(index,"true");
@@ -290,7 +290,7 @@ socketCC.on('newList', function (questionList) {
 	    });
 //	    li.class = ""+(question.id == currentQuestionOfCC.id);
 	    li.textContent = question.enonce;
-	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+//	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	    ul.appendChild(li);
 	});
 	let old = document.querySelector("#chooseQFromSet");
@@ -376,7 +376,7 @@ socketCC.on('newUserList', function (studentList) {
 	    socketCC.emit("sendStudentList", roomID);
 //	    sendSubmission();
 	};
-	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+//	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
     });
     let old = document.querySelector("#chooseSFromSet");

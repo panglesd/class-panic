@@ -65,7 +65,10 @@ module.exports = function(io) {
 	    if(packet[0]=="chooseRoom")
 		next();
 	    if(socket.room)
-		next();
+		Room.getByID(socket.room.id, (err, room) => {
+		    socket.room = room;
+		    next();
+		});
 	});
 	
 	/******************************************/
