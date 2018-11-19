@@ -64,22 +64,26 @@ exports.questionControlledFromRoomID = function (user, roomID, callback) {
 /*       Enregistrer la réponse d'un utilisateur dans une room         */
 /***********************************************************************/
 
+exports.logAnswer = function(user, room, newAnswer, callback) {
+    let query = "SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?";
+    bdd.query(query, [room.id, user.pseudo], function(err, answ) {
+	if(answ[0].count>0) 
+	    bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?",
+		      [JSON.stringify(newAnswer), room.id, user.pseudo],
+		      callback);
+	else {
+	    bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)",
+		      [user.pseudo, JSON.stringify(newAnswer), room.id],
+		      callback);
+	}
+    });
+}
+
 exports.registerAnswer = function (user, room, newAnswer, callback) {
     Room.getByID(room.id, function (err, room) {
 	User.getSubscription(user.id,room.courseID, (err, subscription) => {
 	    if(!subscription.isTDMan && room.status == "pending") {
-		let query = "SELECT COUNT(*) as count FROM `poll` WHERE `roomID`= ? AND `pseudo`= ?";
-		bdd.query(query, [room.id, user.pseudo], function(err, answ) {
-		    if(answ[0].count>0) 
-			bdd.query("UPDATE `poll` SET `response`= ? WHERE `roomID`= ? AND `pseudo`= ?",
-				  [JSON.stringify(newAnswer), room.id, user.pseudo],
-				  callback);
-		    else {
-			bdd.query("INSERT INTO `poll`(`pseudo`,`response`,`roomID`) VALUES (?, ?, ?)",
-				  [user.pseudo, JSON.stringify(newAnswer), room.id],
-				  callback);
-		    }
-		});
+		exports.logAnswer(user, room, newAnswer, callback);
 	    }
 	    else
 		callback();
@@ -87,57 +91,68 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
     });
 };
 
-exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callback) {
-    console.log("registerAnswerCC is called");
-    Room.getByID(room.id, function (err, room) {
-	async.parallel({
-	    set : function (callback) { Set.getByID(room.questionSet, callback); },
-	    question : function (callback) {
-		Question.getByIndex(questionIndex, room.id, callback);
-	    },
-	    room : function (callback) { callback(null, room); },
-	    subscription : function (callback) { User.getSubscription(user.id, room.courseID, callback); },
-	    course : function (callback) { Course.getByID(room.courseID, callback); }
-	}, (err, result) => {
-	    console.log("err async", err);
-	    if(result.subscription && result.room.status == "pending") {
-		let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?";
-		bdd.query(query, [result.room.id, user.id, result.question.id], function(err, answ) {
-//		    console.log("err flatStats", err, answ);		    
-		    if(answ[0]) {
-//			console.log("result.question = ", result.question);
-			let toLog = bdd.query("UPDATE `statsBloc` SET `id`= `id` WHERE `roomID`= ? AND `questionID`= ?;"+
-					      "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?",
-					      [room.id, result.question.id, JSON.stringify(newAnswer), result.question.strategy, Question.correctSubmission(result.question, newAnswer, result.question.strategy), user.id, answ[0].blocID], (err, res) => {
-//						  console.log(err, res);
-						  //						  console.log(toLog.sql);
-						  callback();
-					      });
-		    }
-		    else {
-			let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
-			let params = [ result.set.id, JSON.stringify(result.set),
-				       room.id, JSON.stringify(room) ,
-				       result.question.id, JSON.stringify(result.question) ,
-				       result.course.id, JSON.stringify(result.course) //,
-				       /*JSON.stringify(result.question)*/ ];
-			bdd.query(query, params, (err, tabID) => {
-			    let blocID = tabID[1][0].blocID;
-			    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
-			    let params2 = [user.id, Question.correctSubmission(result.question, newAnswer, result.question.strategy), blocID, JSON.stringify(newAnswer), result.question.strategy, JSON.stringify(result.question)];
-//			    console.log("query2", tabID);
-			    bdd.query(query2, params2, (err, res) => {
-//				console.log("erreur is", err, res);
-				Stats.fillSubmissions(user.id, room.id,callback);
-//				callback(err, res);
-			    });
-			});
-		    }		    
+exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) {
+    async.parallel({
+	set : function (callback) { Set.getByID(room.questionSet, callback); },
+	question : function (callback) {
+	    Question.getByIndex(questionIndex, room.id, callback);
+	},
+	course : function (callback) { Course.getByID(room.courseID, callback); }
+    }, (err, result) => {
+	let set = result.set, question = result.question, course = result.course ;
+	let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?;" + //;
+	    "SELECT * FROM flatStats WHERE `roomID`= ? AND questionID = ?";
+	bdd.query(query, [room.id, user.id, question.id, room.id, question.id], function(err, answ) {
+//	    console.log("err flatStats", err);		    
+	    if(answ[1][0] && answ[0][0]) {                  // Si jamais on a déjà une entrée statsBloc qui correspond
+		console.log("we will update", user.id);
+		let query2 = "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?";
+		let toLog = bdd.query(
+		    query2,
+		    [JSON.stringify(newAnswer), question.strategy, Question.correctSubmission(question, newAnswer, question.strategy), user.id, answ[1][0].blocID],
+		    (err, res) => { callback(err, false);}
+		);
+	    }
+	    else if (answ[1][0]) {
+		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";     // Puis on insère un stats
+		let params2 = [user.id, Question.correctSubmission(question, newAnswer, question.strategy), answ[1][0].blocID, JSON.stringify(newAnswer), question.strategy, JSON.stringify(question)];
+		bdd.query(query2, params2, (err, res) => {
+		    callback(err, true);
 		});
 	    }
-	    else
-		callback();
+	    else {                  // Si jamais on n'a pas d'entrée statsBloc qui correspond
+		let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";   // On commence par insérer un statsBloc
+		let params = [ set.id, JSON.stringify(set),
+			       room.id, JSON.stringify(room) ,
+			       question.id, JSON.stringify(question) ,
+			       course.id, JSON.stringify(course) ];
+		bdd.query(query, params, (err, tabID) => {
+		    let blocID = tabID[1][0].blocID;
+		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";     // Puis on insère un stats
+		    let params2 = [user.id, Question.correctSubmission(question, newAnswer, question.strategy), blocID, JSON.stringify(newAnswer), question.strategy, JSON.stringify(question)];
+		    bdd.query(query2, params2, (err, res) => {
+			callback(err, true);
+		    });
+		});
+	    }		    
 	});
+    });
+}
+
+exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callback) {
+    console.log("registerAnswerCC is called");
+    User.getSubscription(user.id, room.courseID, (err, subscription) => {
+	console.log("err async", err);
+	if(subscription && room.status == "pending") {
+	    exports.logAnswerCC(user, room, questionIndex, newAnswer, (err, hasCreatedNewBloc) => {
+		if(hasCreatedNewBloc)
+		    Stats.fillSubmissions(user.id, room.id, callback);
+		else
+		    callback();
+	    });
+	}
+	else
+	    callback();
     });
 };
 
@@ -256,3 +271,17 @@ exports.backToSet = function (roomID, callback) {
     });
 };
 
+
+
+exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, hash, callback) {
+    let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
+    let params = [userID, roomID, questionID];
+    bdd.query(query, params, (err, submL) => {
+	console.log("submL = ", submL);
+	let fileInfo = JSON.parse(submL[0].fileInfo);
+	fileInfo[n_ans] = {fileName: fileName, hash:hash};
+	let query = "UPDATE stats SET fileInfo = ? WHERE id = ?";
+	let params = [JSON.stringify(fileInfo), submL[0].statsID];
+	bdd.query(query, params, callback);
+    });
+};
