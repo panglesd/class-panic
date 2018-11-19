@@ -130,6 +130,7 @@ socketCC.on('newQuestion', function (reponse) {
     console.log(reponse);
     currentQuestionOfAdmin=reponse;
     currentQuestionOfCC=reponse;
+    currentQuestionOfCC.fileInfo = JSON.parse(currentQuestionOfCC.fileInfo);
     // On s'occupe du carré blanc
     let temp;
     if((temp = document.querySelector("li.currentQuestion"))) {
@@ -207,6 +208,31 @@ socketCC.on('newQuestion', function (reponse) {
 	    }
 	    elem.appendChild(textarea);
 	}
+	// Si besoin, ajout d'un input type=file
+	if(rep.hasFile) {
+	    let fileInfo = document.createElement("div");
+	    fileInfo.innerText = "Pas de fichier envoyé";
+	    if(reponse.fileInfo && reponse.fileInfo[index]) {
+		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  class='fileName'></td></tr>"+
+		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+		fileInfo.querySelector(".fileName").innerText = reponse.fileInfo[index].fileName;
+		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+	    }
+	    fileInfo.style.fontSize = "19px";
+	    let fileInput = document.createElement("input");
+	    fileInput.type="file";
+	    //	    file.value = "Soumettre un fichier";
+	    fileInput.addEventListener('change', function() {
+		var reader = new FileReader();
+		reader.addEventListener('load', function() {
+		    console.log("sending file !");
+		    socketCC.emit("chosenFile", fileInput.files[0].name, index, currentQuestionOfCC.indexSet, reader.result);
+		});
+		reader.readAsArrayBuffer(fileInput.files[0]);		
+	    });
+	    elem.appendChild(fileInfo);
+	    elem.appendChild(fileInput);
+	}
 //	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	wrapper.appendChild(elem);
     });
@@ -215,7 +241,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    let temp = document.querySelectorAll("#wrapperAnswer .reponse")[ans.n];
 	    temp.classList.remove("notSelected");
 	    temp.classList.add("selected");
-	    ta = temp.querySelector("textarea");
+	    let ta = temp.querySelector("textarea");
 	    if(ta)
 		ta.value = ans.text;
 	});
@@ -227,7 +253,6 @@ socketCC.on('newQuestion', function (reponse) {
 /*********************************************************************/
 /*                 lorsque l'on reçoit la liste des question         */
 /*********************************************************************/
-
 
 socketCC.on('newList', function (questionList) {
     console.log("questionList", questionList);

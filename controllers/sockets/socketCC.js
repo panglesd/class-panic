@@ -11,6 +11,7 @@ var async = require('async');
 var fs = require("fs");
 var mkdirp = require("mkdirp");
 var sanit_fn = require("sanitize-filename");
+var md5File = require("md5-file");
 
 /**************************************************************************/
 /*                 Fonction pour gérer les Controles Continus             */
@@ -132,15 +133,20 @@ module.exports = function(io) {
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
 	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(question.allResponses[n_ans].isFiled) {
-		    let path = "storage/user"+socket.request.session.user.id+"/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+/*"/answer"+n_ans+*/"/";
+		if(question.allResponses[n_ans].hasFile) {
+		    let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
 		    console.log("path = ", path);
 		    mkdirp(path, (err) => {
 			fileName = sanit_fn(fileName);
 			if(fileName)
 			    fs.writeFile(path+fileName, data, (err) => {
 				if(err) throw err;
-				socket.emit("fileReceived");
+				md5File(path+fileName, (err, hash) => {
+				    game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, (err) => {
+					sendQuestionFromIndex(socket, questionIndex,() => {});
+					socket.emit("fileReceived", n_ans, fileName, hash);
+				    });
+				});
 				// prévenir le client (et update bdd ?)
 			    });
 		    });

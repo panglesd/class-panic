@@ -103,7 +103,7 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 	let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?;" + //;
 	    "SELECT * FROM flatStats WHERE `roomID`= ? AND questionID = ?";
 	bdd.query(query, [room.id, user.id, question.id, room.id, question.id], function(err, answ) {
-//	    console.log("err flatStats", err, answ[0][0]);		    
+//	    console.log("err flatStats", err);		    
 	    if(answ[1][0] && answ[0][0]) {                  // Si jamais on a déjà une entrée statsBloc qui correspond
 		console.log("we will update", user.id);
 		let query2 = "UPDATE `stats` SET `response` = ?, strategy = ?, `correct` = ? WHERE userID = ? AND blocID = ?";
@@ -271,3 +271,17 @@ exports.backToSet = function (roomID, callback) {
     });
 };
 
+
+
+exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, hash, callback) {
+    let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
+    let params = [userID, roomID, questionID];
+    bdd.query(query, params, (err, submL) => {
+	console.log("submL = ", submL);
+	let fileInfo = JSON.parse(submL[0].fileInfo);
+	fileInfo[n_ans] = {fileName: fileName, hash:hash};
+	let query = "UPDATE stats SET fileInfo = ? WHERE id = ?";
+	let params = [JSON.stringify(fileInfo), submL[0].statsID];
+	bdd.query(query, params, callback);
+    });
+};
