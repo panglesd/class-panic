@@ -1,4 +1,5 @@
-var socket = io.connect(server+'/users');
+//var socket = io.connect(server+'/users');
+var socket = io.connect('http://wim.choum.net/users');
 
 /*********************************************************************/
 /*                 Actions à effectuer à toute connection            */

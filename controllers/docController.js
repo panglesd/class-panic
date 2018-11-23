@@ -90,7 +90,7 @@ function serveFile(req, res, path, ext) {
 
 exports.doc_get = function (req, res) {
     let docID = req.params.docID;
-    if(!["tp1.pdf", "tp2.pdf", "cours1.pdf", "cours2.pdf", "style.css"].includes(docID))
+    if(!["tp1.pdf", "tp2.pdf", "cours1.pdf", "cours2.pdf", "style.css","cours3.pdf","tp3.pdf","manchot.html","screenshot1.png","screenshot2.png","screenshot3.png","screenshot4.png","manchot.jpg","manchot2.jpg"].includes(docID))
 	docID="cours1.pdf";
     let pathname= prefix_doc+docID;
     let ext = path.parse(pathname).ext;

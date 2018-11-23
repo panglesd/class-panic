@@ -114,8 +114,8 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 		);
 	    }
 	    else if (answ[1][0]) {
-		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";     // Puis on insère un stats
-		let params2 = [user.id, Question.correctSubmission(question, newAnswer, question.strategy), answ[1][0].blocID, JSON.stringify(newAnswer), question.strategy, JSON.stringify(question)];
+		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`, fileInfo) VALUES (?,?,?,?,?,?,?)";     // Puis on insère un stats
+		let params2 = [user.id, Question.correctSubmission(question, newAnswer, question.strategy), answ[1][0].blocID, JSON.stringify(newAnswer), question.strategy, JSON.stringify(question), "[]"];
 		bdd.query(query2, params2, (err, res) => {
 		    callback(err, true);
 		});
@@ -128,8 +128,8 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 			       course.id, JSON.stringify(course) ];
 		bdd.query(query, params, (err, tabID) => {
 		    let blocID = tabID[1][0].blocID;
-		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";     // Puis on insère un stats
-		    let params2 = [user.id, Question.correctSubmission(question, newAnswer, question.strategy), blocID, JSON.stringify(newAnswer), question.strategy, JSON.stringify(question)];
+		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`, fileInfo) VALUES (?,?,?,?,?,?,?)";     // Puis on insère un stats
+		    let params2 = [user.id, Question.correctSubmission(question, newAnswer, question.strategy), blocID, JSON.stringify(newAnswer), question.strategy, JSON.stringify(question), "[]"];
 		    bdd.query(query2, params2, (err, res) => {
 			callback(err, true);
 		    });

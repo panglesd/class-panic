@@ -8,7 +8,7 @@
   </head>
   <body>
     <div id="main_wrapper">
-      <h1><%= config.TITLE %><div> <%= config.SUBTITLE %></div></h1>
+      <h1><%- config.TITLE %><div> <%= config.SUBTITLE %></div></h1>
       <nav>
 	  <ul>
 	      <a href="<%= config.PATH %>/course"><li <%= active == "courses" ? "class=selected" : "" %>>Mes cours</li></a>
