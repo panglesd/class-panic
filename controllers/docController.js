@@ -4,7 +4,7 @@ var Room = require('../models/room');
 var Set = require('../models/set');
 var config = require('../configuration');
 var async = require('async');
-
+var Doc = require("../models/documents.js");
 const fs = require('fs');
 
 /*************************************************************/
@@ -18,25 +18,27 @@ const fs = require('fs');
 exports.doc_list = function(req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
+	    title : function(callback) { callback(null, "Big Sister: ... une salle");},
 	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
 	    docs : function(callback) {
-		callback(null, [{
-		    id: 0,
-		    name: "Cours 1"
-		}, {
-		    id: 1,
-		    name: "TP 1"
-		}, {
-		    id: 2,
-		    name: "Cours 2"
-		}, {
-		    id: 3,
-		    name: "TP 2"
-		}]);
+		Doc.getListByCourseID(req.course.id, callback);
+		
+		// callback(null, [{
+		//     id: 0,
+		//     name: "Cours 1"
+		// }, {
+		//     id: 1,
+		//     name: "TP 1"
+		// }, {
+		//     id: 2,
+		//     name: "Cours 2"
+		// }, {
+		//     id: 3,
+		//     name: "TP 2"
+		// }]);
 	    },
 	    subscription: function(callback) {
 		callback(null, req.subscription);
@@ -52,7 +54,7 @@ exports.doc_list = function(req, res) {
 	    },
 	},
 	function (err, results) {
-	    console.log(results);
+	    console.log(results.docs);
 	    res.render('manage_docs', results);
 	});
 };
@@ -74,4 +76,12 @@ exports.doc_get = function (req, res) {
     let docID = req.params.docID;
     let path = table_doc[docID];
     serveFile(res, res, path);
+};
+
+exports.doc_add_post = function(req, res) {
+    console.log("we add");
+    Doc.create(req.files.main, req.files.aux, req.course.id, req.session.user.id, (err) => {
+	console.log("finished adding")
+	exports.doc_list(req, res);
+    });
 };

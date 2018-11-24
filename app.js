@@ -18,7 +18,7 @@ var app = express();
 var server = require('http').Server(app);
 
 var mysql = require('mysql');
- 
+var fileUpload = require('express-fileupload');
 var optionsMySQL = require('./credentials').optionsMySQL;
  
 var sessionStore = new MySQLStore(optionsMySQL);
@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/MathJax', express.static(path.join(__dirname, 'MathJax')));
-
+app.use(fileUpload());
 app.use((req, res, next) => {
     req.msgs = [];
     next();

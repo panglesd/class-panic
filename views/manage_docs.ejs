@@ -5,21 +5,21 @@
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
     <% docs.forEach(function(doc) { %>
-	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>">
+	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= doc.filesInfo.main %>">
 	    <li class="room">
-		<span class="froom"><%= doc.name %></span>
-		<!--	      <ul>		
-		     <li>Nombre de participants : <%=// room.number %></li>
-		     <li>Administrateur: <%=// room.owner %></li>
-		     </ul>-->
-		<!--		<div>
-		     <ul> <li> Voir / Modifier </li> </ul>
-		     </div> -->
-	    </li>
+		<span class="froom"><%= doc.filesInfo.main %></span>
+		<div>
+		    <ul>
+			<% doc.filesInfo.aux.forEach((file) => { %>
+			    <li><a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= file %>"><%= file %></li>
+			<% }); %>
+		    </ul>
+		</div> 	
 	</a>
+	    </li>
     <% }); %>
-    <% if(true) { %>
-	<% //if(subscription.canAddDoc) { %>
+    <% //if(true) { %>
+    <% if(subscription.canAddDocs) { %>
 	<a class="room" onclick="document.querySelector('.windowContainer').classList.toggle('shown');window.scrollTo(0,0)">
 	    <li style="cursor:pointer; text-align:center;" class="room">
 		<span class="froom">+</span>
@@ -27,5 +27,39 @@
 	</a>
     <% } %>
 </ul>
+<% if(subscription.canAddDocs) {%>
+    <div class="windowContainer">
+	<div class="window" id="win">
+	    <h2> Ajouter un document </h2>
+	    <form encType="multipart/form-data" action="<%= config.PATH %>/course/<%= course.id %>/doc/add" method="post">
+		<!-- <p>
+		     <input type='text' name="name" placeholder='Nom de la salle'>
+		     </p> -->
+		<p>
+		    <!--	    <select name="type">
+			 <option value='Type de la room'>Type de salle</option>
+			 </select> -->
+		    Document principal : <input type="file" name="main">
+		</p>
+		<p>
+		    Documents Annexes (selection multiple) : <input type="file" multiple name="aux">
+		</p>
+		<p>
+		    <input type='submit' value='Ajouter le document'>
+<!--		    <input type='button' onclick="document.querySelector('.windowContainer').classList.toggle('shown')" value='Supprimer la fenetre'>-->
+		</p>
+	    </form>
+	</div>
+    </div>
+<script>
+ document.querySelector(".windowContainer").addEventListener("click", (ev) => {
+     if(ev.target.classList.contains("windowContainer")) {
+	 document.querySelector(".windowContainer").classList.remove("shown");
+     }
+ });
+</script>
+<% } %>
+
+
 <%// } %>
 <%- include('admin_footer'); -%>
