@@ -42,9 +42,17 @@ exports.getByID = function(docID, callback) {
 	let doc = res[0];
 	if(doc) {
 	    doc.filesInfo = JSON.parse(doc.filesInfo);
+	    
 	}
 	callback(err, doc);
     });
+};
+exports.getFileFromDoc = function(doc, fileName, callback) {
+//    console.log(doc.filesInfo);
+    if(doc.filesInfo.main == fileName || doc.filesInfo.aux.includes(fileName)) {
+	let path = "storage/course"+doc.courseID+"/doc"+doc.id+"/"+fileName;
+	fs.readFile(path, callback);
+    }
 };
 exports.getListByCourseID = function(courseID, callback) {
     let query = "SELECT * FROM documents WHERE courseID = ?";
@@ -55,4 +63,36 @@ exports.getListByCourseID = function(courseID, callback) {
 	});
 	callback(err, res);
     });
+};
+
+exports.remove = function(docID, callback) {
+    let query = "DELETE FROM documents WHERE id = ?";
+    let params = [docID];
+    bdd.query(query, params, callback);
+};
+
+exports.removeFile = function(doc, fileName, callback) {
+    let query = "UPDATE documents SET filesInfo = ? WHERE id = ?";
+    doc.filesInfo.aux = doc.filesInfo.aux.filter((elem) => {return fileName != elem;});
+//    console.log("doc.filesInfo = ", doc.filesInfo);
+    let params = [JSON.stringify(doc.filesInfo), doc.id];
+    bdd.query(query, params, callback);
+};
+
+exports.addFile = function(doc, files, callback) {
+    //    let fileName = file.name;
+    files.forEach((file) => {
+	doc.filesInfo.aux = doc.filesInfo.aux.filter((elem) => {return file.name != elem;});
+	doc.filesInfo.aux.push(file.name);
+    });
+//    files;
+    let path = "storage/course"+doc.courseID+"/doc"+doc.id+"/";
+    async.forEach(files, (file, callback) => {
+	file.mv(path+sanit_fn(file.name), callback);//(err) => {
+    }, (err) => {
+	let params = [JSON.stringify(doc.filesInfo), doc.id];
+	let query = "UPDATE documents SET filesInfo = ? WHERE id = ?";
+	bdd.query(query, params, callback);
+    });
+	//    console.log("doc.filesInfo = ", doc.filesInfo);
 };

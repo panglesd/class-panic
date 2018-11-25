@@ -33,7 +33,6 @@ router.post("/add", doc_controller.doc_add_post);
 router.use('/:docID/', function (req, res, next) {
     if(req.params.docID != "add") {
 	Doc.getByID(parseInt(req.params.docID), (err, doc) => {
-	    //	console.log(parseInt(req.params.courseID));
 	    if(!err) {
 		req.doc = doc;
 		next();
@@ -47,11 +46,13 @@ router.use('/:docID/', function (req, res, next) {
 
 
 
-// router.get("/:docID/remove", doc_controller.remove);
+router.get("/:docID/delete", doc_controller.remove);
+router.post("/:docID/add", doc_controller.addFile);
+router.get("/:docID/:name/delete", doc_controller.removeFile);
 // router.get("/:docID/update", doc_controller.update);
 
 router.get("/:docID/:name", doc_controller.doc_get);
-router.get("/:docID", doc_controller.doc_get);
+//router.get("/:docID", doc_controller.doc_get);
 
 router.get('/', doc_controller.doc_list);
 

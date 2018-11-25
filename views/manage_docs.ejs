@@ -7,12 +7,23 @@
     <% docs.forEach(function(doc) { %>
 	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= doc.filesInfo.main %>">
 	    <li class="room">
-		<span class="froom"><%= doc.filesInfo.main %></span>
+		<span class="froom"><%= doc.filesInfo.main %>
+		    <% if(subscription.canAddDocs) { %>
+			<a href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/delete" class="room" style="font-size:2em;"> &#10007; </a>
+		    <% } %>
+		</span>
 		<div>
 		    <ul>
 			<% doc.filesInfo.aux.forEach((file) => { %>
-			    <li><a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= file %>"><%= file %></li>
+			    <li>
+				<% if(subscription.canAddDocs) { %>
+				    <a href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= file %>/delete" class="room">&#10007;</a>
+				<% } %>
+				<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= file %>"><%= file %></a></li>
 			<% }); %>
+			<% if(subscription.canAddDocs) { %>
+			    <li><form encType="multipart/form-data" action="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/add" method="post"><input type="file" multiple name="newFiles"><input type="submit"/> </form></li>
+			<% } %>
 		    </ul>
 		</div> 	
 	</a>
