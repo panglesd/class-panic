@@ -21,6 +21,7 @@ var async = require('async');
 
 var roomRouter = require('./roomRouter');
 var setRouter = require('./setRouter');
+var docRouter = require('./docRouter');
 
 
 
@@ -66,7 +67,7 @@ router.use('/:courseID/', function (req, res, next) {
     });
 });
 
-router.get('/:courseID/log', (req, res) => {console.log(req.course);});
+//router.get('/:courseID/log', (req, res) => {console.log(req.course);});
 
 
    /**********************************************************/
@@ -94,8 +95,8 @@ router.post('/:courseID/update', course_controller.course_update_post);
 router.get('/:courseID/update', (req,res) => {res.redirect('./');});
 
 
-router.get('/:courseID/doc/:docID', (req,res) => {doc_controller.doc_get(req, res);;});
-router.get('/:courseID/doc', (req,res) => {doc_controller.doc_list(req, res);;});
+// router.get('/:courseID/doc/:docID/:name', (req, res) => {doc_controller.doc_get(req, res);;});
+// router.get('/:courseID/doc', (req,res) => {doc_controller.doc_list(req, res);;});
 
 // GET request for managing a particular course.
 router.get('/:courseID', course_controller.course_manage);
@@ -117,6 +118,12 @@ router.get('/:courseID/stats/', stats_controller.stats);
 /*************************************************************/
 
 router.use("/:courseID/room", roomRouter);
+
+/*************************************************************/
+/*          Documents                                        */
+/*************************************************************/
+
+router.use("/:courseID/doc", docRouter);
 
 /*************************************************************/
 /*          Sets                                             */

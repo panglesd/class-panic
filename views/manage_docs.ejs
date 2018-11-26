@@ -4,67 +4,33 @@
 <h2>Les documents du cours</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <ul class="room">
-    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/cours1.pdf">
-	<li class="room">
-	    <span class="froom"> Cours1.pdf (HTML) </span>
-	</li>
-    </a>
-    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/tp1.pdf">
-	<li class="room">
-	    <span class="froom">TP1.pdf</span>
-	    <div>
-		<ul> <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/style.css"> style.css</a> </li> </ul>
-	    </div> 
-	</li>
-    </a>
-    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/cours2.pdf">
-	<li class="room">
-	    <span class="froom"> Cours2.pdf (Formulaires)</span>
-	</li>
-    </a>
-    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/tp2.pdf">
-	<li class="room">
-	    <span class="froom">TP2.pdf</span>
-	</li>
-    </a>
-    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/cours3.pdf">
-	<li class="room">
-	    <span class="froom"> Cours3.pdf (CSS)</span>
-	</li>
-    </a>
-    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/tp3.pdf">
-	<li class="room">
-	    <span class="froom">TP3.pdf</span>
-	    <div>
-		<ul> 
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/manchot.html"> manchot.html</a> </li>
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/screenshot1.png"> screenshot1.png</a> </li>
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/screenshot2.png"> screenshot2.png</a> </li>
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/screenshot3.png"> screenshot3.png</a> </li>
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/screenshot4.png"> screenshot4.png</a> </li>
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/manchot.jpg"> manchot.jpg</a> </li>
-		    <li> <a href="<%= config.PATH %>/course/<%= course.id %>/doc/manchot2.jpg"> manchot2.jpg</a> </li>
-		</ul>
-	    </div> 
-	</li>
-    </a>
-    <!-- 
-	 <% docs.forEach(function(doc) { %>
-	 <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>">
-	 <li class="room">
-	 <span class="froom"><%= doc.name %></span>
-	 <!--	      <ul>		
-	 <li>Nombre de participants : <%=// room.number %></li>
-	 <li>Administrateur: <%=// room.owner %></li>
-	 </ul>-->
-    <!--		<div>
-	 <ul> <li> Voir / Modifier </li> </ul>
-	 </div> -->
-    <!-- 	    </li>
-	 </a>
-	 <% }); %> -->
-    <% if(true) { %>
-	<% //if(subscription.canAddDoc) { %>
+    <% docs.forEach(function(doc) { %>
+	<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= doc.filesInfo.main %>">
+	    <li class="room">
+		<span class="froom"><%= doc.filesInfo.main %>
+		    <% if(subscription.canAddDocs) { %>
+			<a href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/delete" class="room" style="font-size:2em;"> &#10007; </a>
+		    <% } %>
+		</span>
+		<div>
+		    <ul>
+			<% doc.filesInfo.aux.forEach((file) => { %>
+			    <li>
+				<% if(subscription.canAddDocs) { %>
+				    <a href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= file %>/delete" class="room">&#10007;</a>
+				<% } %>
+				<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/<%= file %>"><%= file %></a></li>
+			<% }); %>
+			<% if(subscription.canAddDocs) { %>
+			    <li><form encType="multipart/form-data" action="<%= config.PATH %>/course/<%= course.id %>/doc/<%= doc.id %>/add" method="post"><input type="file" multiple name="newFiles"><input type="submit"/> </form></li>
+			<% } %>
+		    </ul>
+		</div> 	
+	</a>
+	    </li>
+    <% }); %>
+    <% //if(true) { %>
+    <% if(subscription.canAddDocs) { %>
 	<a class="room" onclick="document.querySelector('.windowContainer').classList.toggle('shown');window.scrollTo(0,0)">
 	    <li style="cursor:pointer; text-align:center;" class="room">
 		<span class="froom">+</span>
@@ -72,5 +38,39 @@
 	</a>
     <% } %>
 </ul>
+<% if(subscription.canAddDocs) {%>
+    <div class="windowContainer">
+	<div class="window" id="win">
+	    <h2> Ajouter un document </h2>
+	    <form encType="multipart/form-data" action="<%= config.PATH %>/course/<%= course.id %>/doc/add" method="post">
+		<!-- <p>
+		     <input type='text' name="name" placeholder='Nom de la salle'>
+		     </p> -->
+		<p>
+		    <!--	    <select name="type">
+			 <option value='Type de la room'>Type de salle</option>
+			 </select> -->
+		    Document principal : <input type="file" name="main">
+		</p>
+		<p>
+		    Documents Annexes (selection multiple) : <input type="file" multiple name="aux">
+		</p>
+		<p>
+		    <input type='submit' value='Ajouter le document'>
+<!--		    <input type='button' onclick="document.querySelector('.windowContainer').classList.toggle('shown')" value='Supprimer la fenetre'>-->
+		</p>
+	    </form>
+	</div>
+    </div>
+<script>
+ document.querySelector(".windowContainer").addEventListener("click", (ev) => {
+     if(ev.target.classList.contains("windowContainer")) {
+	 document.querySelector(".windowContainer").classList.remove("shown");
+     }
+ });
+</script>
+<% } %>
+
+
 <%// } %>
 <%- include('admin_footer'); -%>
