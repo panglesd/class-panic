@@ -89,7 +89,7 @@ exports.create = function (user, newRoom, courseID, callback) {
 	}
 	else {
 	    if(question) 
-		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`) VALUES (?, ?, ?, ?, "closed", ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question), courseID], function(err, rows) {
+		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`,`type`) VALUES (?, ?, ?, ?, "closed", ?, ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(question), courseID, newRoom.type], function(err, rows) {
 		    console.log(err);
 //		    console.log(this.sql);
 		    callback(err, rows);
