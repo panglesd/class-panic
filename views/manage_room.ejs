@@ -18,6 +18,11 @@ Actuellement avec le set :
     <% }); %>
 </select>
 <br>
+Actuellement <select name="type">
+<option <%= room.type == "cc" ? "selected" : "" %> value="cc">Rythmé par l'élève</option>
+<option <%= room.type == "live" ? "selected" : "" %> value="live">Rythmé par le prof</option>
+</select>
+<br>
 Actuellement 
 <select <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="status">
     <% ["closed", "pending"].forEach( function (status) { %>
