@@ -226,8 +226,8 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 //	console.log("validity2 = ", validity2);
 	
 	bdd.query(query2, params2, (err, res) => {
-	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ?";
-	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id];
+	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
+	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
 	    let q = bdd.query(query, params, (err, res) => {
 		if (err) {
 		    console.log("err = ", err);
