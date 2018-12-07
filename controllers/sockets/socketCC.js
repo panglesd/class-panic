@@ -36,8 +36,11 @@ module.exports = function(io) {
 	    callback();
 	});
     }
-    function sendCorrection(socket, callback) {
-	
+    function sendCorrection(socket, i, callback) {
+	Question.getByID(i, (err, question) => {
+	    if(question.class == socket.room.questionSet)
+		socket.emit("newCorrection", question);
+	});
     };
     function sendQuestionFromIndex (socket, index, callback)  {
 	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
@@ -119,9 +122,9 @@ module.exports = function(io) {
 	/*  Un admin me demande la liste des questions*/
 	/******************************************/
 	
-	socket.on('sendCorrection', function () {
-	    if(socket.room.status == "corrected")
-		sendCorrection(socket, function() {});
+	socket.on('sendCorrection', function (i) {
+	    if(socket.room.status == "revealed")
+		sendCorrection(socket, i, function() {});
 	});
 
 	/******************************************/

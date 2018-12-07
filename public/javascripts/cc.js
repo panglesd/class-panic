@@ -246,7 +246,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    if(ta)
 		ta.value = ans.text;
 	});
-    socketCC.emit("sendCorrection");
+    socketCC.emit("sendCorrection", currentQuestionOfCC.id);
     socketCC.emit("sendList");
 });
 
@@ -305,7 +305,20 @@ socketCC.on('newList', function (questionList) {
 /*********************************************************************/
 
 socketCC.on('newCorrection', function (correction) {
-    
+    console.log("corec = ", correction);
+    correction.reponses.forEach((rep, index) => {
+	let div = document.querySelector("#r"+index);
+	if(rep.validity != "to_correct") {
+	    div.classList.add(rep.validity);
+	}
+	if(rep.texted) {
+	    // Ajout d'un input div pour l'éventuelle correction
+	    let divCorrec = document.createElement("div");
+	    divCorrec.classList.add("correcArea");
+	    divCorrec.textContent = "Correction : "+rep.correction;
+	    div.appendChild(divCorrec);
+	}
+    });
 });
 
 
