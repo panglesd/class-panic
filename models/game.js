@@ -293,11 +293,10 @@ exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, ha
 
 
 exports.getFileFromSubmission= function(userID, room, question, answerNumber, fileName, callback) {
-    Stats.getSubmission(userID, room.id, question.id, (err, res) => {
+    Stats.getSubmission(userID, room.id, question.id, (err, subm) => {
 	let path = "storage/course"+room.courseID+"/room"+room.id+"/question"+question.id+"/user"+userID+"/answer"+answerNumber+"/"+fileName;
 	console.log(path);
 	fs.readFile(path, callback);
-	
     });
 
 };

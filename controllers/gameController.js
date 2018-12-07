@@ -122,52 +122,66 @@ exports.room_cc = function(req, res) {
 // Controlleur pour cc admin une room
 
 exports.room_cc_admin = function(req, res) {
-    //    if(req.subscription.isTDMan) {
+    if(req.subscription.isTDMan) {
     //    if(true) {
-    async.parallel(
-	{
-	    user : function (callback) {
-		callback(null, req.session.user);
-	    },
-	    server : function(callback) {
-		callback(null, req.protocol + '://' + req.get('host') );
-	    },
-	    config : function(callback) { callback(null, config); },	
-	    course: function(callback) {
-		//		Course.getByID(req.params.idCourse, callback);
+	async.parallel(
+	    {
+		user : function (callback) {
+		    callback(null, req.session.user);
+		},
+		server : function(callback) {
+		    callback(null, req.protocol + '://' + req.get('host') );
+		},
+		config : function(callback) { callback(null, config); },	
+		course: function(callback) {
+		    //		Course.getByID(req.params.idCourse, callback);
 		callback(null, req.course);
+		},
+		room : function (callback) {
+		    Room.getByID(req.params.roomID, callback);
+		    //		    Room.getByID( req.params.id, callback)
+		},
+		set : function (callback) {
+		    Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b);});
+		},
+		roomList : function (callback) {
+		    Room.listOfCourse(req.course.id, callback);
+		},
+		roomOwnedList :  function (callback) {
+		    Room.ownedList(req.session.user, function (r) { callback(null, r); });
+		},
+		setOwnedList :  function (callback) {
+		    Set.setOwnedList(req.session.user, req.course.id, callback);
+		}
 	    },
-	    room : function (callback) {
-		Room.getByID(req.params.roomID, callback);
-		//		    Room.getByID( req.params.id, callback)
-	    },
-	    set : function (callback) {
-		Question.listByRoomID(req.params.roomID, function (e,b) {callback(e,b);});
-	    },
-	    roomList : function (callback) {
-		Room.listOfCourse(req.course.id, callback);
-	    },
-	    roomOwnedList :  function (callback) {
-		Room.ownedList(req.session.user, function (r) { callback(null, r); });
-	    },
-	    setOwnedList :  function (callback) {
-		Set.setOwnedList(req.session.user, req.course.id, callback);
-	    }
-	},
-	function (err, results) {
-//	    console.log(results);
-	    res.render('play_CC_admin', results);
-	});
+	    function (err, results) {
+		//	    console.log(results);
+		res.render('play_CC_admin', results);
+	    });
+    }
+    else
+	exports.room_cc(req,res);
 };
 
 
-exports.fileForStudent= function(req, res) {
+exports.fileForStudent = function(req, res) {
     console.log(req.params);
     Game.getFileFromSubmission(req.session.user.id, req.room, req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
 	console.log("yo");
 	docController.serveFile(data, sanit_fn(req.params.fileName), res);
-	//	Stats.getSubmission(req.session.user.id, req.room.id, req.question.id, () => {
     });
+};
+exports.fileForAdmin = function(req, res) {
+    console.log("yooo");
+    if(req.subscription.isTDMan){
+	console.log(req.params);
+	Game.getFileFromSubmission(req.params.userID, req.room, req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
+	    console.log("yo");
+	    docController.serveFile(data, sanit_fn(req.params.fileName), res);
+	});
+    }
+    else
+	exports.room_cc(req, res);
 	
 	
 	

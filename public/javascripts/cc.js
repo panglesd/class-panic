@@ -209,7 +209,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    elem.appendChild(textarea);
 	}
 	// Si besoin, ajout d'un input type=file
-	if(rep.hasFile && ["single","multi","true"].includes(rep.hasFile)) {
+	if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
 	    let fileInfo = document.createElement("div");
 	    fileInfo.innerText = "Pas de fichier envoyé";
 	    if(reponse.fileInfo && reponse.fileInfo[index]) {
