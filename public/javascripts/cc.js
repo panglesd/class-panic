@@ -179,7 +179,7 @@ socketCC.on('newQuestion', function (reponse) {
 	// Si besoin est, ajout d'un event listener
 	elem.addEventListener("click", function (ev) {
 	    //		chooseAnswer(index, event.currentTarget);
-	    if(ev.target.tagName != "TEXTAREA")
+	    if(ev.target.tagName != "TEXTAREA" && ev.target.tagName != "A")
 		chooseAnswer(index, elem, false);
 	    else
 		chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
