@@ -69,6 +69,13 @@ Utiliser $...$ pour mettre des maths.
 		    name="correction-<%= i %>"
 		    style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%"
 		    placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
+	<!--    Peut-on rendre un fichier ?      -->
+		<div
+		    class="text"
+		    style="text-align:left;margin:3px;">
+		    <input name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
+		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple</span>
+		</div>		
 	<!--    Boutons pour le management       -->
 		<% if(canModify) { %>
 		    <div>
@@ -128,6 +135,9 @@ Utiliser $...$ pour mettre des maths.
 	 div.querySelector(".remove").addEventListener("click", (ev) => {
 	     removeElement(div);
 	 });	 
+	 /* div.querySelector(".fileToggle").addEventListener("click", (ev) => {
+	    fileToggle(div);
+	    });	 */
      }
      document.querySelectorAll(".reponse").forEach((div) => {
 //	 let div2 = div;

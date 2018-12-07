@@ -133,7 +133,7 @@ module.exports = function(io) {
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
 	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(question.allResponses[n_ans].hasFile) {
+		if(question.allResponses[n_ans].hasFile != "none") {
 		    let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
 		    console.log("path = ", path);
 		    mkdirp(path, (err) => {

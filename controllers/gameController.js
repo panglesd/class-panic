@@ -1,8 +1,13 @@
+var sanit_fn = require("sanitize-filename");
+var docController = require('./docController');
+
 var user = require('../models/user');
 var Room = require('../models/room');
 var Course = require('../models/course');
 var Set = require('../models/set');
 var Question = require('../models/question');
+var Game = require('../models/game');
+var Stats = require('../models/stats');
 var async = require('async');
 var config = require("./../configuration");
 
@@ -153,4 +158,18 @@ exports.room_cc_admin = function(req, res) {
 //	    console.log(results);
 	    res.render('play_CC_admin', results);
 	});
+};
+
+
+exports.fileForStudent= function(req, res) {
+    console.log(req.params);
+    Game.getFileFromSubmission(req.session.user.id, req.room, req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
+	console.log("yo");
+	docController.serveFile(data, sanit_fn(req.params.fileName), res);
+	//	Stats.getSubmission(req.session.user.id, req.room.id, req.question.id, () => {
+    });
+	
+	
+	
+//    });
 };

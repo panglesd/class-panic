@@ -103,6 +103,7 @@ function formatQuestionFromBody(body) {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
 	    texted: body["texted-"+i]=="true" ? true : false,
+	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
 	};
 	if(reponse[i].texted) 
 	    reponse[i].correction = body["correction-"+i];

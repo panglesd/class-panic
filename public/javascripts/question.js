@@ -22,6 +22,13 @@ function returnHTMLQuestion (i) {
 '		    name="correction-'+i+'"'+
 '		    style="visibility:hidden;display:block; width:100%"'+
 '		    placeholder="Vous pouvez rentrer la correction/justification/explication" ></textarea>'+
+'	<!--    Peut-on rendre un fichier ?      -->'+
+'		<div'+
+'		    class="text"'+
+'		    style="text-align:left;margin:3px;">'+
+'		    <input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
+'		    <input name="multipleFile-'+i+'" type="checkbox">Multiple</span>'+
+'		</div>'+
 '	<!--    Boutons pour le management       -->'+
 '		    <div>'+
 '			<ul>'+
@@ -55,6 +62,19 @@ function addAnswer () {
 
 
 // Avoir ou non un champs texte dans la réponse
+
+function toggleText(elem) {
+    let text = elem.querySelector(".text");
+    text.classList.toggle("texted");
+    let value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
+    elem.querySelector(".correction-textarea").style.visibility = elem.querySelector(".correction-textarea").style.visibility=="hidden" ? "visible" : "hidden";
+    let text_string = text.querySelector("span");
+    if(text_string.textContent == "Enlever le champs texte")
+	text_string.textContent = "Ajouter un champs texte";
+    else
+	text_string.textContent = "Enlever le champs texte";
+}
+// Avoir ou non un fichier
 
 function toggleText(elem) {
     let text = elem.querySelector(".text");
