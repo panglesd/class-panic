@@ -36,7 +36,9 @@ module.exports = function(io) {
 	    callback();
 	});
     }
-
+    function sendCorrection(socket, callback) {
+	
+    };
     function sendQuestionFromIndex (socket, index, callback)  {
 	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
 	    question.allResponses.forEach((rep) => {
@@ -81,7 +83,7 @@ module.exports = function(io) {
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    Room.getByID(parseInt(newRoom), function (err, res) {
-		if(res && res.status == "pending") {
+		if(res && res.status != "closed") {
 		    Course.getByID(res.courseID,(er, course) => {
 			User.getSubscription(socket.request.session.user, course, (err, subscription) => {
 			    if(subscription) {
@@ -112,20 +114,32 @@ module.exports = function(io) {
 	socket.on('sendList', function () {
 	    sendListQuestion(socket, function() {});
 	});
+
+	/******************************************/
+	/*  Un admin me demande la liste des questions*/
+	/******************************************/
+	
+	socket.on('sendCorrection', function () {
+	    if(socket.room.status == "corrected")
+		sendCorrection(socket, function() {});
+	});
+
 	/******************************************/
 	/*  On m'envoie une reponse               */
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-//	    console.log("answer = ", answer);
-	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(answer.length != 0 && question.type != "multi")
-		    answer = [answer[0]];
-		game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
-		    sendListQuestion(socket, function() {});
-		    //			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+	    //	    console.log("answer = ", answer);
+	    if(socket.room.status == "pending") {
+		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		    if(answer.length != 0 && question.type != "multi")
+			answer = [answer[0]];
+		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
+			sendListQuestion(socket, function() {});
+			//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+		    });
 		});
-	    });
+	    }
 	});
 	/******************************************/
 	/*  On m'envoie une reponse avec un fichier*/

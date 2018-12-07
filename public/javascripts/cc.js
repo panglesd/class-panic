@@ -68,9 +68,10 @@ function sendOwnedQuestionPlease() {
 /*                 lorsque l'on veut reveler les resultats           */
 /*********************************************************************/
 
-function revealResults() {
+/*function revealResults() {
     socketCC.emit("revealResults");
 }
+*/
 
 /*********************************************************************/
 /*                 lorsque l'on veut aller à une question donnée     */
@@ -128,7 +129,7 @@ function gotoQuestion(i) {
 socketCC.on('newQuestion', function (reponse) {
     console.log('newQuestion');
     console.log(reponse);
-    currentQuestionOfAdmin=reponse;
+//    currentQuestionOfAdmin=reponse;
     currentQuestionOfCC=reponse;
     currentQuestionOfCC.fileInfo = JSON.parse(currentQuestionOfCC.fileInfo);
     // On s'occupe du carré blanc
@@ -245,8 +246,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    if(ta)
 		ta.value = ans.text;
 	});
-
-
+    socketCC.emit("sendCorrection");
     socketCC.emit("sendList");
 });
 
@@ -299,6 +299,15 @@ socketCC.on('newList', function (questionList) {
 //	console.log(currentQuestionOfCC.id);
 //	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
 });
+
+/*********************************************************************/
+/*                 lorsque l'on reçoit la correction                 */
+/*********************************************************************/
+
+socketCC.on('newCorrection', function (correction) {
+    
+});
+
 
 /*********************************************************************/
 /*                 pour envoyer son choix de reponse                 */
