@@ -214,7 +214,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    let fileInfo = document.createElement("div");
 	    fileInfo.innerText = "Pas de fichier envoyé";
 	    if(reponse.fileInfo && reponse.fileInfo[index]) {
-		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
+		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
 		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
 		fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
 		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
@@ -306,6 +306,7 @@ socketCC.on('newList', function (questionList) {
 
 socketCC.on('newCorrection', function (correction) {
     console.log("corec = ", correction);
+    correction.correcFileInfo = JSON.parse(correction.correcFileInfo);
     correction.reponses.forEach((rep, index) => {
 	let div = document.querySelector("#r"+index);
 	if(rep.validity != "to_correct") {
@@ -317,6 +318,17 @@ socketCC.on('newCorrection', function (correction) {
 	    divCorrec.classList.add("correcArea");
 	    divCorrec.textContent = "Correction : "+rep.correction;
 	    div.appendChild(divCorrec);
+	}
+	if(rep.hasFile == true || ["true","single","multi"].includes(rep.hasFile)) {
+//	    console.log(correction);
+	    if(correction.correcFileInfo[index]) {
+		let linkToCorrection = document.createElement("a");
+		linkToCorrection.href = "fileCorrect/"+currentQuestionOfCC.id+"/"+index+"/"+correction.correcFileInfo[index];;
+		linkToCorrection.target = "_blank";
+		linkToCorrection.style.color = "blue";
+		linkToCorrection.textContent = "Correction : "+correction.correcFileInfo[index];
+		div.appendChild(linkToCorrection);
+	    }
 	}
     });
 });

@@ -11,7 +11,7 @@
 
 <h2> <%= newQuestion ? "Création" : "Modification" %> d'une question</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
-<form id="newQuestion" method="post" action="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
+<form  encType="multipart/form-data"  id="newQuestion" method="post" action="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
     <ul class="room" id="listeQue">
 	<li class="room">
 	    <span class="froom">Énoncé :</span>
@@ -74,7 +74,8 @@ Utiliser $...$ pour mettre des maths.
 		    class="text"
 		    style="text-align:left;margin:3px;">
 		    <input name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
-		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple</span>
+		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple </span>
+		    <input name="correcFile-<%= i %>" type="file"> (Fichier pour la correction)
 		</div>		
 	<!--    Boutons pour le management       -->
 		<% if(canModify) { %>

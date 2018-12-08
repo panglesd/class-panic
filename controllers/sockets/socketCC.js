@@ -149,28 +149,30 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
-	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(question.allResponses[n_ans].hasFile != "none") {
-		    let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
-		    console.log("path = ", path);
-		    mkdirp(path, (err) => {
-			fileName = sanit_fn(fileName);
-			if(fileName)
-			    fs.writeFile(path+fileName, data, (err) => {
-				if(err) throw err;
-				md5File(path+fileName, (err, hash) => {
-				    game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, (err) => {
-					sendQuestionFromIndex(socket, questionIndex,() => {});
-					socket.emit("fileReceived", n_ans, fileName, hash);
+	    if(socket.room.status == "pending"){
+		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		    if(question.allResponses[n_ans].hasFile != "none") {
+			let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
+			console.log("path = ", path);
+			mkdirp(path, (err) => {
+			    fileName = sanit_fn(fileName);
+			    if(fileName)
+				fs.writeFile(path+fileName, data, (err) => {
+				    if(err) throw err;
+				    md5File(path+fileName, (err, hash) => {
+					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, (err) => {
+					    sendQuestionFromIndex(socket, questionIndex,() => {});
+					socket.emit("// FIXME: leReceived", n_ans, fileName, hash);
+					});
 				    });
+				    // prévenir le client (et update bdd ?)
 				});
-				// prévenir le client (et update bdd ?)
-			    });
-		    });
-		// if(answer.length != 0 && question.type != "multi")
-		//     answer = [answer[0]];
-		}
-	    });
+			});
+			// if(answer.length != 0 && question.type != "multi")
+			//     answer = [answer[0]];
+		    }
+		});
+	    }
 	});
 
 	

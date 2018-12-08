@@ -26,8 +26,9 @@ function returnHTMLQuestion (i) {
 '		<div'+
 '		    class="text"'+
 '		    style="text-align:left;margin:3px;">'+
-'		    <input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
-'		    <input name="multipleFile-'+i+'" type="checkbox">Multiple</span>'+
+'		<input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
+'		<input name="multipleFile-'+i+'" type="checkbox">Multiple'+
+'		<input name="correcFile-'+i+'" type="file">Fichier pour la correction'+
 '		</div>'+
 '	<!--    Boutons pour le management       -->'+
 '		    <div>'+

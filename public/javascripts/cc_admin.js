@@ -186,7 +186,7 @@ function afficheResponse (reponse) {
 		fileInfo.id = "fileInfo-"+index;
 		fileInfo.innerText = "Pas de fichier envoyé";
 		if(reponse.fileInfo && reponse.fileInfo[index]) {
-		    fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
+		    fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
 			"<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
 		    fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
 		    fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
