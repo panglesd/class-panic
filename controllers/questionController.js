@@ -5,6 +5,7 @@ var Set = require('../models/set');
 var SetController = require('./setController');
 var Question = require('../models/question');
 var config = require("./../configuration");
+var sanit_fn = require("sanitize-filename");
 
 var async = require('async');
 
@@ -86,8 +87,9 @@ exports.question_update_get = function(req, res) {
 /*         Controlleurs POST pour modifier les questions     */
 /*************************************************************/
 
-function formatQuestionFromBody(body) {
+function formatQuestionFromBody(body, files) {
     console.log("body = ", body);
+    let fileInfo = [];
     let question = {
 	enonce : body.enonce,
 	correct : body.correct,
@@ -103,20 +105,29 @@ function formatQuestionFromBody(body) {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
 	    texted: body["texted-"+i]=="true" ? true : false,
+	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
 	};
+	console.log(files);
+	if(body["hasFile-"+i]) {
+	    if(files["correcFile-"+i]) {
+		files["correcFile-"+i].name = sanit_fn(files["correcFile-"+i].name);
+		fileInfo[i] = files["correcFile-"+i];
+	    }
+	}
 	if(reponse[i].texted) 
 	    reponse[i].correction = body["correction-"+i];
 	i++;
     }
     question.reponse = JSON.stringify(reponse);
-    return question;
+    return [question, fileInfo];
 }
 // Create
 
 exports.question_create_post = function(req, res) {
     if(req.subscription.canOwnSet) {
-	let question = formatQuestionFromBody(req.body);
-	Question.questionCreate(req.session.user, question, req.set.id, function(err, info) {
+	console.log("req.files is", req.files);
+	let [question, fileInfo] = formatQuestionFromBody(req.body, req.files);
+	Question.questionCreate(req.session.user, question, fileInfo, req.set.id, function(err, info) {
 	    if(err) {
 		req.msgs.push("Impossible d'ajouter la question !");
 		SetController.set_manage(req, res);
@@ -137,7 +148,7 @@ exports.question_create_post = function(req, res) {
 
 exports.question_update_post = function(req, res) {
     if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
-	let question = formatQuestionFromBody(req.body);
+	let [question, fileInfo] = formatQuestionFromBody(req.body, req.files);
 	Question.questionUpdate(req.session.user, req.question.id, question, function(err, info) {
 	    if(err) {
 		req.msgs.push("Impossible de mettre à jour la question !");

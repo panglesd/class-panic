@@ -157,10 +157,14 @@ exports.doc_list = function(req, res) {
 // ];
 
 function serveFile(data, fileName, res) {
-    res.setHeader('Content-type',allMime[path.extname(fileName)]);
-    console.log("yo");
+    let mime = allMime[path.extname(fileName)];
+    if(!mime)
+	mime = "application/octet-stream";
+    res.setHeader('Content-type', mime);
+//    console.log("yo");
     res.end(data);
 }
+exports.serveFile = serveFile;
 
 exports.doc_get = function (req, res) {
     let docID = req.params.docID;

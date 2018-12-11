@@ -7,6 +7,10 @@ var Set = require("./set");
 var Course = require("./course");
 var Stats = require("./stats");
 
+var fs = require("fs");
+var mkdirp = require("mkdirp");
+var sanit_fn = require("sanitize-filename");
+
 /***********************************************************************/
 /*       Récupérer la question active d'une room                       */
 /***********************************************************************/
@@ -284,4 +288,15 @@ exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, ha
 	let params = [JSON.stringify(fileInfo), submL[0].statsID];
 	bdd.query(query, params, callback);
     });
+};
+
+
+
+exports.getFileFromSubmission= function(userID, room, question, answerNumber, fileName, callback) {
+    Stats.getSubmission(userID, room.id, question.id, (err, subm) => {
+	let path = "storage/course"+room.courseID+"/room"+room.id+"/question"+question.id+"/user"+userID+"/answer"+answerNumber+"/"+fileName;
+	console.log(path);
+	fs.readFile(path, callback);
+    });
+
 };

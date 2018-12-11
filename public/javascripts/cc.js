@@ -69,9 +69,10 @@ function sendOwnedQuestionPlease() {
 /*                 lorsque l'on veut reveler les resultats           */
 /*********************************************************************/
 
-function revealResults() {
+/*function revealResults() {
     socketCC.emit("revealResults");
 }
+*/
 
 /*********************************************************************/
 /*                 lorsque l'on veut aller à une question donnée     */
@@ -129,7 +130,7 @@ function gotoQuestion(i) {
 socketCC.on('newQuestion', function (reponse) {
     console.log('newQuestion');
     console.log(reponse);
-    currentQuestionOfAdmin=reponse;
+//    currentQuestionOfAdmin=reponse;
     currentQuestionOfCC=reponse;
     currentQuestionOfCC.fileInfo = JSON.parse(currentQuestionOfCC.fileInfo);
     // On s'occupe du carré blanc
@@ -180,7 +181,7 @@ socketCC.on('newQuestion', function (reponse) {
 	// Si besoin est, ajout d'un event listener
 	elem.addEventListener("click", function (ev) {
 	    //		chooseAnswer(index, event.currentTarget);
-	    if(ev.target.tagName != "TEXTAREA")
+	    if(ev.target.tagName != "TEXTAREA" && ev.target.tagName != "A")
 		chooseAnswer(index, elem, false);
 	    else
 		chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
@@ -210,13 +211,13 @@ socketCC.on('newQuestion', function (reponse) {
 	    elem.appendChild(textarea);
 	}
 	// Si besoin, ajout d'un input type=file
-	if(rep.hasFile) {
+	if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
 	    let fileInfo = document.createElement("div");
 	    fileInfo.innerText = "Pas de fichier envoyé";
 	    if(reponse.fileInfo && reponse.fileInfo[index]) {
-		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  class='fileName'></td></tr>"+
+		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
 		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
-		fileInfo.querySelector(".fileName").innerText = reponse.fileInfo[index].fileName;
+		fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
 		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
 	    }
 	    fileInfo.style.fontSize = "19px";
@@ -246,8 +247,7 @@ socketCC.on('newQuestion', function (reponse) {
 	    if(ta)
 		ta.value = ans.text;
 	});
-
-
+    socketCC.emit("sendCorrection", currentQuestionOfCC.id);
     socketCC.emit("sendList");
 });
 
@@ -300,6 +300,40 @@ socketCC.on('newList', function (questionList) {
 //	console.log(currentQuestionOfCC.id);
 //	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
 });
+
+/*********************************************************************/
+/*                 lorsque l'on reçoit la correction                 */
+/*********************************************************************/
+
+socketCC.on('newCorrection', function (correction) {
+    console.log("corec = ", correction);
+    correction.correcFileInfo = JSON.parse(correction.correcFileInfo);
+    correction.reponses.forEach((rep, index) => {
+	let div = document.querySelector("#r"+index);
+	if(rep.validity != "to_correct") {
+	    div.classList.add(rep.validity);
+	}
+	if(rep.texted) {
+	    // Ajout d'un input div pour l'éventuelle correction
+	    let divCorrec = document.createElement("div");
+	    divCorrec.classList.add("correcArea");
+	    divCorrec.textContent = "Correction : "+rep.correction;
+	    div.appendChild(divCorrec);
+	}
+	if(rep.hasFile == true || ["true","single","multi"].includes(rep.hasFile)) {
+//	    console.log(correction);
+	    if(correction.correcFileInfo[index]) {
+		let linkToCorrection = document.createElement("a");
+		linkToCorrection.href = "fileCorrect/"+currentQuestionOfCC.id+"/"+index+"/"+correction.correcFileInfo[index];;
+		linkToCorrection.target = "_blank";
+		linkToCorrection.style.color = "blue";
+		linkToCorrection.textContent = "Correction : "+correction.correcFileInfo[index];
+		div.appendChild(linkToCorrection);
+	    }
+	}
+    });
+});
+
 
 /*********************************************************************/
 /*                 pour envoyer son choix de reponse                 */

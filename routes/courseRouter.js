@@ -16,6 +16,7 @@ var config = require("../configuration");
 var User = require('../models/user');
 var Course = require('../models/course');
 var Room = require('../models/room');
+var Question = require('../models/question');
 var Set = require('../models/set');
 var async = require('async');
 
@@ -132,14 +133,32 @@ router.use("/:courseID/doc", docRouter);
 router.use("/:courseID/set", setRouter);
 
 
+router.use('/:courseID/:command/:roomID', (req, res, next) => {
+    Room.getByID(req.params.roomID, (err, room) => {
+	req.room = room;
+	next();
+    });
+});
+router.use('/:courseID/:command/:roomID/:fileType/:questionID', (req, res, next) => {
+    console.log(req.params);
+    Question.getByID(req.params.questionID, (err, question) => {
+	req.question = question;
+	next();
+    });
+});
 // GET request for entering a room.
 router.get('/:courseID/play/:roomID', game_controller.room_enter);
+// GET request for cc in a room.
+router.get('/:courseID/cc/:roomID/filePerso/:questionID/:answerNumber/:fileName', game_controller.fileForStudent);
+router.get('/:courseID/cc/:roomID/fileCorrect/:questionID/:answerNumber/:fileName', game_controller.fileCorrectForStudent);
 // GET request for cc in a room.
 router.get('/:courseID/cc/:roomID', game_controller.room_cc);
 // GET request for admining a room.
 router.get('/:courseID/control/:roomID', game_controller.room_admin);
 // GET request for admining a room.
 router.get('/:courseID/correct/:roomID', game_controller.room_cc_admin);
+router.get('/:courseID/correct/:roomID/filePerso/:questionID/:answerNumber/:userID/:fileName', game_controller.fileForAdmin);
+router.get('/:courseID/correct/:roomID/fileCorrect/:questionID/:answerNumber/:userID/:fileName', game_controller.fileCorrectForAdmin);
 
 
 

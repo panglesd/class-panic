@@ -180,7 +180,33 @@ function afficheResponse (reponse) {
 			    }*/
 		elem.appendChild(textarea);
 	    }
-//	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+	    // Si besoin, ajout d'un input type=file
+	    if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
+		let fileInfo = document.createElement("div");
+		fileInfo.id = "fileInfo-"+index;
+		fileInfo.innerText = "Pas de fichier envoyé";
+		if(reponse.fileInfo && reponse.fileInfo[index]) {
+		    fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
+			"<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+		    fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
+		    fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+		}
+		fileInfo.style.fontSize = "19px";
+		// let fileInput = document.createElement("input");
+		// fileInput.type="file";
+		// //	    file.value = "Soumettre un fichier";
+		// fileInput.addEventListener('change', function() {
+		//     var reader = new FileReader();
+		//     reader.addEventListener('load', function() {
+		// 	console.log("sending file !");
+		// 	socketCC.emit("chosenFile", fileInput.files[0].name, index, currentQuestionOfCC.indexSet, reader.result);
+		//     });
+		//     reader.readAsArrayBuffer(fileInput.files[0]);		
+		// });
+		elem.appendChild(fileInfo);
+		// elem.appendChild(fileInput);
+	    }
+	    //	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	    let button = document.createElement("button");
 	    button.addEventListener("click",(ev) => {
 		setValidity(index,"true");
@@ -319,7 +345,7 @@ function affSubmission(submission) {
 	let repElem = document.querySelector("#r"+rep.n);
 	repElem.classList.replace("notSelected","selected");
 	if(submission.customQuestion.allResponses[rep.n].texted) {
-	    let textarea
+	    let textarea;
 	    if(repElem.querySelector("textarea"))
 		textarea = repElem.querySelector("textarea");
 	    else
@@ -329,6 +355,18 @@ function affSubmission(submission) {
 	    textarea.style.display="block";
 	    textarea.textContent=rep.text;
 	    repElem.insertBefore(textarea,repElem.querySelector("div").nextSibling);
+	}
+	if(submission.customQuestion.allResponses[rep.n].hasFile == true ||
+	   ["true","single","multi"].includes(submission.customQuestion.allResponses[rep.n].hasFile)) {
+	    console.log(submission);
+	    let fileInfo = document.querySelector("#fileInfo-"+rep.n);
+	    if(submission.fileInfo && submission.fileInfo[rep.n]) {
+		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='"+currentQuestionOfCC.id+"/"+rep.n+"/"+currentStudent.id+"/"+JSON.parse(submission.fileInfo)[rep.n].fileName+"'></a></td></tr>"+
+		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+		fileInfo.querySelector(".fileName").innerText += JSON.parse(submission.fileInfo)[rep.n].fileName;
+		fileInfo.querySelector(".hash").innerText = submission.fileInfo[rep.n].hash;
+	    }
+
 	}
     });
     document.querySelector("#note").textContent = submission.correct+"/1";

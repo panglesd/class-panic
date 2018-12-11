@@ -36,7 +36,12 @@ module.exports = function(io) {
 	    callback();
 	});
     }
-
+    function sendCorrection(socket, i, callback) {
+	Question.getByID(i, (err, question) => {
+	    if(question.class == socket.room.questionSet)
+		socket.emit("newCorrection", question);
+	});
+    };
     function sendQuestionFromIndex (socket, index, callback)  {
 	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
 	    question.allResponses.forEach((rep) => {
@@ -81,7 +86,7 @@ module.exports = function(io) {
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    Room.getByID(parseInt(newRoom), function (err, res) {
-		if(res && res.status == "pending") {
+		if(res && res.status != "closed") {
 		    Course.getByID(res.courseID,(er, course) => {
 			User.getSubscription(socket.request.session.user, course, (err, subscription) => {
 			    if(subscription) {
@@ -112,48 +117,62 @@ module.exports = function(io) {
 	socket.on('sendList', function () {
 	    sendListQuestion(socket, function() {});
 	});
+
+	/******************************************/
+	/*  Un admin me demande la liste des questions*/
+	/******************************************/
+	
+	socket.on('sendCorrection', function (i) {
+	    if(socket.room.status == "revealed")
+		sendCorrection(socket, i, function() {});
+	});
+
 	/******************************************/
 	/*  On m'envoie une reponse               */
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-//	    console.log("answer = ", answer);
-	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(answer.length != 0 && question.type != "multi")
-		    answer = [answer[0]];
-		game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
-		    sendListQuestion(socket, function() {});
-		    //			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+	    //	    console.log("answer = ", answer);
+	    if(socket.room.status == "pending") {
+		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		    if(answer.length != 0 && question.type != "multi")
+			answer = [answer[0]];
+		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
+			sendListQuestion(socket, function() {});
+			//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
+		    });
 		});
-	    });
+	    }
 	});
 	/******************************************/
 	/*  On m'envoie une reponse avec un fichier*/
 	/******************************************/
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
-	    Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		if(question.allResponses[n_ans].hasFile) {
-		    let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
-		    console.log("path = ", path);
-		    mkdirp(path, (err) => {
-			fileName = sanit_fn(fileName);
-			if(fileName)
-			    fs.writeFile(path+fileName, data, (err) => {
-				if(err) throw err;
-				md5File(path+fileName, (err, hash) => {
-				    game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, (err) => {
-					sendQuestionFromIndex(socket, questionIndex,() => {});
-					socket.emit("fileReceived", n_ans, fileName, hash);
+	    if(socket.room.status == "pending"){
+		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		    if(question.allResponses[n_ans].hasFile != "none") {
+			let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
+			console.log("path = ", path);
+			mkdirp(path, (err) => {
+			    fileName = sanit_fn(fileName);
+			    if(fileName)
+				fs.writeFile(path+fileName, data, (err) => {
+				    if(err) throw err;
+				    md5File(path+fileName, (err, hash) => {
+					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, (err) => {
+					    sendQuestionFromIndex(socket, questionIndex,() => {});
+					socket.emit("// FIXME: leReceived", n_ans, fileName, hash);
+					});
 				    });
+				    // prévenir le client (et update bdd ?)
 				});
-				// prévenir le client (et update bdd ?)
-			    });
-		    });
-		// if(answer.length != 0 && question.type != "multi")
-		//     answer = [answer[0]];
-		}
-	    });
+			});
+			// if(answer.length != 0 && question.type != "multi")
+			//     answer = [answer[0]];
+		    }
+		});
+	    }
 	});
 
 	

@@ -1,5 +1,7 @@
+var async = require("async");
 let bdd = require("./bdd");
-
+var mkdirp = require("mkdirp");
+var fs = require("fs");
 
 /***********************************************************************/
 /*       Getters pour les question : listes                            */
@@ -115,7 +117,7 @@ exports.getFirstOfOwnedSet = function (user, setID, callback) {
 exports.getFirstOfSet = function (setID, callback) {
     bdd.query('SELECT * from `questions` WHERE indexSet = 0 AND class = ?', [setID], function (err, rows) {
 	if(err)
-	    callback(err, null)
+	    callback(err, null);
 	else if (rows.length == 0)
 	    callback("Set associé vide");
 	else {
@@ -126,22 +128,47 @@ exports.getFirstOfSet = function (setID, callback) {
     });
 };
 
+exports.getFileCorrect = function (question, n_ans, callback) {
+    console.log("thequestio is ", question);
+    question.correcFileInfo = JSON.parse(question.correcFileInfo);
+    let path = "storage/question"+question.id+"/anwer"+n_ans+"/"+question.correcFileInfo[n_ans];
+    fs.readFile(path, callback);    
+};
+
 /***********************************************************************/
 /*       Gestion CRUD des questions                                    */
 /***********************************************************************/
 
 // Création
 
-exports.questionCreate = function (user, question, setID, callback) {
+exports.questionCreate = function (user, question, fileInfo, setID, callback) {
     console.log("question = ", question);
     
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	if(er)
 	    console.log(er);
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?,?,?); SELECT LAST_INSERT_ID()",
-		  [ question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef],
-		  function (err, r) {console.log(err); callback(err, r[0]);});
+	let fileNames = fileInfo.map((file) => { return file.name;});
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`, `correcFileInfo`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?); SELECT LAST_INSERT_ID() as id", [
+	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef, JSON.stringify(fileNames)
+	], function (err, r) {
+	    console.log(err, r);
+	    let questionID = r[1][0].id;
+	    async.eachOf(fileInfo, (file, index, callback) => {
+		if(file) {
+ 		    let path = "storage/question"+questionID+"/anwer"+index+"/";
+		    console.log("path =", path+file.name);
+		    mkdirp(path, (err) => {
+			file.mv(path+file.name, callback);
+		    });
+		}
+		else
+		    callback();
+	    }, (err) => {
+		console.log(err);
+		callback(err, questionID);
+	    });
+	});
     });
 };
 

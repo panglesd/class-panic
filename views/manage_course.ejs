@@ -10,43 +10,42 @@ Description : <textarea <%= course.ownerID == user.id ? "" : "readonly" %>  name
     <input type="submit" value="Modifier">
     </form>
 <% }%>
-<% if(roomList.find((room) => {return room.status == "pending" || (room.type == "cc" && subscription.isTDMan)})){ %>
-    <h2>Travailler</h2>
-    <ul class="room">
-	<% roomList.forEach(function(room) { %>
-	    <% if(room.status == "pending" || (room.type == "cc" && subscription.isTDMan)) { %>
-		<a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%
-										 if(room.type == "live") {
-										     if(subscription.isTDMan) {
-               									 %>control<%
-	         									  }
-											  else {
-											  %>play<%
-												}
-												}
-												else if (room.type == "cc") {
-												    if (subscription.isTDMan) {
-												%>correct<%
-													 } else {
-													 %>cc<%
-													     }
-													     }
-													     %>/<%= room.id %>">
-		    <li class="room">
-			<span class="froom"><%= room.name %></span>
-			<ul>
-			    <!-- <li>Nombre de participants : <%= //room.number %></li> -->
-			    <li>Administrateur: <%=room.owner %></li>
-			</ul>
-			<div>
-			    Rejoindre
-			</div>
-		    </li>
-		</a>
+<h2>Travailler</h2>
+<ul class="room">
+    <% roomList.forEach(function(room) { %>
+	<% if(room.status == "pending" || room.status == "revealed" || (room.type == "cc" && subscription.isTDMan)) { %>
+	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%
+									     if(room.type == "live") {
+										 if(subscription.isTDMan) {
+               								     %>control<%
+	         								      }
+										      else {
+										      %>play<%				      
+											    }
+											    }
+											    else if (room.type == "cc") {
+												if (subscription.isTDMan) {
+											    %>correct<%
+												     } else {
+												     %>cc<%
+													 }
+													 }
+													 %>/<%= room.id %>/">
+		<li class="room">
+		    <span class="froom"><%= room.name %></span>
+		    <ul>
+			<!-- <li>Nombre de participants : <%= //room.number %></li> -->
+			<li>Administrateur: <%=room.owner %></li>
+		    </ul>
+		    <div>
+			Rejoindre
+		    </div>
+		</li>
+	    </a>
   <% };%>
   <% });%>
     </ul>
-  <% } %>
+  <% //} %>
 
 
   <% if(course.ownerID == user.id) { %>

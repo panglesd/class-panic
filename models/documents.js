@@ -24,7 +24,11 @@ exports.create = function(mainFile, files, courseID, ownerID, callback) {
 	mkdirp(path, (err) => {
 	    mainFile.mv(path+sanit_fn(mainFile.name), (err) => {
 		async.forEach(files, (file, callback) => {
-		    file.mv(path+sanit_fn(file.name), callback);
+		    if(file) {
+			file.mv(path+sanit_fn(file.name), callback);
+		    }
+		    else
+			callback();
 		}, callback);
 	    });
 	});
