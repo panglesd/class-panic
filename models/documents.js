@@ -43,13 +43,17 @@ exports.getByID = function(docID, callback) {
     let query = "SELECT * FROM documents WHERE id = ?";
     let params = [docID];
     bdd.query(query, params, (err, res) => {
-	let doc = res[0];
-	if(doc) {
-	    doc.filesInfo = JSON.parse(doc.filesInfo);
-	    
+	if(res) {
+	    let doc = res[0];
+	    if(doc) {
+		doc.filesInfo = JSON.parse(doc.filesInfo);
+		doc.filesInfo.aux.sort();
+	    }
+	    callback(err, doc);
 	}
-	callback(err, doc);
-    });
+	else
+	    callback("erreur doc", null);
+	});
 };
 exports.getFileFromDoc = function(doc, fileName, callback) {
 //    console.log(doc.filesInfo);
@@ -64,6 +68,7 @@ exports.getListByCourseID = function(courseID, callback) {
     bdd.query(query, params, (err, res) => {
 	res.forEach((doc) => {
 	    doc.filesInfo = JSON.parse(doc.filesInfo);
+	    doc.filesInfo.aux.sort();
 	});
 	callback(err, res);
     });
