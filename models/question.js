@@ -131,7 +131,7 @@ exports.getFirstOfSet = function (setID, callback) {
 exports.getFileCorrect = function (question, n_ans, callback) {
     console.log("thequestio is ", question);
     question.correcFileInfo = JSON.parse(question.correcFileInfo);
-    let path = "storage/question"+question.id+"/anwer"+n_ans+"/"+question.correcFileInfo[n_ans];
+    let path = "storage/question"+question.id+"/answer"+n_ans+"/"+question.correcFileInfo[n_ans];
     fs.readFile(path, callback);    
 };
 

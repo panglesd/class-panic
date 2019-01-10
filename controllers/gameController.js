@@ -175,7 +175,7 @@ exports.fileCorrectForStudent = function(req, res) {
 //    console.log(req.params);
     if(req.room.status == "revealed") {
 	Question.getFileCorrect(req.question, req.params.answerNumber, /*sanit_fn(req.params.fileName),*/ (err, data) => {
-	    console.log("yo");
+	    console.log("yo", err);
 	    docController.serveFile(data, sanit_fn(req.params.fileName), res);
 	});
     }

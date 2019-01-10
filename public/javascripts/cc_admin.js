@@ -361,8 +361,8 @@ function affSubmission(submission) {
 	   ["true","single","multi"].includes(submission.customQuestion.allResponses[rep.n].hasFile)) {
 	    console.log(submission);
 	    let fileInfo = document.querySelector("#fileInfo-"+rep.n);
-	    if(submission.fileInfo && submission.fileInfo[rep.n]) {
-		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='"+currentQuestionOfCC.id+"/"+rep.n+"/"+currentStudent.id+"/"+JSON.parse(submission.fileInfo)[rep.n].fileName+"'></a></td></tr>"+
+	    if(submission.fileInfo && JSON.parse(submission.fileInfo)[rep.n]) {
+		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+rep.n+"/"+currentStudent.id+"/"+JSON.parse(submission.fileInfo)[rep.n].fileName+"'></a></td></tr>"+
 		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
 		fileInfo.querySelector(".fileName").innerText += JSON.parse(submission.fileInfo)[rep.n].fileName;
 		fileInfo.querySelector(".hash").innerText = submission.fileInfo[rep.n].hash;
