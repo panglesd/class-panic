@@ -1,5 +1,6 @@
 //var socket = io.connect('http://192.168.0.12:3000/');
-var socket = io.connect(server+"/student");
+var socket = io.connect("https://wim.choum.net"+'/student');
+//var socket = io.connect(server+"/student");
 //var socket = io.connect('http://localhost:3000/');
 var currentQuestionOfStudent;
 var md = new markdownit({
