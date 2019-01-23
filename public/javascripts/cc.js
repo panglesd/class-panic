@@ -215,9 +215,14 @@ socketCC.on('newQuestion', function (reponse) {
 	    fileInfo.innerText = "Pas de fichier envoyé";
 	    if(reponse.fileInfo && reponse.fileInfo[index]) {
 		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
-		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+//		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+		    "<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>";
 		fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
-		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+		//		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+		if(reponse.fileInfo[index].timestamp){
+		    let date = new Date(reponse.fileInfo[index].timestamp);
+		    fileInfo.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
+		}
 	    }
 	    fileInfo.style.fontSize = "19px";
 	    let fileInput = document.createElement("input");

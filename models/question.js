@@ -1,3 +1,91 @@
+/*
+
+  Actuellement :
+
+    Une question est un objet JS qui contient les propriétés suivantes :
+      Un énoncé
+      l'ID du set auquel il appartient
+      son index dans le set (sa position: 1er, deuxième...)
+      Une liste de réponses possibles
+      à qui il appartient (superflu par rapport à l'appartenance du set)
+      un type (mono ou multi réponses)
+      une stratégie de correction
+      un coefficient
+      une description
+      la liste des fichiers pour la correction
+
+    Une réponse possible est un objet JS qui contient :
+      L'énoncé de la réponse (reponse)
+      Sa validité par défaut (validity, "true" ou "false" ou "to_correct")
+      la question possède-t-elle une entrée texte ? (texted)
+        Si oui, la correction de ce texte (correction)
+      la question possède-t-elle une entrée fichier ? (hasFile)
+
+    Une soummission est :
+      Un statsBloc:
+        setId, setText,
+	roomId, roomText,
+	questionId, questionText,
+	courseId, courseText,
+      Un stats:
+        un user (userID)
+	une note (correct)
+	une strategy,
+	un timestamp (time)
+	une customQuestion:
+	  une liste de réponse possible où l'on modifie juste la validity...
+	une response
+	  une liste de couples "n":numéro de réponse, "text": réponse éventuelle
+	un fileInfo
+	  une liste de fichiers éventuellement uploadé, [n]=le fichier pour la n-ième réponse, un fichier étant
+	    un nom de fichier, un hash, un timestamp.
+
+
+  Ce que je voudrai faire :
+
+  Une question est un objet JS qui contient les propriétés suivantes :
+    Un titre
+    l'ID du set auquel il appartient
+    son index dans le set (sa position: 1er, deuxième...)
+    Une liste d'éléments !
+    un type (mono ou multi réponses, voire exercice ?)
+    une stratégie de correction
+    un coefficient
+
+    Un élément est soit une réponse possible, soit une description
+
+    Une description est un objet JS avec son type (description) et la description (description)
+
+    Une réponse possible est un objet JS qui contient :
+      L'énoncé de la réponse (reponse)
+      Sa validité par défaut (validity, "true" ou "false" ou "to_correct")
+      la question possède-t-elle une entrée texte ? (texted)
+        Si oui, la correction de ce texte (correction)
+      la question possède-t-elle une entrée fichier ? (hasFile)
+        Si oui, la correction de ce(s) fichier(s) (correcFileinfo)
+      un coefficient
+  
+    Une soummission est :
+      Un statsBloc:
+        setId, (setText?,)
+	roomId, (roomText?,)
+	questionId, (questionText?,)
+	courseId, (courseText?,)
+      Un stats:
+        un user (userID)
+	une note (correct)
+	une strategy,
+	un timestamp (time)
+	une correction personnelle
+	  une liste de note, commentaire, [n] pour la n-ième question
+	une response
+	  une liste d'objets, contenant éventuellement : "text", "files". [n] pour la nième réponse, =null si non séléctionnée
+	un fileInfo
+	  une liste de fichiers éventuellement uploadé, [n]=le fichier pour la n-ième réponse, un fichier étant
+	    un nom de fichier, un hash, un timestamp.
+
+
+*/
 var async = require("async");
 let bdd = require("./bdd");
 var mkdirp = require("mkdirp");

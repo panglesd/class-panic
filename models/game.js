@@ -277,13 +277,13 @@ exports.backToSet = function (roomID, callback) {
 
 
 
-exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, hash, callback) {
+exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, hash, timestamp, callback) {
     let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
     let params = [userID, roomID, questionID];
     bdd.query(query, params, (err, submL) => {
 	console.log("submL = ", submL);
 	let fileInfo = JSON.parse(submL[0].fileInfo);
-	fileInfo[n_ans] = {fileName: fileName, hash:hash};
+	fileInfo[n_ans] = {fileName: fileName, hash:hash , timestamp:timestamp};
 	let query = "UPDATE stats SET fileInfo = ? WHERE id = ?";
 	let params = [JSON.stringify(fileInfo), submL[0].statsID];
 	bdd.query(query, params, callback);

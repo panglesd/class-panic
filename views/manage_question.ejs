@@ -53,6 +53,7 @@ Utiliser $...$ pour mettre des maths.
 		<span class="froom nreponse"> Réponse <%= i %> :</span>
 	<!--    Texte de la réponse              -->
 		<textarea
+		    rows="2"
 		    <%= canModify ? "" : "readonly" %>
 		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
 		    class="value-reponse-textarea"
@@ -65,9 +66,10 @@ Utiliser $...$ pour mettre des maths.
 		    <span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span>
 		</div>
 		<textarea
+		    rows="2"
 		    class="correction-textarea"
 		    name="correction-<%= i %>"
-		    style="<%= reponsePossible.texted ? "" : "visibility:hidden;" %> display:block; width:100%"
+		    style="<%= reponsePossible.texted ? "" : "display:none;" %> width:100%"
 		    placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %></textarea>
 	<!--    Peut-on rendre un fichier ?      -->
 		<div
@@ -76,6 +78,12 @@ Utiliser $...$ pour mettre des maths.
 		    <input name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
 		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple </span>
 		    <input name="correcFile-<%= i %>" type="file"> (Fichier pour la correction)
+		</div>		
+	<!--    Coefficient                      -->
+		<div
+		    class="text"
+		    style="text-align:left;margin:3px;">
+		    <input name="coeff-<%= i %>" type="number" value="<%= reponsePossible.coefficient %>"><label for="coef-<%= i %>"> : Coefficient</label>
 		</div>		
 	<!--    Boutons pour le management       -->
 		<% if(canModify) { %>
@@ -147,4 +155,8 @@ Utiliser $...$ pour mettre des maths.
      });
     </script>
 <% } %>
+<script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
+<script>
+autosize(document.querySelectorAll('textarea'));
+</script>
 <%- include('admin_footer'); -%>

@@ -160,7 +160,7 @@ module.exports = function(io) {
 				fs.writeFile(path+fileName, data, (err) => {
 				    if(err) throw err;
 				    md5File(path+fileName, (err, hash) => {
-					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, (err) => {
+					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, Date.now(),(err) => {
 					    sendQuestionFromIndex(socket, questionIndex,() => {});
 					socket.emit("// FIXME: leReceived", n_ans, fileName, hash);
 					});
