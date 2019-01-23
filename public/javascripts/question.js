@@ -39,10 +39,10 @@ function returnHTMLQuestion (i) {
 '			    <li class="set-true select" >'+
 '				Réponse juste'+
 '			    </li>'+
-'			    <li class="set-to_correct select" >'+
+'			    <li class="set-to_correct select selected" >'+
 '				Réponse à corriger'+
 '			    </li>'+
-'			    <li class="set-false select selected" >'+
+'			    <li class="set-false select" >'+
 '				Réponse fausse'+
 '			    </li>'+
 '			</ul>'+
@@ -56,7 +56,7 @@ function addAnswer () {
     let liButton = document.querySelector("#ajoutrep");
     let n = document.querySelectorAll(".reponse").length;
     li.innerHTML=returnHTMLQuestion(n);
-    li.classList.add("reponse", "false");
+    li.classList.add("reponse", "to_correct");
     ul.insertBefore(li,liButton);
     addReponseListener(li);
 }

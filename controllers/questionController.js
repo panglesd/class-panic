@@ -38,7 +38,7 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 			     {
 				 reponses : [{
 				     reponse: "",
-				     validity: "false",
+				     validity: "to_correct",
 				     texted: false
 				 }],
 				 enonce: "",
