@@ -1,4 +1,5 @@
-var socketStats = io.connect(server+'/stats');
+//var socketStats = io.connect(server+'/stats');
+var socketStats = io.connect("https://wim.choum.net"+'/stats');
 
 function update() {
     let filter = {};
