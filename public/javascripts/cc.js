@@ -127,8 +127,8 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketCC.on('newQuestion', function (reponse) {
-    console.log('newQuestion');
-    console.log(reponse);
+//    console.log('newQuestion');
+    console.log("newQuestion", reponse);
 //    currentQuestionOfAdmin=reponse;
     currentQuestionOfCC=reponse;
     currentQuestionOfCC.fileInfo = JSON.parse(currentQuestionOfCC.fileInfo);
@@ -146,7 +146,7 @@ socketCC.on('newQuestion', function (reponse) {
     // On écrit l'énoncé là où il faut. MathJax rendered.
     let enonce = document.querySelector("#question");
     enonce.textContent=reponse.enonce;
-//    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
 
     // On nettoie les réponses précédentes
     let wrapper = document.querySelector("#wrapperAnswer");
@@ -212,18 +212,8 @@ socketCC.on('newQuestion', function (reponse) {
 	// Si besoin, ajout d'un input type=file
 	if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
 	    let fileInfo = document.createElement("div");
+	    fileInfo.classList.add("filesInfo");
 	    fileInfo.innerText = "Pas de fichier envoyé";
-	    if(reponse.fileInfo && reponse.fileInfo[index]) {
-		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
-//		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
-		    "<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>";
-		fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
-		//		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
-		if(reponse.fileInfo[index].timestamp){
-		    let date = new Date(reponse.fileInfo[index].timestamp);
-		    fileInfo.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
-		}
-	    }
 	    fileInfo.style.fontSize = "19px";
 	    let fileInput = document.createElement("input");
 	    fileInput.type="file";
@@ -233,6 +223,7 @@ socketCC.on('newQuestion', function (reponse) {
 		reader.addEventListener('load', function() {
 		    console.log("sending file !");
 		    socketCC.emit("chosenFile", fileInput.files[0].name, index, currentQuestionOfCC.indexSet, reader.result);
+		    elem.classList.replace("notSelected", "selected");
 		});
 		reader.readAsArrayBuffer(fileInput.files[0]);		
 	    });
@@ -242,17 +233,79 @@ socketCC.on('newQuestion', function (reponse) {
 //	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
 	wrapper.appendChild(elem);
     });
-    if(reponse.userResponse)
-	reponse.userResponse.forEach((ans) => {
-	    let temp = document.querySelectorAll("#wrapperAnswer .reponse")[ans.n];
-	    temp.classList.remove("notSelected");
-	    temp.classList.add("selected");
-	    let ta = temp.querySelector("textarea");
-	    if(ta)
-		ta.value = ans.text;
-	});
+    //    afficheSubmission(reponse.submission);
+//    let temp2 = {responses:reponse.userResponse.map((obj) => {if (obj) {obj.filesInfo=[];obj.selected = true; }return obj;})};
+    let temp2 = {responses:reponse.userResponse};
+    afficheSubmission(temp2);
     socketCC.emit("sendCorrection", currentQuestionOfCC.id);
     socketCC.emit("sendList");
+});
+
+/*********************************************************************/
+/*                 lorsque l'on reçoit une nouvelle soumission       */
+/*********************************************************************/
+
+//socketCC.on('newSubmission', function (submission) {
+function afficheSubmission (submission) {
+    console.log("affSubm with ", submission);
+    submission.responses.forEach((reponse, index) => {
+	if(reponse) {
+//	    reponse.userResponse.forEach((ans, index) => {
+	    let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[index];
+	    elemReponse.classList.remove("notSelected");
+	    elemReponse.classList.remove("selected");
+	    elemReponse.classList.add(reponse.selected ? "selected" : "notSelected");
+	    let ta = elemReponse.querySelector("textarea");
+	    if(ta)
+		ta.value = reponse.text;
+	    //    });
+	    if(reponse.filesInfo[0]) {
+		affFileInfo(elemReponse,reponse.filesInfo[0],index);
+		// let filesInfo = elemReponse.querySelector(".filesInfo");
+		// filesInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.filesInfo[0].fileName+"'></a></td></tr>"+
+		//     //		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+		// "<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>";
+		// filesInfo.querySelector(".fileName").innerText += reponse.filesInfo[0].fileName;
+		// //		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+		// if(reponse.filesInfo[0].timestamp){
+		//     let date = new Date(reponse.filesInfo[0].timestamp);
+		//     filesInfo.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
+		// }
+	    }
+	    // Ici gérer les corrections personnelles par reponse
+	    // elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
+	}
+    });
+    // Ici gérer les corrections personnelles de la question
+    // document.querySelector(".correcPersoGlobal").innerText = submission.correcPerso
+    // Notes etc...
+};
+//});
+
+/*********************************************************************/
+/*                 lorsqu'un fichier a été reçu                      */
+/*********************************************************************/
+
+function affFileInfo(elemReponse, fileInfo, n_ans) {
+    console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
+    let filesInfo = elemReponse.querySelector(".filesInfo");
+    filesInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+n_ans+"/"+fileInfo.fileName+"'></a></td></tr>"+
+	//		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+    "<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>";
+    filesInfo.querySelector(".fileName").innerText += fileInfo.fileName;
+    //		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+    if(fileInfo.timestamp){
+	let date = new Date(fileInfo.timestamp);
+	filesInfo.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
+    }
+    elemReponse.setAttribute("fileInfo",JSON.stringify(fileInfo));
+}
+
+socketCC.on("fileReceived", (n_ans, fileName, hash) => {
+    console.log("fileReceived with : ", n_ans, fileName, hash);
+    let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[n_ans];
+    affFileInfo(elemReponse, {fileName: fileName, hash: hash, timestamp: 23456}, n_ans);
+    sendAnswer();    
 });
 
 /*********************************************************************/
@@ -260,8 +313,8 @@ socketCC.on('newQuestion', function (reponse) {
 /*********************************************************************/
 
 socketCC.on('newList', function (questionList) {
-    console.log("questionList", questionList);
-    console.log("currentList", currentList);
+    // console.log("questionList", questionList);
+    // console.log("currentList", currentList);
     // On vérifie si quelque chose a changé dans les énoncés.
     let notTheSame = typeof currentList == "undefined";
     notTheSame = notTheSame || currentList.length != questionList.length;
@@ -277,7 +330,7 @@ socketCC.on('newList', function (questionList) {
 	ul.id = "chooseQFromSet";
 	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
 	questionList.forEach(function (question, index) {
-	    console.log(question);
+	    // console.log(question);
 	    let li = document.createElement("li");
 	    li.id = "q-" + question.id;
 	    li.classList.add("q-");
@@ -370,14 +423,20 @@ function chooseAnswer(i, elem, update) {
 
 function sendAnswer() {
     let reponses = [];
-    document.querySelectorAll(".reponse.selected").forEach((elem) => {
+//    document.querySelectorAll(".reponse.selected").forEach((elem) => {
+    document.querySelectorAll(".reponse").forEach((elem) => {
 	let atom = {};
-	atom.n = parseInt(elem.id.split("r")[1]);
+	atom.selected = elem.classList.contains("selected");
+//	let nQuestion = parseInt(elem.id.split("r")[1]);
 	let textarea = elem.querySelector("textarea");
 	atom.text = textarea ? textarea.value : "";
+	let fI = JSON.parse(elem.getAttribute("fileInfo"));
+	atom.filesInfo = fI ? [fI] : [];
+//	reponses[nQuestion] = atom;
 	reponses.push(atom);
     });
+    console.log("reponse envoyées : ", reponses);
     socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
-    console.log("reponses, currentQuestionOfCC.indexSet = ", reponses, currentQuestionOfCC.indexSet);
+//    console.log("reponses, currentQuestionOfCC.indexSet = ", reponses, currentQuestionOfCC.indexSet);
 }
 

@@ -34,7 +34,7 @@ function returnHTMLQuestion (i) {
 '		<div'+
 '		    class="text"'+
 '		    style="text-align:left;margin:3px;">'+
-'		    <input name="coeff-<%= i %>" type="number" value="<%= reponsePossible.coefficient %>"><label for="coef-<%= i %>"> : Coefficient</label>'+
+'		    <input name="coeff-<%= i %>" type="number" value="1"><label for="coef-<%= i %>"> : Coefficient</label>'+
 '		</div>		'+		
 '	<!--    Boutons pour le management       -->'+
 '		    <div>'+

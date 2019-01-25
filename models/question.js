@@ -80,9 +80,8 @@
 	  une liste de note, commentaire, [n] pour la n-ième question
 	une response
 	  une liste d'objets, contenant éventuellement : "text", "files". [n] pour la nième réponse, =null si non séléctionnée
-	un fileInfo
-	  une liste de fichiers éventuellement uploadé, [n]=le fichier pour la n-ième réponse, un fichier étant
-	    un nom de fichier, un hash, un timestamp.
+                                                                  un fichier étant
+                                                        	    un nom de fichier, un hash, un timestamp.
 
 
 */
@@ -229,20 +228,22 @@ exports.getFileCorrect = function (question, n_ans, callback) {
 
 // Création
 
-exports.questionCreate = function (user, question, fileInfo, setID, callback) {
+exports.questionCreate = function (user, question, filesData, setID, callback) {
     console.log("question = ", question);
     
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	if(er)
 	    console.log(er);
-	let fileNames = fileInfo.map((file) => { return file.name;});
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`, `correcFileInfo`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?); SELECT LAST_INSERT_ID() as id", [
-	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef, JSON.stringify(fileNames)
+//	let fileNames = question.map((repPoss) => { return repPoss.fileInfo.name;});
+	// bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`, `correcFileInfo`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?); SELECT LAST_INSERT_ID() as id", [
+	//     question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef, JSON.stringify(fileNames)
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?); SELECT LAST_INSERT_ID() as id", [
+	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef
 	], function (err, r) {
 	    console.log(err, r);
 	    let questionID = r[1][0].id;
-	    async.eachOf(fileInfo, (file, index, callback) => {
+	    async.eachOf(filesData, (file, index, callback) => {
 		if(file) {
  		    let path = "storage/question"+questionID+"/anwer"+index+"/";
 		    console.log("path =", path+file.name);
@@ -277,10 +278,25 @@ exports.questionDelete = function (user, questionID, callback) {
 
 // Update
 
-exports.questionUpdate = function (user, questionID, newQuestion, callback) {
+exports.questionUpdate = function (user, questionID, newQuestion, filesData, callback) {
     let i=0;
     bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `strategy` = ?, `coef` = ? WHERE `id` = ?",
-	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], callback);
+	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], (err, res) =>
+	      async.eachOf(filesData, (file, index, callback) => {
+		  if(file) {
+ 		      let path = "storage/question"+questionID+"/anwer"+index+"/";
+		      console.log("path =", path+file.name);
+		      mkdirp(path, (err) => {
+			  file.mv(path+file.name, callback);
+		      });
+		  }
+		  else
+		      callback();
+	      }, (err) => {
+		  console.log(err);
+		  callback(err, questionID);
+	      })
+	     );
 };
 
 

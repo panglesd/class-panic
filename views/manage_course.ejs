@@ -14,7 +14,7 @@ Description : <textarea <%= course.ownerID == user.id ? "" : "readonly" %>  name
 <h2>Travailler</h2>
 <ul class="room">
     <% roomList.forEach(function(room) { %>
-	<% if(room.status == "pending" || (room.type == "cc" && subscription.isTDMan)) { %>
+	<% if(room.status == "pending" || room.status == "revealed" || (room.type == "cc" && subscription.isTDMan)) { %>
 	    <a class="room" href="<%= config.PATH %>/course/<%= course.id %>/<%
 									     if(room.type == "live") {
 										 if(subscription.isTDMan) {
