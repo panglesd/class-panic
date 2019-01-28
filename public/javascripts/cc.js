@@ -2,7 +2,7 @@
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketCC = io.connect(server+'/cc');
-var currentQuestionOfCC;
+var currentQuestion;
 var currentList;
 var md = new markdownit({
     html:         false,        // Enable HTML tags in source
@@ -53,7 +53,7 @@ socketCC.on('connect', () => {
 /*********************************************************************/
 
 function changeQuestionPlease() {
-    socketCC.emit("changeToQuestion", currentQuestionOfCC.indexSet+1);
+    socketCC.emit("changeToQuestion", currentQuestion.indexSet+1);
 }
 
 /*********************************************************************/
@@ -123,19 +123,20 @@ function gotoQuestion(i) {
 // });
 
 /*********************************************************************/
-/*                 lorsque l'on reçoit une nouvelle question (admin) */
+/*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
 socketCC.on('newQuestion', function (reponse) {
 //    console.log('newQuestion');
     console.log("newQuestion", reponse);
 //    currentQuestionOfAdmin=reponse;
-    currentQuestionOfCC=reponse;
-    currentQuestionOfCC.fileInfo = JSON.parse(currentQuestionOfCC.fileInfo);
+    currentQuestion=reponse;
+    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
 
-    let temp2 = {responses:reponse.userResponse};
+    let temp2 = reponse.userResponse;
+    afficheQuestion(reponse);
     afficheSubmission(temp2);
-    socketCC.emit("sendCorrection", currentQuestionOfCC.id);
+    socketCC.emit("sendCorrection", currentQuestion.id);
     socketCC.emit("sendList");
 });
 
@@ -163,7 +164,7 @@ socketCC.on('newList', function (questionList) {
 /*********************************************************************/
 
 function chooseAnswer(i, elem, update) {
-    if(currentQuestionOfCC.type!="multi") {
+    if(currentQuestion.type!="multi") {
 	var reponse=document.querySelector(".reponse.selected");
 	if(reponse) {
 	    reponse.classList.replace('selected', 'notSelected');
@@ -202,7 +203,7 @@ function sendAnswer() {
 	reponses.push(atom);
     });
     console.log("reponse envoyées : ", reponses);
-    socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
-//    console.log("reponses, currentQuestionOfCC.indexSet = ", reponses, currentQuestionOfCC.indexSet);
+    socketCC.emit("chosenAnswer", reponses, currentQuestion.indexSet);
+//    console.log("reponses, currentQuestion.indexSet = ", reponses, currentQuestion.indexSet);
 }
 

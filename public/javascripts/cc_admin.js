@@ -2,7 +2,7 @@ var roomID;
 //var socketAdmin = io.connect('http://192.168.0.12:3000/admin');
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 var socketCC = io.connect(server+'/ccAdmin');
-var currentQuestionOfCC;
+var currentQuestion = {};
 var currentStudent;
 var currentStudentList;
 var currentList;
@@ -56,7 +56,7 @@ socketCC.on('connect', () => {
 /*********************************************************************/
 
 function changeQuestionPlease() {
-    socketCC.emit("changeToQuestion", roomID, currentQuestionOfCC.indexSet+1);
+    socketCC.emit("changeToQuestion", roomID, currentQuestion.indexSet+1);
 }
 
 /*********************************************************************/
@@ -72,7 +72,8 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 function sendSubmission() {
-    socketCC.emit("sendAnswer", roomID, currentStudent.userID, currentQuestionOfCC.id);
+    console.log("sendSubmission")
+    socketCC.emit("sendAnswer", roomID, currentStudent.userID, currentQuestion.id);
 }
 
 /*********************************************************************/
@@ -80,7 +81,7 @@ function sendSubmission() {
 /*********************************************************************/
 
 function setValidity(i, validity) {
-    socketCC.emit("setValidity", roomID, currentStudent.userID, currentQuestionOfCC.id, i, validity);
+    socketCC.emit("setValidity", roomID, currentStudent.userID, currentQuestion.id, i, validity);
 }
 function setStrategy() {
     console.log("setStrategy is on!");
@@ -90,10 +91,10 @@ function setStrategy() {
 	val = Math.max(-1, val);
 	val = Math.min(1, val);
 	/*console.log("val is", val);*/
-	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestionOfCC.id, strategy, val);
+	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestion.id, strategy, val);
     }
     else
-	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestionOfCC.id, strategy);
+	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestion.id, strategy);
 }
 
 /*********************************************************************/
@@ -284,56 +285,57 @@ function setStrategy() {
 
 
 socketCC.on('newList', function (questionList) {
-//    console.log("questionList", questionList);
-//    console.log("currentList", currentList);
-    // On vérifie si quelque chose a changé dans les énoncés.
-    let notTheSame = typeof currentList == "undefined";
-    notTheSame = notTheSame || currentList.length != questionList.length;
-    if(!notTheSame)
-	questionList.forEach((question, index) => {
-	    if(question.enonce != currentList[index].enonce)
-		notTheSame = true;
-	});
-    currentList = questionList;
-    // notTheSame vaut true ssi quelque chose a changé dans les énoncés. Si c'est le cas, on refait entièrement le menu
-    if(notTheSame) {
-	let ul = document.createElement("ul");
-	ul.id = "chooseQFromSet";
-	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
-	questionList.forEach(function (question, index) {
-//	    console.log(question);
-	    let li = document.createElement("li");
-	    li.id = "q-" + question.id;
-	    li.classList.add("q-");
-//	    if(question.id == currentQuestionOfCC.id)
-//		li.classList.add("currentQuestion");
-	    li.addEventListener("click", () => {
-//		console.log("sdfggfeer");
-		//		gotoQuestion(question.indexSet);
-		currentQuestionOfCC = currentList[index];
-		socketCC.emit("sendStudentList", roomID);
-		//		sendSubmission();
-	    });
-//	    li.class = ""+(question.id == currentQuestionOfCC.id);
-	    li.textContent = question.enonce;
-//	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
-	    ul.appendChild(li);
-	});
-	let old = document.querySelector("#chooseQFromSet");
-	old.parentNode.replaceChild(ul,old);
-    }
-    // Dans tous les cas, on refait le check des petites marques blanches
-    document.querySelectorAll(".q-").forEach((elem, index) => {
-	if(questionList[index].correct != "unknown")
-	    elem.classList.add("answered");
-	else
-	    elem.classList.remove("answered");
-    });
-    if(!currentQuestionOfCC)
-	currentQuestionOfCC = currentList[0];
-//    console.log("currentQuestionOfCC = ", currentQuestionOfCC);
+    affQuestionList(questionList);
+    if(!currentQuestion.id)
+	currentQuestion = currentList[0];
     sendSubmission();
 });
+// //    console.log("questionList", questionList);
+// //    console.log("currentList", currentList);
+//     // On vérifie si quelque chose a changé dans les énoncés.
+//     let notTheSame = typeof currentList == "undefined";
+//     notTheSame = notTheSame || currentList.length != questionList.length;
+//     if(!notTheSame)
+// 	questionList.forEach((question, index) => {
+// 	    if(question.enonce != currentList[index].enonce)
+// 		notTheSame = true;
+// 	});
+//     currentList = questionList;
+//     // notTheSame vaut true ssi quelque chose a changé dans les énoncés. Si c'est le cas, on refait entièrement le menu
+//     if(notTheSame) {
+// 	let ul = document.createElement("ul");
+// 	ul.id = "chooseQFromSet";
+// 	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
+// 	questionList.forEach(function (question, index) {
+// //	    console.log(question);
+// 	    let li = document.createElement("li");
+// 	    li.id = "q-" + question.id;
+// 	    li.classList.add("q-");
+// //	    if(question.id == currentQuestionOfCC.id)
+// //		li.classList.add("currentQuestion");
+// 	    li.addEventListener("click", () => {
+// 		socketCC.emit("sendStudentList", roomID);
+// 	    });
+// //	    li.class = ""+(question.id == currentQuestionOfCC.id);
+// 	    li.textContent = question.enonce;
+// //	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
+// 	    ul.appendChild(li);
+// 	});
+// 	let old = document.querySelector("#chooseQFromSet");
+// 	old.parentNode.replaceChild(ul,old);
+//     }
+//     // Dans tous les cas, on refait le check des petites marques blanches
+//     document.querySelectorAll(".q-").forEach((elem, index) => {
+// 	if(questionList[index].correct != "unknown")
+// 	    elem.classList.add("answered");
+// 	else
+// 	    elem.classList.remove("answered");
+//     });
+// //    if(!currentQuestion)
+// //	currentQuestion = currentList[0];
+// //    console.log("currentQuestionOfCC = ", currentQuestionOfCC);
+// //    sendSubmission();
+// });
 
 /*********************************************************************/
 /*                 pour afficher une submission                      */
@@ -394,9 +396,18 @@ socketCC.on('newSubmission', function (submission) {
     console.log("submission = ", submission);
     currentSubmission = submission;
 //    afficheResponse(submission.customQuestion);
-    afficheQuestion(submission.customQuestion);
+    let notTheSame = typeof currentQuestion == "undefined";
+    console.log(notTheSame);
+    notTheSame = notTheSame || !document.querySelector("#question");
+    console.log(notTheSame);
+    notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != submission.customQuestion.id;
+//    notTheSame = notTheSame || currentQuestion.id != submission.customQuestion.id;
+    console.log(notTheSame, submission.id);
+    if(notTheSame) {
+	afficheQuestion(submission.customQuestion);
+	addAdminInterface(submission.customQuestion, setValidity, setStrategy);
+    }
     afficheSubmission(submission.response);
-    addAdminInterface(submission.customQuestion, setValidity, setStrategy);
 //    affSubmission(submission);
 });
 

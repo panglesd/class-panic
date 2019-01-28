@@ -16,6 +16,7 @@ function afficheQuestion(question) {
 
     // On écrit l'énoncé là où il faut. MathJax rendered.
     let enonce = document.querySelector("#question");
+    enonce.setAttribute("questionID", question.id);
     enonce.textContent=question.enonce;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
 
@@ -249,7 +250,7 @@ function afficheSubmission (submission) {
 function affFileInfo(elemReponse, fileInfo, n_ans) {
     console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
     let filesInfo = elemReponse.querySelector(".filesInfo");
-    filesInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+n_ans+"/"+fileInfo.fileName+"'></a></td></tr>"+
+    filesInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+fileInfo.fileName+"'></a></td></tr>"+
 	//		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
     "<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>";
     filesInfo.querySelector(".fileName").innerText += fileInfo.fileName;
@@ -265,7 +266,7 @@ function affFileInfo(elemReponse, fileInfo, n_ans) {
 /*                 Pour afficher une liste de questions              */
 /*********************************************************************/
 
-function affQuestionListe(questionList) {
+function affQuestionList(questionList) {
     // On vérifie si quelque chose a changé dans les énoncés.
     let notTheSame = typeof currentList == "undefined";
     notTheSame = notTheSame || currentList.length != questionList.length;
@@ -285,10 +286,12 @@ function affQuestionListe(questionList) {
 	    let li = document.createElement("li");
 	    li.id = "q-" + question.id;
 	    li.classList.add("q-");
-	    if(question.id == currentQuestionOfCC.id)
+	    if(question.id == currentQuestion.id)
 		li.classList.add("currentQuestion");
-	    li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
-	    li.class = ""+(question.id == currentQuestionOfCC.id);
+	    li.addEventListener("click", () => {
+		console.log("sdfggfeer");gotoQuestion(question.indexSet);
+	    });
+	    li.class = ""+(question.id == currentQuestion.id);
 	    li.textContent = question.enonce;
 //	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	    ul.appendChild(li);
