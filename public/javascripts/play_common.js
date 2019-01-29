@@ -53,10 +53,13 @@ function createResponse(question, rep, index) {
     elem.classList.add("notSelected");
     elem.id = "r"+index;    
     // Si besoin est, ajout d'un event listener  A DEPLACER ?
-    if(!rep.texted && !rep.hasFile && typeof chooseAnswer == "function")
+    console.log("on ajoute chooseAnswer ???", rep);
+    if(!rep.texted && rep.hasFile == "none" && typeof chooseAnswer == "function") {
+	console.log("on ajoute chooseAnswer !!!");
 	elem.addEventListener("click", function (ev) {
 	    chooseAnswer(index);		    //updateAnswer(index, elem, true);
 	});
+    }
     // Création de l'élément contenant l'énoncé de la réponse
     let span = document.createElement("span");
     elem.innerHTML = "";
