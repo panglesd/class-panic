@@ -132,11 +132,12 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-	    //	    console.log("answer = ", answer);
+	    	    console.log("answer = ", answer);
 	    if(socket.room.status == "pending") {
 		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		    if(answer.length != 0 && question.type != "multi")
-			answer = [answer[0]];
+		    // A gérer autrement à cause de la réorganisation
+		    // if(answer.length != 0 && question.type != "multi")
+		    // 	answer = [answer[0]];
 		    game.registerAnswerCC(socket.request.session.user, socket.room, questionIndex, answer, function () {
 			sendListQuestion(socket, function() {});
 			//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
@@ -160,11 +161,12 @@ module.exports = function(io) {
 				fs.writeFile(path+fileName, data, (err) => {
 				    if(err) throw err;
 				    md5File(path+fileName, (err, hash) => {
-					// game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, Date.now(),(err) => {
-					//     sendQuestionFromIndex(socket, questionIndex,() => {});
-					// socket.emit("fileReceived", n_ans, fileName, hash);
-					// });
-					socket.emit("fileReceived", n_ans, fileName, hash);
+					console.log("calling logFile");
+					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, Date.now(),(err) => {
+					    sendQuestionFromIndex(socket, questionIndex,() => {});
+//					socket.emit("fileReceived", n_ans, fileName, hash);
+					});
+					//socket.emit("fileReceived", n_ans, fileName, hash);
 				    });
 				    // prévenir le client (et update bdd ?)
 				});
@@ -176,6 +178,20 @@ module.exports = function(io) {
 	    }
 	});
 
+	/******************************************/
+	/*  On veux supprimer un fichier          */
+	/******************************************/
+		 
+	socket.on('removeFile', function (n_ans, fileName, questionIndex) {
+	    if(socket.room.status == "pending"){
+		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		    console.log("calling logFile");
+		    game.removeFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, fileName,(err) => {
+			sendQuestionFromIndex(socket, questionIndex,() => {});
+		    });
+		});
+	    };
+	});
 	
 	/******************************************/
 	/*  Un admin me demande les stats         */

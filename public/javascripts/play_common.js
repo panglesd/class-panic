@@ -52,14 +52,11 @@ function createResponse(question, rep, index) {
     elem.classList.add("reponse");
     elem.classList.add("notSelected");
     elem.id = "r"+index;    
-    // Si besoin est, ajout d'un event listener  A DEPLACER !
-    elem.addEventListener("click", function (ev) {
-	//		chooseAnswer(index, event.currentTarget);
-	if(ev.target.tagName != "TEXTAREA" && ev.target.tagName != "A")
-	    chooseAnswer(index, elem, false);
-	else
-	    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
-    });
+    // Si besoin est, ajout d'un event listener  A DEPLACER ?
+    if(!rep.texted && !rep.hasFile)
+	elem.addEventListener("click", function (ev) {
+	    chooseAnswer(index);		    //updateAnswer(index, elem, true);
+	});
     // Création de l'élément contenant l'énoncé de la réponse
     let span = document.createElement("span");
     elem.innerHTML = "";
@@ -78,7 +75,7 @@ function createResponse(question, rep, index) {
 	if(typeof isAdmin == "undefined") {
 	    textarea.addEventListener("input", (ev) => {
 		console.log("updateed");
-		chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
+		chooseAnswer(index);		    //updateAnswer(index, elem, true);
 		//		    sendAnswer();
 	    });
 	}
@@ -86,7 +83,7 @@ function createResponse(question, rep, index) {
     }
     // Si besoin, ajout d'un input type=file
     if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
-	let fileInfo = document.createElement("div");
+	let fileInfo = document.createElement("ul");
 	fileInfo.classList.add("filesInfo");
 	fileInfo.innerText = "Pas de fichier envoyé";
 	fileInfo.style.fontSize = "19px";
@@ -103,6 +100,8 @@ function createResponse(question, rep, index) {
 	    reader.readAsArrayBuffer(fileInput.files[0]);		
 	});
 	elem.appendChild(fileInfo);
+	let comment = document.createElement("span");comment.innerText = "Ajouter un fichier : "; comment.style.fontSize="19px";
+	elem.appendChild(comment);
 	elem.appendChild(fileInput);
     }
     // A commenter ?
@@ -154,12 +153,17 @@ function addAdminInterface(question, setValidity, setStrategy){
 	button2.addEventListener("click",(ev) => {
 	    setValidity(index,"to_correct");
 	});
+	let customNote = document.createElement("input");
+	customNote.type="number";
+	customNote.id="customNote-"+index;
 	button.textContent = "Forcer à juste";
 	button2.textContent = "Forcer à faux";
 	button3.textContent = "Décorriger";
 	elemRep.appendChild(button);
 	elemRep.appendChild(button3);
 	elemRep.appendChild(button2);
+	elemRep.appendChild(document.createTextNode(" Note custom : "));
+	elemRep.appendChild(customNote);
     });
     let elem = document.createElement('div');
     elem.classList.add("reponse");
@@ -231,7 +235,7 @@ function afficheSubmission (submission) {
 		ta.value = reponse.text;
 	    //    });
 	    if(reponse.filesInfo[0]) {
-		affFileInfo(elemReponse,reponse.filesInfo[0],index);
+		affFileInfo(elemReponse,reponse.filesInfo,index);
 	    }
 	    // Ici gérer les corrections personnelles par reponse
 	    // elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
@@ -247,19 +251,29 @@ function afficheSubmission (submission) {
 /*                 lorsqu'un fichier a été reçu                      */
 /*********************************************************************/
 
-function affFileInfo(elemReponse, fileInfo, n_ans) {
-    console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
-    let filesInfo = elemReponse.querySelector(".filesInfo");
-    filesInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+fileInfo.fileName+"'></a></td></tr>"+
-	//		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
-    "<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>";
-    filesInfo.querySelector(".fileName").innerText += fileInfo.fileName;
-    //		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
-    if(fileInfo.timestamp){
-	let date = new Date(fileInfo.timestamp);
-	filesInfo.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
-    }
-    elemReponse.setAttribute("fileInfo",JSON.stringify(fileInfo));
+function affFileInfo(elemReponse, filesInfo, n_ans) {
+    let filesInfoElem = elemReponse.querySelector(".filesInfo");
+    filesInfoElem.innerHTML = "";
+    filesInfo.forEach((fileInfo) => {
+	console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
+	let fileInfoElem = document.createElement("li");
+	fileInfoElem.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+fileInfo.fileName+"'></a></td></tr>"+
+	    //		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
+	"<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>"+
+	"<tr><td></td><td  style='padding-left: 10px;' class='delete'><a style='color:#990000'>Supprimer</a></td></tr>";
+	fileInfoElem.querySelector(".fileName").innerText += fileInfo.fileName;
+	fileInfoElem.querySelector(".delete").addEventListener("click", (ev) => {
+	    removeFile(n_ans, fileInfo.fileName);
+	});
+	//		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
+	if(fileInfo.timestamp){
+	    let date = new Date(fileInfo.timestamp);
+	    fileInfoElem.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
+	}
+//	elemReponse.setAttribute("fileInfo",JSON.stringify(fileInfo));
+	elemReponse.setAttribute("fileInfo","");
+	filesInfoElem.appendChild(fileInfoElem);
+    });
 }
 
 /*********************************************************************/

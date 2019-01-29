@@ -131,7 +131,7 @@ socketCC.on('newQuestion', function (reponse) {
     console.log("newQuestion", reponse);
 //    currentQuestionOfAdmin=reponse;
     currentQuestion=reponse;
-    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
+//    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
 
     let temp2 = reponse.userResponse;
     afficheQuestion(reponse);
@@ -147,7 +147,7 @@ socketCC.on('newQuestion', function (reponse) {
 socketCC.on("fileReceived", (n_ans, fileName, hash) => {
     console.log("fileReceived with : ", n_ans, fileName, hash);
     let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[n_ans];
-    affFileInfo(elemReponse, {fileName: fileName, hash: hash, timestamp: 23456}, n_ans);
+    affFileInfo(elemReponse, {fileName: fileName, hash: hash, timestamp: Date.now()}, n_ans);
     sendAnswer();    
 });
 
@@ -163,26 +163,44 @@ socketCC.on('newList', function (questionList) {
 /*                 Pour envoyer son choix de réponses                */
 /*********************************************************************/
 
-function chooseAnswer(i, elem, update) {
-    if(currentQuestion.type!="multi") {
-	var reponse=document.querySelector(".reponse.selected");
-	if(reponse) {
-	    reponse.classList.replace('selected', 'notSelected');
-	};
-	if(i>-1) {
-	    let a = document.querySelector("#r"+i);
-	    a.classList.replace("notSelected", "selected");
+function chooseAnswer(i) {
+    let chosenAnswer = currentQuestion.allResponses[i];
+    console.log(chosenAnswer);
+    // Dans le cas où seul le clic détermine si question est selectionnée, (pas de fichier/textarea)
+    if(!chosenAnswer.texted && !(chosenAnswer.hasFile == true || ["single","multi","true"].includes(chosenAnswer.hasFile))) {
+	console.log("clic-determined");
+	if(currentQuestion.type!="multi") {
+	    var reponse=document.querySelector(".reponse.selected");
+	    if(reponse)
+		reponse.classList.replace('selected', 'notSelected');
+	    if(i>-1) {
+		let a = document.querySelector("#r"+i);
+		a.classList.replace("notSelected", "selected");
+	    }
+	}
+	else {
+		let a = document.querySelector("#r"+i);
+		a.classList.toggle("notSelected");	    
+		a.classList.toggle("selected");	    
 	}
     }
     else {
-	let a = document.querySelector("#r"+i);
-	if(update) {
-	    a.classList.remove("notSelected");
-	    a.classList.add("selected");
+	console.log("content-determined");
+	let elem = document.querySelector("#r"+i);
+	let flag = false;
+	let textarea = elem.querySelector("textarea");
+	if(textarea && textarea.value)
+	    flag = true;
+	let file = elem.querySelector("a.fileName");
+	if(file)
+	    flag = true;
+	if(flag) {
+	    elem.classList.remove("notSelected");
+	    elem.classList.add("selected");
 	}
 	else {
-	    a.classList.toggle("notSelected");
-	    a.classList.toggle("selected");
+	    elem.classList.add("notSelected");
+	    elem.classList.remove("selected");
 	}
     }
     sendAnswer();
@@ -197,13 +215,21 @@ function sendAnswer() {
 //	let nQuestion = parseInt(elem.id.split("r")[1]);
 	let textarea = elem.querySelector("textarea");
 	atom.text = textarea ? textarea.value : "";
-	let fI = JSON.parse(elem.getAttribute("fileInfo"));
-	atom.filesInfo = fI ? [fI] : [];
+//	let fI = JSON.parse(elem.getAttribute("fileInfo"));
+	atom.filesInfo = [];
 //	reponses[nQuestion] = atom;
 	reponses.push(atom);
     });
     console.log("reponse envoyées : ", reponses);
     socketCC.emit("chosenAnswer", reponses, currentQuestion.indexSet);
 //    console.log("reponses, currentQuestion.indexSet = ", reponses, currentQuestion.indexSet);
+}
+
+/*********************************************************************/
+/*                 Pour supprimer un fichier                         */
+/*********************************************************************/
+
+function removeFile(n_ans, fileName) {
+    socketCC.emit("removeFile", n_ans, fileName, currentQuestion.indexSet);
 }
 

@@ -192,20 +192,21 @@ exports.getSubmission = function(userID, roomID, questionID, callback) {
 
 exports.fillSubmissions = function(userID, roomID, callback) {
     console.log("fillSubmission is called");
-//    console.log("userID = ", userID);
     User.userByID(userID, (err, user) => {
-//	console.log("user111 is", user);
 	Room.getByID(roomID, (err, room) => {
 	    Question.listBySetID(room.questionSet, (err, qList) => {
-		//		console.log("qList = ", qList);
 		async.forEach(qList, (question, callback2) => {
 		    tryGetSubmission(userID, roomID, question.id, (err, subm) => {
-			//			console.log("subm = ", subm);
-//			console.log("*********************", question);
 			if(!subm){
-//			    console.log("user is = ", user);
-			    //			    Game.registerAnswerCC(user, room, question.indexSet, [], callback2);
-			    Game.logAnswerCC(user, room, question.indexSet, [], callback2);
+			    let dummyAnswer = [];
+			    question.reponses.forEach((rep) => {
+				dummyAnswer.push({
+				    "selected":false,
+				    "text":"",
+				    "filesInfo":[]
+				});
+			    });
+			    Game.logAnswerCC(user, room, question.indexSet, dummyAnswer, callback2);
 			}
 			else
 			    callback2();
