@@ -439,7 +439,6 @@ socketCC.on('newUserList', function (studentList) {
     ul.id = "chooseSFromSet";
     ul.innerHTML = '<li id="chooseStudentNext"> Choisir l\'élève à corriger :</li>';
     studentList.forEach(function (student, index) {
-//	console.log(student);
 	let li = document.createElement("li");
 	li.id = "s-" + student.id;
 	li.classList.add("s-");
@@ -448,14 +447,12 @@ socketCC.on('newUserList', function (studentList) {
 	    currentStudent = currentStudentList[index];
 	    // On s'occupe du carré blanc
 	    let temp;
-	    if((temp = document.querySelector("#chooseSFromSet li.currentQuestion"))) {
-		temp.classList.remove("currentQuestion");
+	    if((temp = document.querySelector("#chooseSFromSet li.currentStudent"))) {
+		temp.classList.remove("currentStudent");
 	    }
 	    if(document.querySelector("li#s-"+currentStudent.id))
-		document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
-//	    socketCC.emit("sendList", roomID, currentStudent.userID);
+		document.querySelector("li#s-"+currentStudent.id).classList.add("currentStudent");
 	    socketCC.emit("sendStudentList", roomID);
-//	    sendSubmission();
 	};
 //	MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	ul.appendChild(li);
@@ -478,7 +475,7 @@ socketCC.on('newUserList', function (studentList) {
 	currentStudent = studentList[0];
     }
 //    console.log("doit");
-    document.querySelector("li#s-"+currentStudent.id).classList.add("currentQuestion");
+    document.querySelector("li#s-"+currentStudent.id).classList.add("currentStudent");
 //    console.log('document.querySelecto = ', document.querySelector("li#s-"+currentStudent.id).classList);
 //    console.log("studentList[0].userID = ", studentList[0].userID);
     console.log("callling sendList");

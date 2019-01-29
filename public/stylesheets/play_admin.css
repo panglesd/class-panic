@@ -54,7 +54,7 @@
     border-bottom: 1px solid white;
 }
 
-li.currentQuestion {
+li.currentQuestion, li.currentStudent {
     border-left: 15px solid rgba(255,255,255,1);
 }
 li.inactiveQuestion {

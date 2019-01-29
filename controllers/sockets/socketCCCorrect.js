@@ -30,9 +30,16 @@ module.exports = function(io) {
 
     function sendQuestionFromIndex (socket, index, callback)  {
 	    console.log("sendQuestionfromindex");
-	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
-	    socket.emit("newQuestion", question);
-	    callback();
+	// Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
+	//     socket.emit("newQuestion", question);
+	//     callback();
+	// });
+	Question.getByIndex(index, socket.room.id, (err, question) => {
+		socket.emit("newQuestion", question);
+		callback();
+	    // Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
+	    // 	question.submission = submission;
+	    // });
 	});
     };
 

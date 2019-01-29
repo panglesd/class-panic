@@ -109,7 +109,12 @@ exports.ownedList = function (user, callback) {
 // List by set ID
 
 exports.listBySetID = function (setID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ? ORDER BY indexSet", [setID], callback);
+    bdd.query("SELECT * FROM `questions` WHERE `class` = ? ORDER BY indexSet", [setID], (err, qList) => {
+	qList.forEach((qu) => {
+	    qu.reponses = JSON.parse(qu.reponses);
+	});
+	callback(err, qList);	
+    });
 };
 
 exports.listOwnedBySetID = function (user, setID, callback) {
@@ -166,8 +171,9 @@ exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
 	  "questions LEFT OUTER JOIN "+
 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
-    bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
-	console.log(err);
+     glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
+	 console.log(err);
+	 console.log("gler", glere.sql);
 	let q = row[0];
 //	console.log(q);
 	q.allResponses = JSON.parse(q.allResponses);

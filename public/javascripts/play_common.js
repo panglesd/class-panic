@@ -40,7 +40,7 @@ function afficheQuestion(question) {
 
     // Pour chaque nouvelle réponse :
 
-    question.allResponses.forEach(function (rep, index) {
+    question.reponses.forEach(function (rep, index) {
 	let elem = createResponse(question, rep, index);
 	wrapper.appendChild(elem);
     });
@@ -141,7 +141,7 @@ function addCorrection(question, elem, rep, index) {
 
 function addAdminInterface(question, setValidity, setStrategy){
     let wrapper = document.querySelector("#wrapperAnswer");
-    question.allResponses.forEach((rep, index) => {
+    question.reponses.forEach((rep, index) => {
 	let elemRep = document.querySelector("#r"+index);
 	let button = document.createElement("button");
 	button.addEventListener("click",(ev) => {
@@ -226,8 +226,7 @@ function addAdminInterface(question, setValidity, setStrategy){
 function afficheSubmission (submission) {
     console.log("affSubm with ", submission);
     submission.forEach((reponse, index) => {
-	if(reponse) {
-//	    reponse.userResponse.forEach((ans, index) => {
+	    console.log("reponse ", reponse);
 	    let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[index];
 	    elemReponse.classList.remove("notSelected");
 	    elemReponse.classList.remove("selected");
@@ -236,12 +235,12 @@ function afficheSubmission (submission) {
 	    if(ta)
 		ta.value = reponse.text;
 	    //    });
-	    if(reponse.filesInfo[0]) {
+	    console.log("reponse.hasFile = ", reponse.hasFile);
+	    if(elemReponse.querySelector(".filesInfo")) {
 		affFileInfo(elemReponse,reponse.filesInfo,index);
 	    }
 	    // Ici gérer les corrections personnelles par reponse
 	    // elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
-	}
     });
     // Ici gérer les corrections personnelles de la question
     // document.querySelector(".correcPersoGlobal").innerText = submission.correcPerso
@@ -254,8 +253,9 @@ function afficheSubmission (submission) {
 /*********************************************************************/
 
 function affFileInfo(elemReponse, filesInfo, n_ans) {
+    console.log("FILESINFO", filesInfo);
     let filesInfoElem = elemReponse.querySelector(".filesInfo");
-    filesInfoElem.innerHTML = "";
+    filesInfoElem.innerHTML = filesInfo.length == 0 ? "Aucun fichier envoyé" : "";
     filesInfo.forEach((fileInfo) => {
 	console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
 	let fileInfoElem = document.createElement("li");
@@ -276,7 +276,7 @@ function affFileInfo(elemReponse, filesInfo, n_ans) {
 	    fileInfoElem.querySelector(".tstamp").innerText = "Le " + date.toLocaleDateString() + " à " + date.toLocaleTimeString();
 	}
 //	elemReponse.setAttribute("fileInfo",JSON.stringify(fileInfo));
-	elemReponse.setAttribute("fileInfo","");
+//	elemReponse.setAttribute("fileInfo","");
 	filesInfoElem.appendChild(fileInfoElem);
     });
 }

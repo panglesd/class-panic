@@ -133,7 +133,7 @@ socketCC.on('newQuestion', function (reponse) {
     currentQuestion=reponse;
 //    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
 
-    let temp2 = reponse.userResponse;
+    let temp2 = reponse.submission.response;
     afficheQuestion(reponse);
     afficheSubmission(temp2);
     socketCC.emit("sendCorrection", currentQuestion.id);
@@ -164,7 +164,7 @@ socketCC.on('newList', function (questionList) {
 /*********************************************************************/
 
 function chooseAnswer(i) {
-    let chosenAnswer = currentQuestion.allResponses[i];
+    let chosenAnswer = currentQuestion.reponses[i];
     console.log(chosenAnswer);
     // Dans le cas où seul le clic détermine si question est selectionnée, (pas de fichier/textarea)
     if(!chosenAnswer.texted && !(chosenAnswer.hasFile == true || ["single","multi","true"].includes(chosenAnswer.hasFile))) {
