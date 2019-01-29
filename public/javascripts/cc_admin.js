@@ -72,8 +72,12 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 function sendSubmission() {
-    console.log("sendSubmission")
+    console.log("sendSubmission");
     socketCC.emit("sendAnswer", roomID, currentStudent.userID, currentQuestion.id);
+}
+function sendQuestion() {
+    console.log("sendQuestion");
+    socketCC.emit("sendQuestion", roomID, currentStudent.userID, currentQuestion.indexSet);
 }
 
 /*********************************************************************/
@@ -288,7 +292,8 @@ socketCC.on('newList', function (questionList) {
     affQuestionList(questionList);
     if(!currentQuestion.id)
 	currentQuestion = currentList[0];
-    sendSubmission();
+    sendQuestion();
+//    sendSubmission();
 });
 // //    console.log("questionList", questionList);
 // //    console.log("currentList", currentList);
@@ -386,29 +391,40 @@ socketCC.on('newList', function (questionList) {
 // }
 
 /*********************************************************************/
+/*                 Lors de la reception d'une question               */
+/*********************************************************************/
+
+socketCC.on('newQuestion', function (question) {
+    console.log("question = ", question);
+    currentQuestion = question;
+    let notTheSame = typeof currentQuestion == "undefined";
+    notTheSame = notTheSame || !document.querySelector("#question");
+    notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != question.id;
+    if(notTheSame) {
+	console.log("question is", question);
+	afficheQuestion(question);
+	addAdminInterface(question, setValidity, setStrategy);
+    }
+    sendSubmission();
+});
+/*********************************************************************/
 /*                 Lors de la reception d'une soumission             */
 /*********************************************************************/
 
 socketCC.on('newSubmission', function (submission) {
-    submission.customQuestion = JSON.parse(submission.customQuestion);
-    submission.response = JSON.parse(submission.response);
-    submission.customQuestion.allResponses = submission.customQuestion.reponses;
+    // submission.customQuestion = JSON.parse(submission.customQuestion);
+    // submission.response = JSON.parse(submission.response);
+    // submission.customQuestion.allResponses = submission.customQuestion.reponses;
     console.log("submission = ", submission);
     currentSubmission = submission;
-//    afficheResponse(submission.customQuestion);
-    let notTheSame = typeof currentQuestion == "undefined";
-    console.log(notTheSame);
-    notTheSame = notTheSame || !document.querySelector("#question");
-    console.log(notTheSame);
-    notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != submission.customQuestion.id;
-//    notTheSame = notTheSame || currentQuestion.id != submission.customQuestion.id;
-    console.log(notTheSame, submission.id);
-    if(notTheSame) {
-	afficheQuestion(submission.customQuestion);
-	addAdminInterface(submission.customQuestion, setValidity, setStrategy);
-    }
+    // let notTheSame = typeof currentQuestion == "undefined";
+    // notTheSame = notTheSame || !document.querySelector("#question");
+    // notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != submission.customQuestion.id;
+    // if(notTheSame) {
+    // 	afficheQuestion(submission.customQuestion);
+    // 	addAdminInterface(submission.customQuestion, setValidity, setStrategy);
+    // }
     afficheSubmission(submission.response);
-//    affSubmission(submission);
 });
 
 /*********************************************************************/

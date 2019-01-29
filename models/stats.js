@@ -176,8 +176,13 @@ function tryGetSubmission(userID, roomID, questionID, callback) {
 
 exports.getSubmission = function(userID, roomID, questionID, callback) {
     tryGetSubmission(userID, roomID, questionID, (err, subm) => {
-	if(subm)
+	if(subm) {
+	    subm.customQuestion = JSON.parse(subm.customQuestion);
+	    subm.response = JSON.parse(subm.response);
+	    subm.customQuestion.allResponses = subm.customQuestion.reponses;
+
 	    callback(err, subm);
+	}
 	else
 	    exports.fillSubmissions(userID, roomID, () => {
 		exports.getSubmission(userID, roomID, questionID, callback);
@@ -241,14 +246,13 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 
 exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	subm.customQuestion = JSON.parse(subm.customQuestion);
 	subm.customQuestion.strategy = strategy;
 	if(strategy == "manual") {
 	    subm.customQuestion.mark = "" + mark;
 	}
 	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 	let params2 = [roomID, userID, questionID];
-	let validity2 = Question.correctSubmission(subm.customQuestion, JSON.parse(subm.response), subm.customQuestion.strategy);
+	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
 //	console.log("validity2 = ", validity2);
 	
 	bdd.query(query2, params2, (err, res) => {

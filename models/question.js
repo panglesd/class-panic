@@ -319,19 +319,19 @@ exports.correctSubmission = function(question, submission, strategy) {
 	let tot = 0;
 	let visited = [];
 	submission.forEach((rep) => {
-	    console.log("Myvalidity = ",question.reponses[rep.n].validity);
-	    if(!visited[rep.n] && tot != "unkown") {
-		console.log("we are here");
-		if(question.reponses[rep.n].validity=="true")
-		    tot++;
-		if(question.reponses[rep.n].validity=="false")
-		    tot--;
-		if(question.reponses[rep.n].validity=="to_correct"){
-		    console.log("we are there");
-		    tot = "unknown";
-		}
-	    }
-	    visited[rep.n]=true;
+//	    console.log("Myvalidity = ",question.reponses[rep.n].validity);
+	//     if(!visited[rep.n] && tot != "unkown") {
+	// 	console.log("we are here");
+	// 	if(question.reponses[rep.n].validity=="true")
+	// 	    tot++;
+	// 	if(question.reponses[rep.n].validity=="false")
+	// 	    tot--;
+	// 	if(question.reponses[rep.n].validity=="to_correct"){
+	// 	    console.log("we are there");
+	// 	    tot = "unknown";
+	// 	}
+	//     }
+	//     visited[rep.n]=true;
 	});
 	let max = 0;
 	question.reponses.forEach((rep)=> {
@@ -347,10 +347,10 @@ exports.correctSubmission = function(question, submission, strategy) {
     case "all_or_0":
 	if(!submission[0])
 	    return "0";
-	if(question.reponses[submission[0].n].validity == "true")
-	    return "1";
-	if(question.reponses[submission[0].n].validity == "false")
-	    return "0";
+//	if(question.reponses[submission[0].n].validity == "true")
+//	    return "1";
+//	if(question.reponses[submission[0].n].validity == "false")
+//	    return "0";
 	return "unknown";
     }
     

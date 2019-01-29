@@ -26,14 +26,15 @@ module.exports = function(io) {
 	    callback();
 	});
     }
+*/
 
     function sendQuestionFromIndex (socket, index, callback)  {
+	    console.log("sendQuestionfromindex");
 	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
 	    socket.emit("newQuestion", question);
 	    callback();
 	});
     };
-*/
 
     function sendListStudents (user, socket, room, callback) {
 	Stats.studentListForCC(user, room.id, function (err, question) {
@@ -98,6 +99,14 @@ module.exports = function(io) {
 	socket.on('sendAnswer', function (roomID, studentID, questionID) {
 //	    console.log("studentID = ", studentID);
 	    sendAnswer(socket, socket.room, studentID, questionID, function (err) {
+		if(err) throw err;
+	    });
+	});
+	
+	socket.on('sendQuestion', function (roomID, studentID, questionIndex) {
+//	    console.log("studentID = ", studentID);
+	    console.log("studentID = ");
+	    sendQuestionFromIndex(socket, questionIndex, function (err) {
 		if(err) throw err;
 	    });
 	});
