@@ -233,3 +233,6 @@ function removeFile(n_ans, fileName) {
     socketCC.emit("removeFile", n_ans, fileName, currentQuestion.indexSet);
 }
 
+function sendFile(fileName, index, set, data) {
+    socketCC.emit("chosenFile", fileName, index, set, data);
+}

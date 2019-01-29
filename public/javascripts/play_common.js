@@ -53,7 +53,7 @@ function createResponse(question, rep, index) {
     elem.classList.add("notSelected");
     elem.id = "r"+index;    
     // Si besoin est, ajout d'un event listener  A DEPLACER ?
-    if(!rep.texted && !rep.hasFile)
+    if(!rep.texted && !rep.hasFile && typeof chooseAnswer == "function")
 	elem.addEventListener("click", function (ev) {
 	    chooseAnswer(index);		    //updateAnswer(index, elem, true);
 	});
@@ -72,7 +72,7 @@ function createResponse(question, rep, index) {
 	// if(rep.correction)
 	// 	textarea.textContent=rep.correction;
 	// Ajout d'un event listener pour le textarea
-	if(typeof isAdmin == "undefined") {
+	if(typeof chooseAnswer == "function") {
 	    textarea.addEventListener("input", (ev) => {
 		console.log("updateed");
 		chooseAnswer(index);		    //updateAnswer(index, elem, true);
@@ -87,22 +87,24 @@ function createResponse(question, rep, index) {
 	fileInfo.classList.add("filesInfo");
 	fileInfo.innerText = "Pas de fichier envoyé";
 	fileInfo.style.fontSize = "19px";
-	let fileInput = document.createElement("input");
-	fileInput.type="file";
-	//	    file.value = "Soumettre un fichier";
-	fileInput.addEventListener('change', function() {
-	    var reader = new FileReader();
-	    reader.addEventListener('load', function() {
-		console.log("sending file !");
-		socketCC.emit("chosenFile", fileInput.files[0].name, index, question.indexSet, reader.result);
-		elem.classList.replace("notSelected", "selected");
-	    });
-	    reader.readAsArrayBuffer(fileInput.files[0]);		
-	});
 	elem.appendChild(fileInfo);
-	let comment = document.createElement("span");comment.innerText = "Ajouter un fichier : "; comment.style.fontSize="19px";
-	elem.appendChild(comment);
-	elem.appendChild(fileInput);
+	if(typeof sendFile == "function") {
+	    let fileInput = document.createElement("input");
+	    fileInput.type="file";
+	    //	    file.value = "Soumettre un fichier";
+	    fileInput.addEventListener('change', function() {
+		var reader = new FileReader();
+		reader.addEventListener('load', function() {
+		    console.log("sending file !");
+		    sendFile(fileInput.files[0].name, index, question.indexSet, reader.result);
+		    elem.classList.replace("notSelected", "selected");
+		});
+		reader.readAsArrayBuffer(fileInput.files[0]);		
+	    });
+	    let comment = document.createElement("span");comment.innerText = "Ajouter un fichier : "; comment.style.fontSize="19px";
+	    elem.appendChild(comment);
+	    elem.appendChild(fileInput);
+	}
     }
     // A commenter ?
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
@@ -260,11 +262,14 @@ function affFileInfo(elemReponse, filesInfo, n_ans) {
 	fileInfoElem.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+fileInfo.fileName+"'></a></td></tr>"+
 	    //		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
 	"<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>"+
-	"<tr><td></td><td  style='padding-left: 10px;' class='delete'><a style='color:#990000'>Supprimer</a></td></tr>";
+	    (typeof removeFile == "function" ? "<tr><td></td><td  style='padding-left: 10px;' class='delete'><a style='color:#990000'>Supprimer</a></td></tr>" : "")+
+	    "</table>";
 	fileInfoElem.querySelector(".fileName").innerText += fileInfo.fileName;
-	fileInfoElem.querySelector(".delete").addEventListener("click", (ev) => {
-	    removeFile(n_ans, fileInfo.fileName);
-	});
+	if(typeof removeFile == "function"){
+	    fileInfoElem.querySelector(".delete").addEventListener("click", (ev) => {
+		removeFile(n_ans, fileInfo.fileName);
+	    });
+	}
 	//		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
 	if(fileInfo.timestamp){
 	    let date = new Date(fileInfo.timestamp);
