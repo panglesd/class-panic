@@ -64,7 +64,9 @@ function changeQuestionPlease() {
 /*********************************************************************/
 
 function gotoQuestion(i) {
-    socketCC.emit("changeToQuestion", roomID, i);
+//    socketCC.emit("changeToQuestion", roomID, i);
+    currentQuestion = currentList[i];
+    socketCC.emit("sendStudentList", roomID);
 }
 
 /*********************************************************************/
