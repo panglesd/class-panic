@@ -152,7 +152,7 @@ function addAdminInterface(question, setValidity, setStrategy){
 	    setValidity(index,"false");
 	});
 	let button3 = document.createElement("button");
-	button2.addEventListener("click",(ev) => {
+	button3.addEventListener("click",(ev) => {
 	    setValidity(index,"to_correct");
 	});
 	let customNote = document.createElement("input");
@@ -164,7 +164,8 @@ function addAdminInterface(question, setValidity, setStrategy){
 	elemRep.appendChild(button);
 	elemRep.appendChild(button3);
 	elemRep.appendChild(button2);
-	elemRep.appendChild(document.createTextNode(" Note custom : "));
+	let noteCust = document.createElement("span"); noteCust.innerText = " Note custom : "; noteCust.style.fontSize = "19px";
+	elemRep.appendChild(noteCust);
 	elemRep.appendChild(customNote);
     });
     let elem = document.createElement('div');
@@ -226,21 +227,27 @@ function addAdminInterface(question, setValidity, setStrategy){
 function afficheSubmission (submission) {
     console.log("affSubm with ", submission);
     submission.forEach((reponse, index) => {
-	    console.log("reponse ", reponse);
-	    let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[index];
-	    elemReponse.classList.remove("notSelected");
-	    elemReponse.classList.remove("selected");
-	    elemReponse.classList.add(reponse.selected ? "selected" : "notSelected");
-	    let ta = elemReponse.querySelector("textarea");
-	    if(ta)
-		ta.value = reponse.text;
-	    //    });
-	    console.log("reponse.hasFile = ", reponse.hasFile);
-	    if(elemReponse.querySelector(".filesInfo")) {
-		affFileInfo(elemReponse,reponse.filesInfo,index);
-	    }
-	    // Ici gérer les corrections personnelles par reponse
-	    // elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
+	console.log("reponse ", reponse);
+	let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[index];
+	elemReponse.classList.remove("notSelected");
+	elemReponse.classList.remove("selected");
+	elemReponse.classList.add(reponse.selected ? "selected" : "notSelected");
+	
+	let ta = elemReponse.querySelector("textarea");
+	if(ta)
+	    ta.value = reponse.text;
+	//    });
+	console.log("reponse.hasFile = ", reponse.hasFile);
+	if(elemReponse.querySelector(".filesInfo")) {
+	    affFileInfo(elemReponse,reponse.filesInfo,index);
+	}
+	console.log("we are here");
+	elemReponse.classList.remove("to_correct", "true", "false");
+	if(reponse.validity) {
+	    elemReponse.classList.add(reponse.validity);
+	}
+	// Ici gérer les corrections personnelles par reponse
+	// elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
     });
     // Ici gérer les corrections personnelles de la question
     // document.querySelector(".correcPersoGlobal").innerText = submission.correcPerso

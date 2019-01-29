@@ -59,9 +59,14 @@ module.exports = function(io) {
 		if(rep.texted) {
 		    delete(rep.correction);
 		}
+		delete(rep.correcFileInfo);
 	    });
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
+		submission.response.forEach((rep) => {
+		    if(!socket.room.revealed)
+			delete(rep.validity);
+		});
 		socket.emit("newQuestion", question);
 		callback();
 	    });

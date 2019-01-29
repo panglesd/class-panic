@@ -419,6 +419,7 @@ socketCC.on('newSubmission', function (submission) {
     // submission.customQuestion.allResponses = submission.customQuestion.reponses;
     console.log("submission = ", submission);
     currentSubmission = submission;
+    currentQuestion.submission = submission;
     // let notTheSame = typeof currentQuestion == "undefined";
     // notTheSame = notTheSame || !document.querySelector("#question");
     // notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != submission.customQuestion.id;

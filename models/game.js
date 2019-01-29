@@ -39,6 +39,7 @@ exports.questionListForCC = function (user, roomID, callback) {
 //	console.log("questionListForCC", rows);
 	rows.forEach((row) => {
 	    if(row.questionID){
+		console.log(row);
 		row.response = JSON.parse(row.response);
 		row.answered = row.response.length > 0;
 	    }

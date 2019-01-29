@@ -222,18 +222,15 @@ exports.fillSubmissions = function(userID, roomID, callback) {
 // = function(userID, roomID, questionID, callback) {
 exports.setValidity = function(roomID, userID, questionID, i, validity, callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	subm.customQuestion = JSON.parse(subm.customQuestion);
-//	console.log("subm = ", subm);
-	
 	subm.customQuestion.reponses[i].validity = validity;
+	subm.response[i].validity = validity;
 	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 	let params2 = [roomID, userID, questionID];
-	let validity2 = Question.correctSubmission(subm.customQuestion, JSON.parse(subm.response), subm.customQuestion.strategy);
-//	console.log("validity2 = ", validity2);
+	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
 	
 	bdd.query(query2, params2, (err, res) => {
-	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
-	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
+	    let query = "UPDATE stats SET response = ?, customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
+	    let params = [JSON.stringify(subm.response), JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
 	    let q = bdd.query(query, params, (err, res) => {
 		if (err) {
 		    console.log("err = ", err);
