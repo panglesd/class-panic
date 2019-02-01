@@ -55,17 +55,21 @@ module.exports = function(io) {
 	// });
 	Question.getByIndex(index, socket.room.id, (err, question) => {
 	    question.reponses.forEach((rep) => {
-		delete(rep.validity);
-		if(rep.texted) {
-		    delete(rep.correction);
+		if(!socket.room.status.showTruth) {
+		    delete(rep.validity);
+		    if(rep.texted) {
+			delete(rep.correction);
+		    }
+		    delete(rep.correcFileInfo);
 		}
-		delete(rep.correcFileInfo);
 	    });
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
 		submission.response.forEach((rep) => {
-		    if(!socket.room.revealed)
+		    if(!socket.room.status.showCorrecPerso) {
 			delete(rep.validity);
+			// delete commentaire perso etc...
+		    }
 		});
 		socket.emit("newQuestion", question);
 		callback();
@@ -101,14 +105,16 @@ module.exports = function(io) {
 
 	socket.on('chooseRoom', function (newRoom) {
 	    console.log("chooseRoom");
-	    if (socket.room)
+	    if (socket.room) {
 		socket.leave(socket.room.id);
-	    Room.getByID(parseInt(newRoom), function (err, res) {
-		if(res && res.status != "closed") {
-		    Course.getByID(res.courseID,(er, course) => {
+		delete(socket.room);
+	    }
+	    Room.getByID(parseInt(newRoom), function (err, room) {
+		if(room && room.status.open) {
+		    Course.getByID(room.courseID,(er, course) => {
 			User.getSubscription(socket.request.session.user, course, (err, subscription) => {
 			    if(subscription) {
-				socket.room = res;
+				socket.room = room;
 				socket.join(socket.room.id);
 				sendQuestionFromIndex(socket, 0, function (err) {if(err) throw err;});
 			    }
@@ -151,7 +157,7 @@ module.exports = function(io) {
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
 	    	    console.log("answer = ", answer);
-	    if(socket.room.status == "pending") {
+	    if(socket.room.status.acceptSubm) {
 		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    // A gérer autrement à cause de la réorganisation
 		    // if(answer.length != 0 && question.type != "multi")
@@ -168,7 +174,7 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
-	    if(socket.room.status == "pending"){
+	    if(socket.room.status.acceptSubm){
 		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    if(question.allResponses[n_ans].hasFile != "none") {
 			let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
@@ -201,7 +207,7 @@ module.exports = function(io) {
 	/******************************************/
 		 
 	socket.on('removeFile', function (n_ans, fileName, questionIndex) {
-	    if(socket.room.status == "pending"){
+	    if(socket.room.status.acceptSubm){
 		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    console.log("calling logFile");
 		    game.removeFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, fileName,(err) => {

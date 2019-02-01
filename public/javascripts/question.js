@@ -3,7 +3,7 @@
 function returnHTMLQuestion (i) {
     return '	<!--    Regroupement des champs hidden   -->'+
 '		<input type="hidden" class="texted-hidden" name="texted-'+i+'" value="false">'+
-'		<input type="hidden" class="correctness-hidden" name="correctness-'+i+'" value="false">'+
+'		<input type="hidden" class="correctness-hidden" name="correctness-'+i+'" value="to_correct">'+
 '	<!--    Numéro de réponse                -->'+
 '		<span class="froom nreponse"> Réponse '+i+' :</span>'+
 '	<!--    Texte de la réponse              -->'+
@@ -27,9 +27,16 @@ function returnHTMLQuestion (i) {
 '		    class="text"'+
 '		    style="text-align:left;margin:3px;">'+
 '		<input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
-'		<input name="multipleFile-'+i+'" type="checkbox">Multiple'+
-'		<input name="correcFile-'+i+'" type="file">Fichier pour la correction'+
-'		</div>'+
+'<!--		<input name="multipleFile-'+i+'" type="checkbox">Multiple -->'+
+'		    <div>'+
+'			<span style="font-size: 0.65em;">Ajouter des fichiers pour la correction : </span><input multiple name="correcFile-'+i+'" type="file">'+
+'			<span style="font-size: 0.65em;">Enlever des fichiers :</span>'+
+'			<select multiple name="delete-'+i+'">'+
+'			    <!-- <option value="prout1">Tout garder</option> -->'+
+'			</select>'+
+'		    </div>'+
+// '		<input name="correcFile-'+i+'" type="file">Fichier pour la correction'+
+// '		</div>'+
 '	<!--    Coefficient                      -->'+
 '		<div'+
 '		    class="text"'+

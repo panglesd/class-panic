@@ -76,8 +76,17 @@ Utiliser $...$ pour mettre des maths.
 		    class="text"
 		    style="text-align:left;margin:3px;">
 		    <input name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
-		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple </span>
-		    <input name="correcFile-<%= i %>" type="file"> (Fichier pour la correction)
+		    <!--		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple </span> -->
+		    <div>
+			<span style="font-size: 0.65em;">Ajouter des fichiers pour la correction : </span><input name="correcFile-<%= i %>" multiple type="file">
+			<span style="font-size: 0.65em;">Enlever des fichiers :</span>
+			<select multiple name="delete-<%= i %>">
+			    <!-- <option value="prout1">Tout garder</option> -->
+			    <% reponsePossible.correcFilesInfo.forEach((fileInfo) => { %>
+				<option value="<%= fileInfo %>"><%= fileInfo %></option>
+			    <% }); %>
+			</select>
+		    </div>
 		</div>		
 	<!--    Coefficient                      -->
 		<div

@@ -8,8 +8,8 @@
 <% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <form action="<%= config.PATH %>/course/<%= course.id %>/room/<%=room.id%>/update" method="post">
 <% } %>
-Name : <input <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="name" value="<%= room.name %>"> <br>
-Actuellement avec le set :
+Nom de la salle : <input <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="name" value="<%= room.name %>"> <br>
+Set associé :
 <select <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="questionSet">
     <% setOwnedList.forEach( function (set) { %>
 	<option value="<%=set.id%>" <%= set.id==room.questionSet ? "selected" : ""%>>
@@ -23,15 +23,10 @@ Actuellement <select name="type">
 <option <%= room.type == "live" ? "selected" : "" %> value="live">Rythmé par le prof</option>
 </select>
 <br>
-Actuellement 
-<select <%= (subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom ? "" : "readonly" %> name="status">
-    <% ["closed", "pending"].forEach( function (status) { %>
-	<option value="<%= status %>" <%= room.status == status ? "selected" : ""%>>
-	    <%= status %>
-	</option>
-    <% }); %>
-</select>
-
+<input type="checkbox" id="open" name="open"" <%= room.status.open ? "checked" : "" %>><label for="open">Ouverture de la salle</label> <br>
+<input type="checkbox" id="acceptSubm" name="acceptSubm"" <%= room.status.acceptSubm ? "checked" : "" %>><label for="acceptSubm">La salle accepte les nouvelles soumissions</label> <br>
+<input type="checkbox" id="showTruth" name="showTruth"" <%= room.status.showTruth ? "checked" : "" %>><label for="showTruth">La salle montre la correction des réponses</label> <br>
+<input type="checkbox" id="showCorrecPerso" name="showCorrecPerso"" <%= room.status.showCorrecPerso ? "checked" : "" %>><label for="showCorrecPerso">La salle montre les corrections personnelles et la note des étudiants corrigés</label> <br>
 <% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <input type="submit" value="Modifier">
     </form>

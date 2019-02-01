@@ -53,9 +53,9 @@ function createResponse(question, rep, index) {
     elem.classList.add("notSelected");
     elem.id = "r"+index;    
     // Si besoin est, ajout d'un event listener  A DEPLACER ?
-    console.log("on ajoute chooseAnswer ???", rep);
+//    console.log("on ajoute chooseAnswer ???", rep);
     if(!rep.texted && rep.hasFile == "none" && typeof chooseAnswer == "function") {
-	console.log("on ajoute chooseAnswer !!!");
+//	console.log("on ajoute chooseAnswer !!!");
 	elem.addEventListener("click", function (ev) {
 	    chooseAnswer(index);		    //updateAnswer(index, elem, true);
 	});
@@ -111,11 +111,15 @@ function createResponse(question, rep, index) {
     }
     // A commenter ?
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
+    console.log("rep = ", rep);
+    if(rep.validity)
+	addCorrection(question, elem, rep, index);
     return elem;
 //    wrapper.appendChild(elem);
 }
 
 function addCorrection(question, elem, rep, index) {
+    console.log("rep = ", rep);
     // Si la correction est présente
     if(rep.validity != "to_correct") {
 	elem.classList.add(rep.validity);

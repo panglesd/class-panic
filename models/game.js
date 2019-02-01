@@ -87,7 +87,7 @@ exports.logAnswer = function(user, room, newAnswer, callback) {
 exports.registerAnswer = function (user, room, newAnswer, callback) {
     Room.getByID(room.id, function (err, room) {
 	User.getSubscription(user.id,room.courseID, (err, subscription) => {
-	    if(!subscription.isTDMan && room.status == "pending") {
+	    if(!subscription.isTDMan && room.status.acceptSubm) {
 		exports.logAnswer(user, room, newAnswer, callback);
 	    }
 	    else
@@ -161,7 +161,7 @@ exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callb
     console.log("registerAnswerCC is called");
     User.getSubscription(user.id, room.courseID, (err, subscription) => {
 	console.log("err async", err);
-	if(subscription && room.status == "pending") {
+	if(subscription && room.status.acceptSubm) {
 	    exports.logAnswerCC(user, room, questionIndex, newAnswer, (err, hasCreatedNewBloc) => {
 		if(hasCreatedNewBloc)
 		    Stats.fillSubmissions(user.id, room.id, callback);
@@ -213,6 +213,7 @@ exports.nextQuestionFromRoomID = function (roomID, callback) {
 	function(nextQ, callback) {    // 4 Updater la room
 	    nextQ.reponses = JSON.parse(nextQ.reponses);
 	    bdd.query("UPDATE `rooms` SET `id_currentQuestion` = ?, `question` = ? WHERE id = ?", [nextQ.id, JSON.stringify(nextQ), roomID], function(err) {
+		// GROS PROBLEME ICI, CODE TROP VIEUX POUR L'EVOLUTION IL VA FALLOIR RASSEMBLER CC ET SONDAGE DANS STATS ET STATSBLOC !
 		Room.setStatusForRoomID(roomID, "pending", function() {
 		    exports.flushOldPlayers(roomID, callback);
 		});
@@ -262,6 +263,7 @@ exports.enterRoom = function (user, room, callback) {
 
 exports.setQuestion = function(roomID, question, callback) {
     exports.flushOldPlayers(roomID, function(err) {
+	// GROS PROBLEME ICI, CODE TROP VIEUX POUR L'EVOLUTION IL VA FALLOIR RASSEMBLER CC ET SONDAGE DANS STATS ET STATSBLOC !
 	let query = "UPDATE rooms SET status = \"pending\", question = ? "+(question.id ? (", id_currentQuestion = " + question.id) : "") +" WHERE id = ?";
 //	console.log(query);
 	bdd.query(query, [JSON.stringify(question), roomID], function(err, res) { callback(err, res);});

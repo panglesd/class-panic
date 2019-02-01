@@ -234,38 +234,49 @@ exports.getFileCorrect = function (question, n_ans, callback) {
 
 // Création
 
-exports.questionCreate = function (user, question, filesData, setID, callback) {
+exports.questionCreate = function (user, question, /*filesData,*/ setID, callback) {
     console.log("question = ", question);
     
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
-	if(er)
-	    console.log(er);
-//	let fileNames = question.map((repPoss) => { return repPoss.fileInfo.name;});
-	// bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`, `correcFileInfo`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?); SELECT LAST_INSERT_ID() as id", [
-	//     question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef, JSON.stringify(fileNames)
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?); SELECT LAST_INSERT_ID() as id", [
-	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, question.reponse, question.description, question.type, question.strategy, question.coef
+	if(er) console.log(er);
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)", [
+	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.strategy, question.coef
 	], function (err, r) {
-	    console.log(err, r);
-	    let questionID = r[1][0].id;
-	    async.eachOf(filesData, (file, index, callback) => {
-		if(file) {
- 		    let path = "storage/question"+questionID+"/anwer"+index+"/";
+	    let questionID = r.insertId;
+	    let newReponses = [];
+	    async.forEachOf(question.reponses, (reponse, n_ans, callbackRep) => {
+		newReponses[n_ans] = {correcFilesInfo:[]};
+		async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
+ 		    let path = "storage/question"+questionID+"/anwer"+n_ans+"/";
 		    console.log("path =", path+file.name);
 		    mkdirp(path, (err) => {
-			file.mv(path+file.name, callback);
+			console.log(err);
+			file.mv(path+file.name, (err, res) => {
+			    console.log("adding "+file.name+" a la liste de la reponse numero "+n_ans);
+			    newReponses[n_ans].correcFilesInfo.push(file.name);
+			    callbackFileInfo(err, res);});
 		    });
-		}
-		else
-		    callback();
+		}, (err) => {
+		    console.log(err);
+		    callbackRep(err);
+		});
 	    }, (err) => {
-		console.log(err);
-		callback(err, questionID);
+		if(err) // Il y a eu une erreur lors de l'enregistrement des fichiers : on préfère tout supprimer (il faudrait aussi supprimer les fichiers enregistrés...)
+		    bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
+			// fs.rm(path);
+			callback(err);
+		    });
+		else {
+		    newReponses.forEach((rep, n_ans) => {
+			question.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
+		    });
+		    bdd.query("UPDATE `questions` SET reponses = ? WHERE id = ?", [JSON.stringify(question.reponses), questionID], (err) => {callback(err, questionID);});
+		}
 	    });
 	});
     });
-};
+}
 
 // Suppression
 
@@ -284,8 +295,59 @@ exports.questionDelete = function (user, questionID, callback) {
 
 // Update
 
-exports.questionUpdate = function (user, questionID, newQuestion, filesData, callback) {
-    let i=0;
+exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove, callback) {
+    console.log("filesToRemove = ", filesToRemove);
+    function removeElem(array, elem) {
+	let index = array.indexOf(elem);
+	if (index > -1) {
+	    array.splice(index, 1);
+	}
+	return index > -1;
+    }
+    exports.getByID(questionID, (err, question) =>{
+
+	filesToRemove.forEach((fileList, n_ans) => {
+	    fileList.forEach((fileName) => {
+		removeElem(question.reponses[n_ans].correcFilesInfo, fileName);
+	    });
+	});
+	let newReponses = [];
+	
+	async.forEachOf(newQuestion.reponses, (reponse, n_ans, callbackRep) => {
+	    newReponses[n_ans] = {correcFilesInfo:[]};
+	    async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
+ 		let path = "storage/question"+questionID+"/anwer"+n_ans+"/";
+		console.log("path =", path+file.name);
+		mkdirp(path, (err) => {
+		    console.log(err);
+		    file.mv(path+file.name, (err, res) => {
+			console.log("adding "+file.name+" a la liste de la reponse numero "+n_ans);
+			removeElem(question.reponses[n_ans].correcFilesInfo, file.name);
+			question.reponses[n_ans].correcFilesInfo.push(file.name);
+			callbackFileInfo(err, res);});
+		});
+	    }, (err) => {
+		console.log(err);
+		callbackRep(err);
+	    });
+	}, (err) => {
+	    if(err) // Il y a eu une erreur lors de l'enregistrement des fichiers : on préfère tout supprimer (il faudrait aussi supprimer les fichiers enregistrés...)
+		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
+		    // fs.rm(path);
+		    callback(err);
+		});
+	    else {
+		question.reponses.forEach((rep, n_ans) => {
+		    newQuestion.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
+		});
+		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `strategy` = ?, `coef` = ? WHERE `id` = ?",
+			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], (err, res) => {callback(err, questionID);});
+//		bdd.query("UPDATE `questions` SET reponses = ? WHERE id = ?", [JSON.stringify(question.reponses), questionID], (err) => {callback(err, questionID);});
+	    }
+	});
+
+    });
+/*
     bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `strategy` = ?, `coef` = ? WHERE `id` = ?",
 	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], (err, res) =>
 	      async.eachOf(filesData, (file, index, callback) => {
@@ -303,6 +365,7 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesData, cal
 		  callback(err, questionID);
 	      })
 	     );
+*/
 };
 
 
