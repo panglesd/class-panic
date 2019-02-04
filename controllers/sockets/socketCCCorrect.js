@@ -123,9 +123,16 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('setValidity', function (roomID, studentID, questionID, i, validity) {
-//	    console.log("studentID = ", studentID);
+	    console.log("customValidity = ", validity);
 	    Stats.setValidity(socket.room.id, studentID, questionID, i, validity,function (err) {
-		//	    tools.setValidity(socket.room, studentID, questionID, i, validity,
+		if(err) //throw err;
+		    console.error(err);
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+	    });
+	});
+	socket.on('setCustomComment', function (roomID, studentID, questionID, i, customComment) {
+	    console.log("customComment = ", customComment);
+	    Stats.setCustomComment(socket.room.id, studentID, questionID, i, customComment,function (err) {
 		if(err) //throw err;
 		    console.error(err);
 		sendListStudents(socket.request.session.user, socket, socket.room, function() {});

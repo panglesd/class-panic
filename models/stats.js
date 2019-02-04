@@ -241,6 +241,21 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 	});
     });
 };
+exports.setCustomComment = function(roomID, userID, questionID, i, customComment, callback) {
+    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+//	subm.customQuestion.reponses[i].customComment = customComment;
+	subm.response[i].customComment = customComment;
+	console.log("subm.response = ", subm);
+	let query = "UPDATE stats SET response = ? WHERE id = ? AND userID = ?";
+	let params = [JSON.stringify(subm.response), subm.statsID, userID];
+	let q = bdd.query(query, params, (err, res) => {
+	    if (err)
+		console.log("err = ", err);
+	    console.log(q.sql);
+	    callback(err, res);
+	});
+    });
+};
 
 exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {

@@ -114,12 +114,23 @@ function createResponse(question, rep, index) {
     console.log("rep = ", rep);
     if(rep.validity)
 	addCorrection(question, elem, rep, index);
+    
+    let customComment = document.createElement("textarea");
+    customComment.id="customComment-"+index;
+    customComment.classList.add("customComment");
+    customComment.placeholder="Commentaires de correction";
+    customComment.required=true;
+    //	console.log("rep=",reponse);
+    customComment.addEventListener("input", (ev) => {
+	setCustomComment(index, customComment.value);
+    });
+    elem.appendChild(customComment);
+
     return elem;
 //    wrapper.appendChild(elem);
 }
 
 function addCorrection(question, elem, rep, index) {
-    console.log("rep = ", rep);
     // Si la correction est présente
     if(rep.validity != "to_correct") {
 	elem.classList.add(rep.validity);
@@ -143,8 +154,19 @@ function addCorrection(question, elem, rep, index) {
 		elem.appendChild(linkToCorrection);
 	    });
 	}
-    }    
-}
+    }
+    // let customComment = document.createElement("textarea");
+    // customComment.id="customComment-"+index;
+    // customComment.classList.add("customComment");
+    // customComment.placeholder="Commentaires de correction";
+    // customComment.required=true;
+    // //	console.log("rep=",reponse);
+    // customComment.addEventListener("input", (ev) => {
+    // 	setCustomComment(index, customComment.value);
+    // });
+    // elem.appendChild(customComment);
+
+    return elem;}
 
 function addAdminInterface(question, setValidity, setStrategy){
     let wrapper = document.querySelector("#wrapperAnswer");
@@ -174,6 +196,8 @@ function addAdminInterface(question, setValidity, setStrategy){
 	let noteCust = document.createElement("span"); noteCust.innerText = " Note custom : "; noteCust.style.fontSize = "19px";
 	elemRep.appendChild(noteCust);
 	elemRep.appendChild(customNote);
+	elemRep.querySelector(".customComment").required = false;
+
     });
     let elem = document.createElement('div');
     elem.classList.add("reponse");
@@ -253,6 +277,9 @@ function afficheSubmission (submission) {
 	if(reponse.validity) {
 	    elemReponse.classList.add(reponse.validity);
 	}
+	if(reponse.customComment)
+	    elemReponse.querySelector(".customComment").value = reponse.customComment;
+
 	// Ici gérer les corrections personnelles par reponse
 	// elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
     });

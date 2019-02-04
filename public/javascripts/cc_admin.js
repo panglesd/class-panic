@@ -89,6 +89,12 @@ function sendQuestion() {
 function setValidity(i, validity) {
     socketCC.emit("setValidity", roomID, currentStudent.userID, currentQuestion.id, i, validity);
 }
+
+function setCustomComment(i, customComment) {
+    socketCC.emit("setCustomComment", roomID, currentStudent.userID, currentQuestion.id, i, customComment);
+}
+
+
 function setStrategy() {
     console.log("setStrategy is on!");
     let strategy = document.querySelector("#strategy").value;

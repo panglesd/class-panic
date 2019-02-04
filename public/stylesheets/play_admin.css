@@ -132,3 +132,11 @@ li.inactiveQuestion {
     content: "✓";
     color:white;
 }
+
+.customComment:invalid {
+    display:none;
+}
+.customComment {
+    display: block;
+    width: 100%;
+}

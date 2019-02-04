@@ -68,6 +68,7 @@ module.exports = function(io) {
 		submission.response.forEach((rep) => {
 		    if(!socket.room.status.showCorrecPerso) {
 			delete(rep.validity);
+			delete(rep.customComment);
 			// delete commentaire perso etc...
 		    }
 		});
