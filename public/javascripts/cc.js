@@ -3,7 +3,7 @@
 //var socketAdmin = io.connect('http://localhost:3000/admin');
 //var socketCC = io.connect(server+'/cc');
 var socketCC = io.connect("https://wim.choum.net"+'/cc');
-var currentQuestionOfCC;
+var currentQuestion;
 var currentList;
 var md = new markdownit({
     html:         false,        // Enable HTML tags in source
@@ -54,7 +54,7 @@ socketCC.on('connect', () => {
 /*********************************************************************/
 
 function changeQuestionPlease() {
-    socketCC.emit("changeToQuestion", currentQuestionOfCC.indexSet+1);
+    socketCC.emit("changeToQuestion", currentQuestion.indexSet+1);
 }
 
 /*********************************************************************/
@@ -124,131 +124,32 @@ function gotoQuestion(i) {
 // });
 
 /*********************************************************************/
-/*                 lorsque l'on reçoit une nouvelle question (admin) */
+/*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
 socketCC.on('newQuestion', function (reponse) {
-    console.log('newQuestion');
-    console.log(reponse);
+//    console.log('newQuestion');
+    console.log("newQuestion", reponse);
 //    currentQuestionOfAdmin=reponse;
-    currentQuestionOfCC=reponse;
-    currentQuestionOfCC.fileInfo = JSON.parse(currentQuestionOfCC.fileInfo);
-    // On s'occupe du carré blanc
-    let temp;
-    if((temp = document.querySelector("li.currentQuestion"))) {
-	temp.classList.remove("currentQuestion");
-    }
-    if(document.querySelector("li#q-"+reponse.id))
-	document.querySelector("li#q-"+reponse.id).classList.add("currentQuestion");
+    currentQuestion=reponse;
+//    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
 
-    // On stocke la question
-    currentQuestionOfCC = reponse;
-
-    // On écrit l'énoncé là où il faut. MathJax rendered.
-    let enonce = document.querySelector("#question");
-    enonce.textContent=reponse.enonce;
-//    MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
-
-    // On nettoie les réponses précédentes
-    let wrapper = document.querySelector("#wrapperAnswer");
-    while (wrapper.firstChild) {
-	wrapper.removeChild(wrapper.firstChild);
-    }
-
-    // Si besoin est, on rajoute la description
-    let descr = document.querySelector("#description");
-    if(reponse.description)
-	descr.style.visibility="visible";
-    else
-	descr.style.visibility="hidden";
-    if(reponse.description)
-	descr.innerHTML = md.render(reponse.description);
-    else
-	descr.innerHTML = reponse.description;
-//    MathJax.Hub.Queue(["Typeset",MathJax.Hub,descr]);
-
-    // Pour chaque nouvelle réponse :
-
-    reponse.allResponses.forEach(function (rep, index) {
-	// Création de l'élément HTML vide
-	let elem = document.createElement('div');
-	elem.classList.add("reponse");
-	elem.classList.add("notSelected");
-//	if(rep.validity)
-//	    elem.classList.add(rep.validity);
-	elem.id = "r"+index;
-
-	// Si besoin est, ajout d'un event listener
-	elem.addEventListener("click", function (ev) {
-	    //		chooseAnswer(index, event.currentTarget);
-	    if(ev.target.tagName != "TEXTAREA" && ev.target.tagName != "A")
-		chooseAnswer(index, elem, false);
-	    else
-		chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
-	});
-	// Création de l'élément contenant l'énoncé de la réponse
-	let span = document.createElement("span");
-	elem.innerHTML = "";
-	span.innerHTML = md.render(rep.reponse);
-	console.log(span, rep.reponse);
-	span.classList.add("markdown");
-	elem.appendChild(span);
-	// Si besoin, ajout d'un textarea
-	if(rep.texted) {
-	    let textarea = document.createElement("textarea");
-	    textarea.style.width="100%";
-	    textarea.style.display="block";
-	    if(rep.correction)
-		textarea.textContent=rep.correction;
-	    // Ajout d'un event listener pour le textarea
-	    if(typeof isAdmin == "undefined") {
-		textarea.addEventListener("input", (ev) => {
-		    console.log("updateed");
-		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
-//		    sendAnswer();
-		});
-	    }
-	    elem.appendChild(textarea);
-	}
-	// Si besoin, ajout d'un input type=file
-	if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
-	    let fileInfo = document.createElement("div");
-	    fileInfo.innerText = "Pas de fichier envoyé";
-	    if(reponse.fileInfo && reponse.fileInfo[index]) {
-		fileInfo.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestionOfCC.id+"/"+index+"/"+reponse.fileInfo[index].fileName+"'></a></td></tr>"+
-		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
-		fileInfo.querySelector(".fileName").innerText += reponse.fileInfo[index].fileName;
-		fileInfo.querySelector(".hash").innerText = reponse.fileInfo[index].hash;
-	    }
-	    fileInfo.style.fontSize = "19px";
-	    let fileInput = document.createElement("input");
-	    fileInput.type="file";
-	    //	    file.value = "Soumettre un fichier";
-	    fileInput.addEventListener('change', function() {
-		var reader = new FileReader();
-		reader.addEventListener('load', function() {
-		    console.log("sending file !");
-		    socketCC.emit("chosenFile", fileInput.files[0].name, index, currentQuestionOfCC.indexSet, reader.result);
-		});
-		reader.readAsArrayBuffer(fileInput.files[0]);		
-	    });
-	    elem.appendChild(fileInfo);
-	    elem.appendChild(fileInput);
-	}
-//	MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
-	wrapper.appendChild(elem);
-    });
-    if(reponse.userResponse)
-	reponse.userResponse.forEach((ans) => {
-	    let temp = document.querySelectorAll("#wrapperAnswer .reponse")[ans.n];
-	    temp.classList.remove("notSelected");
-	    temp.classList.add("selected");
-	    let ta = temp.querySelector("textarea");
-	    if(ta)
-		ta.value = ans.text;
-	});
-    socketCC.emit("sendCorrection", currentQuestionOfCC.id);
+    let temp2 = reponse.submission.response;
+    afficheQuestion(reponse);
+    afficheSubmission(temp2);
+    socketCC.emit("sendCorrection", currentQuestion.id);
     socketCC.emit("sendList");
+});
+
+/*********************************************************************/
+/*                 lorsqu'un fichier a été reçu                      */
+/*********************************************************************/
+
+socketCC.on("fileReceived", (n_ans, fileName, hash) => {
+    console.log("fileReceived with : ", n_ans, fileName, hash);
+    let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[n_ans];
+    affFileInfo(elemReponse, {fileName: fileName, hash: hash, timestamp: Date.now()}, n_ans);
+    sendAnswer();    
 });
 
 /*********************************************************************/
@@ -256,109 +157,51 @@ socketCC.on('newQuestion', function (reponse) {
 /*********************************************************************/
 
 socketCC.on('newList', function (questionList) {
-    console.log("questionList", questionList);
-    console.log("currentList", currentList);
-    // On vérifie si quelque chose a changé dans les énoncés.
-    let notTheSame = typeof currentList == "undefined";
-    notTheSame = notTheSame || currentList.length != questionList.length;
-    if(!notTheSame)
-	questionList.forEach((question, index) => {
-	    if(question.enonce != currentList[index].enonce)
-		notTheSame = true;
-	});
-    // notTheSame vaut true ssi quelque chose a changé dans les énoncés. Si c'est le cas, on refait entièrement le menu
-    currentList = questionList;
-    if(notTheSame) {
-	let ul = document.createElement("ul");
-	ul.id = "chooseQFromSet";
-	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
-	questionList.forEach(function (question, index) {
-	    console.log(question);
-	    let li = document.createElement("li");
-	    li.id = "q-" + question.id;
-	    li.classList.add("q-");
-	    if(question.id == currentQuestionOfCC.id)
-		li.classList.add("currentQuestion");
-	    li.addEventListener("click", () => { console.log("sdfggfeer");gotoQuestion(question.indexSet); });
-	    li.class = ""+(question.id == currentQuestionOfCC.id);
-	    li.textContent = question.enonce;
-//	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
-	    ul.appendChild(li);
-	});
-	let old = document.querySelector("#chooseQFromSet");
-	old.parentNode.replaceChild(ul,old);
-    }
-    // Dans tous les cas, on refait le check des petites marques blanches
-    document.querySelectorAll(".q-").forEach((elem, index) => {
-	if(questionList[index].answered)
-	    elem.classList.add("answered");
-	else
-	    elem.classList.remove("answered");
-    });
-//	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-//	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
-//	console.log(currentQuestionOfCC.id);
-//	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
+    affQuestionList(questionList);
 });
 
 /*********************************************************************/
-/*                 lorsque l'on reçoit la correction                 */
+/*                 Pour envoyer son choix de réponses                */
 /*********************************************************************/
 
-socketCC.on('newCorrection', function (correction) {
-    console.log("corec = ", correction);
-    correction.correcFileInfo = JSON.parse(correction.correcFileInfo);
-    correction.reponses.forEach((rep, index) => {
-	let div = document.querySelector("#r"+index);
-	if(rep.validity != "to_correct") {
-	    div.classList.add(rep.validity);
-	}
-	if(rep.texted) {
-	    // Ajout d'un input div pour l'éventuelle correction
-	    let divCorrec = document.createElement("div");
-	    divCorrec.classList.add("correcArea");
-	    divCorrec.textContent = "Correction : "+rep.correction;
-	    div.appendChild(divCorrec);
-	}
-	if(rep.hasFile == true || ["true","single","multi"].includes(rep.hasFile)) {
-//	    console.log(correction);
-	    if(correction.correcFileInfo[index]) {
-		let linkToCorrection = document.createElement("a");
-		linkToCorrection.href = "fileCorrect/"+currentQuestionOfCC.id+"/"+index+"/"+correction.correcFileInfo[index];;
-		linkToCorrection.target = "_blank";
-		linkToCorrection.style.color = "blue";
-		linkToCorrection.textContent = "Correction : "+correction.correcFileInfo[index];
-		div.appendChild(linkToCorrection);
+function chooseAnswer(i) {
+    let chosenAnswer = currentQuestion.reponses[i];
+    console.log(chosenAnswer);
+    // Dans le cas où seul le clic détermine si question est selectionnée, (pas de fichier/textarea)
+    if(!chosenAnswer.texted && !(chosenAnswer.hasFile == true || ["single","multi","true"].includes(chosenAnswer.hasFile))) {
+	console.log("clic-determined");
+	if(currentQuestion.type!="multi") {
+	    var reponse=document.querySelector(".reponse.selected");
+	    if(reponse)
+		reponse.classList.replace('selected', 'notSelected');
+	    if(i>-1) {
+		let a = document.querySelector("#r"+i);
+		a.classList.replace("notSelected", "selected");
 	    }
 	}
-    });
-});
-
-
-/*********************************************************************/
-/*                 pour envoyer son choix de reponse                 */
-/*********************************************************************/
-
-function chooseAnswer(i, elem, update) {
-    if(currentQuestionOfCC.type!="multi") {
-	var reponse=document.querySelector(".reponse.selected");
-	if(reponse) {
-	    reponse.classList.replace('selected', 'notSelected');
-	};
-	if(i>-1) {
-	    let a = document.querySelector("#r"+i);
-	    a.classList.replace("notSelected", "selected");
+	else {
+		let a = document.querySelector("#r"+i);
+		a.classList.toggle("notSelected");	    
+		a.classList.toggle("selected");	    
 	}
     }
     else {
-	let a = document.querySelector("#r"+i);
-	if(update) {
-	    a.classList.remove("notSelected");
-	    a.classList.add("selected");
+	console.log("content-determined");
+	let elem = document.querySelector("#r"+i);
+	let flag = false;
+	let textarea = elem.querySelector("textarea");
+	if(textarea && textarea.value)
+	    flag = true;
+	let file = elem.querySelector("a.fileName");
+	if(file)
+	    flag = true;
+	if(flag) {
+	    elem.classList.remove("notSelected");
+	    elem.classList.add("selected");
 	}
 	else {
-	    a.classList.toggle("notSelected");
-	    a.classList.toggle("selected");
+	    elem.classList.add("notSelected");
+	    elem.classList.remove("selected");
 	}
     }
     sendAnswer();
@@ -366,14 +209,31 @@ function chooseAnswer(i, elem, update) {
 
 function sendAnswer() {
     let reponses = [];
-    document.querySelectorAll(".reponse.selected").forEach((elem) => {
+//    document.querySelectorAll(".reponse.selected").forEach((elem) => {
+    document.querySelectorAll(".reponse").forEach((elem) => {
 	let atom = {};
-	atom.n = parseInt(elem.id.split("r")[1]);
+	atom.selected = elem.classList.contains("selected");
+//	let nQuestion = parseInt(elem.id.split("r")[1]);
 	let textarea = elem.querySelector("textarea");
 	atom.text = textarea ? textarea.value : "";
+//	let fI = JSON.parse(elem.getAttribute("fileInfo"));
+	atom.filesInfo = [];
+//	reponses[nQuestion] = atom;
 	reponses.push(atom);
     });
-    socketCC.emit("chosenAnswer", reponses, currentQuestionOfCC.indexSet);
-    console.log("reponses, currentQuestionOfCC.indexSet = ", reponses, currentQuestionOfCC.indexSet);
+    console.log("reponse envoyées : ", reponses);
+    socketCC.emit("chosenAnswer", reponses, currentQuestion.indexSet);
+//    console.log("reponses, currentQuestion.indexSet = ", reponses, currentQuestion.indexSet);
 }
 
+/*********************************************************************/
+/*                 Pour supprimer un fichier                         */
+/*********************************************************************/
+
+function removeFile(n_ans, fileName) {
+    socketCC.emit("removeFile", n_ans, fileName, currentQuestion.indexSet);
+}
+
+function sendFile(fileName, index, set, data) {
+    socketCC.emit("chosenFile", fileName, index, set, data);
+}

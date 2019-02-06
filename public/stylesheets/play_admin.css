@@ -54,7 +54,7 @@
     border-bottom: 1px solid white;
 }
 
-li.currentQuestion {
+li.currentQuestion, li.currentStudent {
     border-left: 15px solid rgba(255,255,255,1);
 }
 li.inactiveQuestion {
@@ -131,4 +131,18 @@ li.inactiveQuestion {
 .answered:before {
     content: "✓";
     color:white;
+}
+
+.customComment:invalid {
+    display:none;
+}
+.customComment {
+    display: block;
+    width: 100%;
+}
+
+.correcFilesArea {
+    font-size: 0.7em;
+    padding: 5px;
+    margin: 5px;
 }

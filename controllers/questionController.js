@@ -31,6 +31,7 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 		callback(null, typeof question == "undefined");
 	    },
 	    question: function (callback) {
+		console.log(question);
 		if(typeof question != "undefined")
 		    callback(null, question);
 		else
@@ -39,8 +40,12 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 				 reponses : [{
 				     reponse: "",
 				     validity: "to_correct",
-				     texted: false
+				     coef: 1,
+				     texted: false,
+				     correcFilesInfo: []
+				     // correcFilesInfo: [{fileName:"test.pdf"},{fileName:"test2.pdf"}]
 				 }],
+				 coef:1,
 				 enonce: "",
 				 description:"",
 				 type:"mono"
@@ -86,10 +91,9 @@ exports.question_update_get = function(req, res) {
 /*************************************************************/
 /*         Controlleurs POST pour modifier les questions     */
 /*************************************************************/
-
 function formatQuestionFromBody(body, files) {
     console.log("body = ", body);
-    let fileInfo = [];
+    let filesData = [];
     let question = {
 	enonce : body.enonce,
 	correct : body.correct,
@@ -101,33 +105,44 @@ function formatQuestionFromBody(body, files) {
     let reponse = [];
     let i=0;
     while(typeof body["value-reponse-"+i] != "undefined") {
+	let correcFilesInfo = [];
+	if(Array.isArray(files["correcFile-"+i])) correcFilesInfo = files["correcFile-"+i];
+	else if (files["correcFile-"+i]) correcFilesInfo = [files["correcFile-"+i]];
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
 	    texted: body["texted-"+i]=="true" ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
+	    coef: body["coeff-"+i],
+	    correcFilesInfo: correcFilesInfo
 	};
-	console.log(files);
-	if(body["hasFile-"+i]) {
-	    if(files["correcFile-"+i]) {
-		files["correcFile-"+i].name = sanit_fn(files["correcFile-"+i].name);
-		fileInfo[i] = files["correcFile-"+i];
-	    }
-	}
+	// console.log(files);
+	// if(body["hasFile-"+i]) {
+	//     if(files["correcFile-"+i]) {
+	// 	files["correcFile-"+i].name = sanit_fn(files["correcFile-"+i].name);
+	// 	filesData[i] = files["correcFile-"+i];
+	// 	reponse[i].correcFileInfo=[files["correcFile-"+i].name];
+	//     }
+	// }
 	if(reponse[i].texted) 
 	    reponse[i].correction = body["correction-"+i];
 	i++;
     }
-    question.reponse = JSON.stringify(reponse);
-    return [question, fileInfo];
+//    question.reponse = JSON.stringify(reponse);
+    question.reponses = reponse;
+//    return [question, filesData];
+    return question;
 }
 // Create
 
 exports.question_create_post = function(req, res) {
     if(req.subscription.canOwnSet) {
 	console.log("req.files is", req.files);
-	let [question, fileInfo] = formatQuestionFromBody(req.body, req.files);
-	Question.questionCreate(req.session.user, question, fileInfo, req.set.id, function(err, info) {
+	let question = formatQuestionFromBody(req.body, req.files);
+	console.log("question = ", question);
+	
+//	let [question, filesData] = formatQuestionFromBody(req.body, req.files);
+	Question.questionCreate(req.session.user, question, /* filesData,*/ req.set.id, function(err, info) {
 	    if(err) {
 		req.msgs.push("Impossible d'ajouter la question !");
 		SetController.set_manage(req, res);
@@ -148,8 +163,20 @@ exports.question_create_post = function(req, res) {
 
 exports.question_update_post = function(req, res) {
     if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
-	let [question, fileInfo] = formatQuestionFromBody(req.body, req.files);
-	Question.questionUpdate(req.session.user, req.question.id, question, function(err, info) {
+//	let [question, filesData] = formatQuestionFromBody(req.body, req.files);
+	let question = formatQuestionFromBody(req.body, req.files);
+	let filesToRemove = [];
+	let i=0;
+	while(typeof req.body["value-reponse-"+i] != "undefined") {
+	    if(!Array.isArray(req.body["delete-"+i])) {
+		if(req.body["delete-"+i])
+		    req.body["delete-"+i] = [req.body["delete-"+i]];
+		else req.body["delete-"+i] = [];
+	    }
+	    filesToRemove[i] = req.body["delete-"+i];
+	    i++;
+	}
+	Question.questionUpdate(req.session.user, req.question.id, question, filesToRemove, function(err, info) {
 	    if(err) {
 		req.msgs.push("Impossible de mettre à jour la question !");
 		SetController.set_manage(req, res);

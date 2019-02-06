@@ -16,8 +16,8 @@ var courseController = require("./courseController");
 let renderRooms = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -33,9 +33,9 @@ let renderRooms = function(user, msgs, req, res) {
 	},
 	function (err, results) {
 	    //	    console.log(results);
-	    res.render('courses', results)
+	    res.render('courses', results);
 	});
-}
+};
 
 // Render manage_room.ejs
 
@@ -43,8 +43,8 @@ let renderRooms = function(user, msgs, req, res) {
 let renderRoomManage = function (user, course, room, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Administrer "+room.name)},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Administrer "+room.name);},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -74,8 +74,8 @@ let renderRoomManage = function (user, course, room, msgs, req, res) {
 let renderManageRooms = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: ... une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -100,7 +100,7 @@ let renderManageRooms = function(user, course, msgs, req, res) {
 	},
 	function (err, results) {
 //	    console.log(results);
-	    res.render('manage_rooms', results)
+	    res.render('manage_rooms', results);
 	});
 };
 
@@ -133,12 +133,27 @@ exports.room_manage_all = function(req, res) {
 /*         Controlleurs POST pour modifier les rooms         */
 /*************************************************************/
 
+function parseBodytoNewRoom(body) {
+    let newRoom = {};
+    newRoom.status = {};
+    newRoom.status.open = body.open ? true : false;
+    newRoom.status.acceptSubm = body.acceptSubm ? true : false;
+    newRoom.status.showTruth = body.showTruth ? true : false;
+    newRoom.status.showCorrecPerso = body.showCorrecPerso ? true : false;
+    newRoom.name = body.name;
+    newRoom.questionSet = body.questionSet;
+    newRoom.type = body.type;
+    return newRoom;
+}
+
 // Create
 
 exports.room_create_post = function(req, res) {
     if(req.subscription.canOwnRoom) {
-	if(req.body.questionSet) { 
-	    Room.create(req.session.user, req.body, req.course.id, function (err,r) { // HACK DEGEU
+	if(req.body.questionSet) {
+	    // Construction de l'objet newRoom depuis les données du formulaire.
+	    let newRoom = parseBodytoNewRoom(req.body);
+	    Room.create(req.session.user, newRoom, req.course.id, function (err,r) {
 		//	    res.redirect(config.PATH+'/manage/room');
 		//	    console.log(req.body);
 		if(err) {
@@ -192,7 +207,10 @@ exports.room_delete_post = function(req, res) {
 
 exports.room_update_post = function(req, res) {
     if(req.subscription.canAllRoom || (req.subscription.canOwnRoom && req.room.ownerID == req.user.id)) {
-	Room.update(req.session.user, req.room, req.body, function (err, id) {
+	console.log("req.body = ", req.body);
+	let newRoom = parseBodytoNewRoom(req.body);
+	console.log("newRoom = ", newRoom);
+	Room.update(req.session.user, req.room, newRoom, function (err, id) {
 	    if(err) {
 		req.msgs.push("Impossible de modifier la room");
 		renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);

@@ -26,14 +26,22 @@ module.exports = function(io) {
 	    callback();
 	});
     }
+*/
 
     function sendQuestionFromIndex (socket, index, callback)  {
-	Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
-	    socket.emit("newQuestion", question);
-	    callback();
+	    console.log("sendQuestionfromindex");
+	// Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
+	//     socket.emit("newQuestion", question);
+	//     callback();
+	// });
+	Question.getByIndex(index, socket.room.id, (err, question) => {
+		socket.emit("newQuestion", question);
+		callback();
+	    // Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
+	    // 	question.submission = submission;
+	    // });
 	});
     };
-*/
 
     function sendListStudents (user, socket, room, callback) {
 	Stats.studentListForCC(user, room.id, function (err, question) {
@@ -102,14 +110,29 @@ module.exports = function(io) {
 	    });
 	});
 	
+	socket.on('sendQuestion', function (roomID, studentID, questionIndex) {
+//	    console.log("studentID = ", studentID);
+	    console.log("studentID = ");
+	    sendQuestionFromIndex(socket, questionIndex, function (err) {
+		if(err) throw err;
+	    });
+	});
+	
 	/******************************************/
 	/*                                         */
 	/******************************************/
 	
 	socket.on('setValidity', function (roomID, studentID, questionID, i, validity) {
-//	    console.log("studentID = ", studentID);
+	    console.log("customValidity = ", validity);
 	    Stats.setValidity(socket.room.id, studentID, questionID, i, validity,function (err) {
-		//	    tools.setValidity(socket.room, studentID, questionID, i, validity,
+		if(err) //throw err;
+		    console.error(err);
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+	    });
+	});
+	socket.on('setCustomComment', function (roomID, studentID, questionID, i, customComment) {
+	    console.log("customComment = ", customComment);
+	    Stats.setCustomComment(socket.room.id, studentID, questionID, i, customComment,function (err) {
 		if(err) //throw err;
 		    console.error(err);
 		sendListStudents(socket.request.session.user, socket, socket.room, function() {});

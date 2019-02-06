@@ -99,8 +99,8 @@ exports.logStats = function (roomID,  callback) {
 		let blocID = res[1][0].blocID;
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
-			let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`, `fileInfo`) VALUES (?,?,?,?,?,?,?)";
-			let params = [oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response, result.question.strategy, JSON.stringify(room.question), "[]"];
+			let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
+			let params = [oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response, result.question.strategy, JSON.stringify(room.question)];
 			bdd.query(query,params, (err, res) => {callback(err, res);});
 //			console.log("result.question.strategy = ", result.question.strategy);
 		    }, (err) => {
@@ -176,8 +176,13 @@ function tryGetSubmission(userID, roomID, questionID, callback) {
 
 exports.getSubmission = function(userID, roomID, questionID, callback) {
     tryGetSubmission(userID, roomID, questionID, (err, subm) => {
-	if(subm)
+	if(subm) {
+	    subm.customQuestion = JSON.parse(subm.customQuestion);
+	    subm.response = JSON.parse(subm.response);
+	    subm.customQuestion.allResponses = subm.customQuestion.reponses;
+
 	    callback(err, subm);
+	}
 	else
 	    exports.fillSubmissions(userID, roomID, () => {
 		exports.getSubmission(userID, roomID, questionID, callback);
@@ -187,26 +192,27 @@ exports.getSubmission = function(userID, roomID, questionID, callback) {
 
 exports.fillSubmissions = function(userID, roomID, callback) {
     console.log("fillSubmission is called");
-//    console.log("userID = ", userID);
     User.userByID(userID, (err, user) => {
-//	console.log("user111 is", user);
 	Room.getByID(roomID, (err, room) => {
 	    Question.listBySetID(room.questionSet, (err, qList) => {
-		//		console.log("qList = ", qList);
 		async.forEach(qList, (question, callback2) => {
 		    tryGetSubmission(userID, roomID, question.id, (err, subm) => {
-			//			console.log("subm = ", subm);
-//			console.log("*********************", question);
 			if(!subm){
-//			    console.log("user is = ", user);
-			    //			    Game.registerAnswerCC(user, room, question.indexSet, [], callback2);
-			    Game.logAnswerCC(user, room, question.indexSet, [], callback2);
+			    let dummyAnswer = [];
+			    question.reponses.forEach((rep) => {
+				dummyAnswer.push({
+				    "selected":false,
+				    "text":"",
+				    "filesInfo":[]
+				});
+			    });
+			    Game.logAnswerCC(user, room, question.indexSet, dummyAnswer, callback2);
 			}
 			else
 			    callback2();
 		    });
-		}, () => {
-		    console.log("finished fillSubmission");
+		}, (err) => {
+		    console.log("finished fillSubmission", err);
 		    callback();
 		});
 	    });
@@ -216,18 +222,15 @@ exports.fillSubmissions = function(userID, roomID, callback) {
 // = function(userID, roomID, questionID, callback) {
 exports.setValidity = function(roomID, userID, questionID, i, validity, callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	subm.customQuestion = JSON.parse(subm.customQuestion);
-//	console.log("subm = ", subm);
-	
 	subm.customQuestion.reponses[i].validity = validity;
+	subm.response[i].validity = validity;
 	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 	let params2 = [roomID, userID, questionID];
-	let validity2 = Question.correctSubmission(subm.customQuestion, JSON.parse(subm.response), subm.customQuestion.strategy);
-//	console.log("validity2 = ", validity2);
+	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
 	
 	bdd.query(query2, params2, (err, res) => {
-	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
-	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
+	    let query = "UPDATE stats SET response = ?, customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
+	    let params = [JSON.stringify(subm.response), JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
 	    let q = bdd.query(query, params, (err, res) => {
 		if (err) {
 		    console.log("err = ", err);
@@ -238,17 +241,31 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 	});
     });
 };
+exports.setCustomComment = function(roomID, userID, questionID, i, customComment, callback) {
+    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+//	subm.customQuestion.reponses[i].customComment = customComment;
+	subm.response[i].customComment = customComment;
+	console.log("subm.response = ", subm);
+	let query = "UPDATE stats SET response = ? WHERE id = ? AND userID = ?";
+	let params = [JSON.stringify(subm.response), subm.statsID, userID];
+	let q = bdd.query(query, params, (err, res) => {
+	    if (err)
+		console.log("err = ", err);
+	    console.log(q.sql);
+	    callback(err, res);
+	});
+    });
+};
 
 exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	subm.customQuestion = JSON.parse(subm.customQuestion);
 	subm.customQuestion.strategy = strategy;
 	if(strategy == "manual") {
 	    subm.customQuestion.mark = "" + mark;
 	}
 	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 	let params2 = [roomID, userID, questionID];
-	let validity2 = Question.correctSubmission(subm.customQuestion, JSON.parse(subm.response), subm.customQuestion.strategy);
+	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
 //	console.log("validity2 = ", validity2);
 	
 	bdd.query(query2, params2, (err, res) => {
