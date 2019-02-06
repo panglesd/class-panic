@@ -221,11 +221,15 @@ exports.getFirstOfSet = function (setID, callback) {
     });
 };
 
-exports.getFileCorrect = function (question, n_ans, callback) {
+exports.getFileCorrect = function (question, n_ans, fileName, callback) {
     console.log("thequestio is ", question);
-    question.correcFileInfo = JSON.parse(question.correcFileInfo);
-    let path = "storage/question"+question.id+"/anwer"+n_ans+"/"+question.correcFileInfo[n_ans];
-    fs.readFile(path, callback);    
+    //    question.correcFileInfo = JSON.parse(question.correcFileInfo);
+    if(question.reponses[n_ans].correcFilesInfo.includes(fileName)) {
+	let path = "storage/question"+question.id+"/answer"+n_ans+"/"+fileName;
+	fs.readFile(path, callback);    
+    }
+    else
+	callback("bad file name", null);
 };
 
 /***********************************************************************/
@@ -243,12 +247,13 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
 	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)", [
 	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.strategy, question.coef
 	], function (err, r) {
+	    if(err) console.log(err);
 	    let questionID = r.insertId;
 	    let newReponses = [];
 	    async.forEachOf(question.reponses, (reponse, n_ans, callbackRep) => {
 		newReponses[n_ans] = {correcFilesInfo:[]};
 		async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
- 		    let path = "storage/question"+questionID+"/anwer"+n_ans+"/";
+ 		    let path = "storage/question"+questionID+"/answer"+n_ans+"/";
 		    console.log("path =", path+file.name);
 		    mkdirp(path, (err) => {
 			console.log(err);
@@ -316,7 +321,7 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	async.forEachOf(newQuestion.reponses, (reponse, n_ans, callbackRep) => {
 	    newReponses[n_ans] = {correcFilesInfo:[]};
 	    async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
- 		let path = "storage/question"+questionID+"/anwer"+n_ans+"/";
+ 		let path = "storage/question"+questionID+"/answer"+n_ans+"/";
 		console.log("path =", path+file.name);
 		mkdirp(path, (err) => {
 		    console.log(err);
@@ -352,7 +357,7 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	      [newQuestion.enonce, newQuestion.reponse, newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], (err, res) =>
 	      async.eachOf(filesData, (file, index, callback) => {
 		  if(file) {
- 		      let path = "storage/question"+questionID+"/anwer"+index+"/";
+ 		      let path = "storage/question"+questionID+"/answer"+index+"/";
 		      console.log("path =", path+file.name);
 		      mkdirp(path, (err) => {
 			  file.mv(path+file.name, callback);

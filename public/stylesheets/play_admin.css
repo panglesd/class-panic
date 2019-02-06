@@ -140,3 +140,9 @@ li.inactiveQuestion {
     display: block;
     width: 100%;
 }
+
+.correcFilesArea {
+    font-size: 0.7em;
+    padding: 5px;
+    margin: 5px;
+}

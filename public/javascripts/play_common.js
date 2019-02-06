@@ -121,9 +121,10 @@ function createResponse(question, rep, index) {
     customComment.placeholder="Commentaires de correction";
     customComment.required=true;
     //	console.log("rep=",reponse);
-    customComment.addEventListener("input", (ev) => {
-	setCustomComment(index, customComment.value);
-    });
+    if(typeof(setCustomComment) == "function")
+	customComment.addEventListener("input", (ev) => {
+	    setCustomComment(index, customComment.value);
+	});
     elem.appendChild(customComment);
 
     return elem;
@@ -137,22 +138,36 @@ function addCorrection(question, elem, rep, index) {
     }
     if(rep.texted) {
 	if(rep.correction){
-	    let divCorrec = document.createElement("div");
+	    let divCorrec = document.createElement("fieldset");
+	    let legend = document.createElement("legend");
+	    legend.innerText = "Corrigé";
+	    divCorrec.appendChild(legend);
 	    divCorrec.classList.add("correcArea");
-	    divCorrec.textContent = "Correction : "+rep.correction;
+	    let correcText = document.createTextNode(rep.correction)
+//	    divCorrec.textContent = /* "Correction : " + */ rep.correction;
+	    divCorrec.appendChild(correcText);
 	    elem.insertBefore(divCorrec, elem.querySelector("textarea").nextSibling);
 	}
     }
     if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
 	if(rep.correcFilesInfo) {
-	    rep.correcsFileInfo.forEach((fileInfo) => {
+	    let divForCorrection = document.createElement("fieldset");
+	    let legend = document.createElement("legend");
+	    legend.innerText = "Fichiers Corrigés";
+	    divForCorrection.appendChild(legend);
+	    divForCorrection.classList.add("correcFilesArea");
+	    rep.correcFilesInfo.forEach((fileInfo) => {
+		let divOneCorrection = document.createElement("div");
+		divOneCorrection.classList.add("correcFileArea");
 		let linkToCorrection = document.createElement("a");
-		linkToCorrection.href = "fileCorrect/"+question.id+"/"+index+"/"+fileInfo.fileName;
+		linkToCorrection.href = "fileCorrect/"+question.id+"/"+index+"/"+fileInfo;
 		linkToCorrection.target = "_blank";
 		linkToCorrection.style.color = "blue";
-		linkToCorrection.textContent = "Correction : "+fileInfo.fileName;
-		elem.appendChild(linkToCorrection);
+		linkToCorrection.textContent = /*"Correction : "+*/fileInfo;
+		divOneCorrection.appendChild(linkToCorrection);
+		divForCorrection.appendChild(divOneCorrection);
 	    });
+	    elem.appendChild(divForCorrection);
 	}
     }
     // let customComment = document.createElement("textarea");
