@@ -1,66 +1,132 @@
+     // ICI ajouter les events listener
+function addReponseListener(div) {
+    div.querySelector(".remove").addEventListener("click", (ev) => {
+	removeElement(div);
+    });
+    div.querySelectorAll("fieldset").forEach((f) => { addHideAndShow(f) });
+}
+
+function addHideAndShow(fieldset) {
+    let i = 1;
+    fieldset.querySelector("legend").addEventListener("click", (ev) => {
+	i=1-i;
+	fieldset.querySelector(".wrapperFieldset").style.display = i == 0 ? "none" : "";
+    });
+}
+
+document.querySelectorAll(".reponse").forEach(addReponseListener);
+
 // Le HTML d'une question
 
+function points(sel, val) {
+    let s = document.querySelector("#strategy");
+    switch(s.value) {
+    case "normal":
+	if(val=="true" && sel == "selected") return "1";
+	return "0";
+    case "QCM":
+	if(val=="true" && sel == "selected") return "1";
+	if(val=="false" && sel == "selected") return "-1";
+	return "0";
+    case "hardQCM":
+	if(val=="true" && sel == "selected") return "1";
+	if(val=="false" && sel == "selected") return "-1";
+	if(val=="true" && sel == "unselected") return "-1";
+	return "0";
+    default:
+	return "";
+    }
+}
+
 function returnHTMLQuestion (i) {
-    return '	<!--    Regroupement des champs hidden   -->'+
-'		<input type="hidden" class="texted-hidden" name="texted-'+i+'" value="false">'+
-'		<input type="hidden" class="correctness-hidden" name="correctness-'+i+'" value="to_correct">'+
-'	<!--    Numéro de réponse                -->'+
+
+//    return    '<li class="reponse to_correct">'+
+    return    '		<!--    Numéro de réponse                -->'+
 '		<span class="froom nreponse"> Réponse '+i+' :</span>'+
-'	<!--    Texte de la réponse              -->'+
+'		<!--    Texte de la réponse              -->'+
 '		<textarea'+
+'		    rows="2"'+
 '		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"'+
-'		    class="value-reponse-textarea" name="value-reponse-'+i+'"'+
+'		    class="value-reponse-textarea"'+
+'		    name="value-reponse-'+i+'"'+
 '		    style="width:100%"></textarea>'+
-'	<!--    Réponse custom ou non            -->'+
-'		<div'+
-'		    class="text"'+
-'		    style="text-align:left;margin:3px;">'+
-'		    <span>Ajouter un champs texte</span>'+
-'		</div>'+
-'		<textarea'+
-'		    class="correction-textarea"'+
-'		    name="correction-'+i+'"'+
-'		    style="display:none; width:100%"'+
-'		    placeholder="Vous pouvez rentrer la correction/justification/explication" ></textarea>'+
-'	<!--    Peut-on rendre un fichier ?      -->'+
-'		<div'+
-'		    class="text"'+
-'		    style="text-align:left;margin:3px;">'+
-'		<input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
-'<!--		<input name="multipleFile-'+i+'" type="checkbox">Multiple -->'+
-'		    <div>'+
-'			<span style="font-size: 0.65em;">Ajouter des fichiers pour la correction : </span><input multiple name="correcFile-'+i+'" type="file">'+
-'			<span style="font-size: 0.65em;">Enlever des fichiers :</span>'+
-'			<select multiple name="delete-'+i+'">'+
-'			    <!-- <option value="prout1">Tout garder</option> -->'+
-'			</select>'+
+'		<!--    Réponse custom ou non            -->'+
+'		<fieldset>'+
+'		    <legend>Type de question</legend>'+
+'		    <div class="wrapperFieldset">'+
+'			<input type="checkbox" class="texted-hidden" name="texted-'+i+'"> <label for="texted-'+i+'">Possède un champs texte.</label>'+
+'			<input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
 '		    </div>'+
-// '		<input name="correcFile-'+i+'" type="file">Fichier pour la correction'+
-// '		</div>'+
-'	<!--    Coefficient                      -->'+
-'		<div'+
-'		    class="text"'+
-'		    style="text-align:left;margin:3px;">'+
-'		    <input name="coeff-<%= i %>" type="number" value="1"><label for="coef-<%= i %>"> : Coefficient</label>'+
-'		</div>		'+		
-'	<!--    Boutons pour le management       -->'+
+'		</fieldset>'+
+'		<!--    Peut-on rendre un fichier ?      -->'+
+'		<fieldset>'+
+'		    <legend>Correction</legend>'+
+'		    <div class="wrapperFieldset">'+
+'			Cette réponse est'+
+'			<input type="radio" value="true" name="correctness-'+i+'" id="true-'+i+'"/>'+
+'			<label for="true-'+i+'"> Juste </label>'+
+'			<input type="radio" id="tocorrect-'+i+'" value="to_correct" name="correctness-'+i+'"/>'+
+'			<label for="tocorrect-'+i+'"> À corriger </label>'+
+'			<input type="radio" id="false-'+i+'"  value="false" name="correctness-'+i+'"/>'+
+'			<label for="false-'+i+'"> Fausse </label>'+
+'			<textarea'+
+'			    rows="2"'+
+'			    class="correction-textarea"'+
+'			    name="correction-'+i+'"'+
+'			    style="width:100%"'+
+'			    placeholder="Commentaire ou correction" ></textarea>'+
+'			<div'+
+'			    class="text"'+
+'			    style="text-align:left;margin:3px;">'+
+'			    '+
+'			    <!--		    <input name="multipleFile-'+i+'" type="checkbox">Multiple </span> -->'+
+'			    <div>'+
+'				<span style="font-size: 1em;">Ajouter des fichiers pour la correction : </span><input name="correcFile-'+i+'" multiple type="file">'+
+'			    </div>'+
+'			</div></div>		'+
+'		</fieldset>		<!--    Coefficient                      -->'+
+'		'+
+'		<fieldset>'+
+'		    <legend>Notation</legend>'+
+'		    <div class="wrapperFieldset">'+
+'			<div'+
+'			    class="text"'+
+'				   style="text-align:left;margin:3px;">'+
+'			    Cette réponse est sur  <input style="width:30px;" name="max-points-'+i+'" type="number" value="1"> points.<br>'+
+'			    <table>'+
+'				<tr>'+
+'				    <td></td>'+
+'				    <td>Faux</td>'+
+'				    <td>Juste</td></tr>'+
+'				<tr>'+
+'				    <td>Selectionnée</td>'+
+'				    <td>'+ // Dépend de la stratégie en cours !
+	'					<input style="width:30px;" name="selected-false-'+i+'" type="number" value="'+points("selected", "false")+'"> points par défaut'+
+'				    </td>'+
+'				    <td>'+
+'					<input style="width:30px;" name="selected-true-'+i+'" type="number" value="'+points("selected", "true")+'"> points par défaut'+
+'				    </td>'+
+'				</tr>'+
+'				<tr>'+
+'				    <td>Non selectionnée</td>'+
+'				    <td>'+
+'					<input style="width:30px;" name="unselected-false-'+i+'" type="number" value="'+points("unselected", "false")+'"> points par défaut'+
+'				    </td>'+
+'				    <td>'+
+'					<input style="width:30px;" name="unselected-true-'+i+'" type="number" value="'+points("unselected", "true")+'"> points par défaut'+
+'				    </td>'+
+'				</tr>'+
+'			    </table>'+
+'			</div>		'+
+'		    </div>		</fieldset>	<!--    Boutons pour le management       -->'+
 '		    <div>'+
 '			<ul>'+
 '			    <li style="display:inline-block; margin-right:20px;">'+
 '				<a class="room remove">Enlever cette réponse</a>'+
 '			    </li>'+
-'			    <li class="set-true select" >'+
-'				Réponse juste'+
-'			    </li>'+
-'			    <li class="set-to_correct select selected" >'+
-'				Réponse à corriger'+
-'			    </li>'+
-'			    <li class="set-false select" >'+
-'				Réponse fausse'+
-'			    </li>'+
 '			</ul>'+
-'		    </div>'+
-'';
+	'		    </div>';//+
+//	'	    </li>';
 }
 
 function addAnswer () {

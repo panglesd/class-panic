@@ -411,11 +411,17 @@ exports.correctSubmission = function(question, submission, callback) {
     let totPoints = 0;
     submission.forEach((repSubm, index) => {
 	let rep = question.reponses[index];
-	if(repSubm.points)
+	if(typeof(repSubm.points) == "number")
 	    submPoints += repSubm.points;
 	else {
-	    if(repSubm.selected) submPoints += rep.selectedPoints;
-	    else submPoints += rep.unSelectedPoints;
+	    if(repSubm.selected) {
+		if(repSubm.validity == "true") submPoints += rep.selected.vrai;
+		if(repSubm.validity == "false") submPoints += rep.selected.vrai;
+	    }
+	    if(!repSubm.selected) {
+		if(repSubm.validity == "true") submPoints += rep.unselected.vrai;
+		if(repSubm.validity == "false") submPoints += rep.unselected.vrai;
+	    }
 	}
 	totPoints += rep.maxPoints;
     });

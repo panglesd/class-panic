@@ -42,13 +42,15 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 				     validity: "to_correct",
 				     coef: 1,
 				     texted: false,
-				     correcFilesInfo: []
+				     correcFilesInfo: [],
+				     strategy: { selected: { vrai: 1, faux: 0}, unselected: { vrai: 0, faux: 0}},
+				     maxPoints:1
 				     // correcFilesInfo: [{fileName:"test.pdf"},{fileName:"test2.pdf"}]
 				 }],
 				 coef:1,
 				 enonce: "",
 				 description:"",
-				 type:"mono"
+				 type:"multi"
 			     });
 	    },
 	    course : function(callback) {
@@ -108,11 +110,22 @@ function formatQuestionFromBody(body, files) {
 	let correcFilesInfo = [];
 	if(Array.isArray(files["correcFile-"+i])) correcFilesInfo = files["correcFile-"+i];
 	else if (files["correcFile-"+i]) correcFilesInfo = [files["correcFile-"+i]];
+	let strategy = {
+	    selected: {
+		vrai: body["selected-true-"+i],
+		faux: body["selected-false-"+i]
+	    },
+	    unselected: {
+		vrai: body["unselected-true-"+i],
+		faux: body["unselected-false-"+i]
+	    }
+	}
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
-//	    validity: body["correctness-"+i],
-	    selectedPoints: parseInt(body["selected-points-"+i]),
-	    unSelectedPoints: parseInt(body["unselected-points-"+i]),
+	    validity: body["correctness-"+i],
+	    // selectedPoints: parseInt(body["selected-points-"+i]),
+	    // unSelectedPoints: parseInt(body["unselected-points-"+i]),
+	    strategy: strategy,
 	    maxPoints: parseInt(body["max-points-"+i]),
 	    texted: body["texted-"+i]=="true" ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",

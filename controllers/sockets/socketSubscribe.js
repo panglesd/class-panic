@@ -65,6 +65,7 @@ module.exports = function(io) {
 			      Course.subscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
+			      console.log(err);
 			      if(!socket.filter)
 				  socket.filter={};
 			      socket.filter.courseID = socket.course.id;
