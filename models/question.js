@@ -379,54 +379,73 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 /*       Correction des questions                                      */
 /***********************************************************************/
 
-exports.correctSubmission = function(question, submission, strategy) {
-//    console.log("queztion = ", question);
-//    console.log("strategy = ", strategy);
-//   console.log("queztion", question.type);
-//    console.log("submission = ", submission);
-    switch(/*[*/strategy/*, question.strategy]*/) {
-    case "manual":
-	if(question.mark)
-	    return question.mark;
-	return "unknown";
-    case "QCM":
-	let tot = 0;
-	let visited = [];
-	submission.forEach((rep) => {
-//	    console.log("Myvalidity = ",question.reponses[rep.n].validity);
-	//     if(!visited[rep.n] && tot != "unkown") {
-	// 	console.log("we are here");
-	// 	if(question.reponses[rep.n].validity=="true")
-	// 	    tot++;
-	// 	if(question.reponses[rep.n].validity=="false")
-	// 	    tot--;
-	// 	if(question.reponses[rep.n].validity=="to_correct"){
-	// 	    console.log("we are there");
-	// 	    tot = "unknown";
-	// 	}
-	//     }
-	//     visited[rep.n]=true;
-	});
-	let max = 0;
-	question.reponses.forEach((rep)=> {
-	    if (rep.validity == "true" && max != "unknown")
-		max++;
-	    if (rep.validity == "to_correct")
-		max = "unknown";
-	});
-	if(max == "unknown" || tot == "unknown")
-	    return "unknown";
-	else
-	    return ""+(tot*1./(max ? max : 1));
-    case "all_or_0":
-	if(!submission[0])
-	    return "0";
-//	if(question.reponses[submission[0].n].validity == "true")
-//	    return "1";
-//	if(question.reponses[submission[0].n].validity == "false")
-//	    return "0";
-	return "unknown";
-    }
+// function returnGradeRep(validity, strategy) {
+//     let n,p;
+//     switch(strategy) {
+//     case "QCM":
+// 	n=2; p=1; break;
+//     default:
+// 	n=1; p=0;
+//     }
+//     return (n * validity - p);
+// }
+// function assignGradeQuestion(question, submission, mergingStrategy) {
+//     switch(mergingStrategy) {
+//     case "normal":
+// 	let maxGrade=0;
+// 	question.reponses.forEach((rep, index) => {
+// 	    maxGrade += returnGradeRep(rep.validity ? rep.validity : 1, question.strategy);
+// 	});
+// 	if(maxGrade < 0) maxGrade = 0-maxGrade;
+// 	if(maxGrade == 0) maxGrade = 1;
+// 	let grade = 0;
+// 	submission.forEach((rep, index) => {
+// 	    if(rep.selected)
+// 		grade += returnGradeRep(rep.validity ? rep.validity : 1, question.strategy);
+// 	});
+//     }    
+// } 
+
+exports.correctSubmission = function(question, submission, callback) {
+    let submPoints = 0;
+    let totPoints = 0;
+    submission.forEach((repSubm, index) => {
+	let rep = question.reponses[index];
+	if(repSubm.points)
+	    submPoints += repSubm.points;
+	else {
+	    if(repSubm.selected) submPoints += rep.selectedPoints;
+	    else submPoints += rep.unSelectedPoints;
+	}
+	totPoints += rep.maxPoints;
+    });
+    callback(null, submPoints);
+//     switch(markInfo.strategy ? markInfo.strategy : question.strategy) {
+//     case "manual":
+// 	if(markInfo.mark)
+// 	    return markInfo.mark; // CALLBACK !!!
+// 	return "unknown";
+//     case "QCM":
+// 	let tot = 0;
+// 	let maxGrade = 0;
+// 	submission.forEach((rep) => {
+// 	    if(rep.validity == "to_correct")
+// 		callback("has unknown value", null);
+// 	    if(rep.selected)
+// 		tot += 2*rep.validity - 1;
+// 	    maxGrade += Math.max(0, 2*rep.validity -1);
+// 	});
+// 	return tot*1./(maxGrade != 0 ? maxGrade : 1);
+//     case "Mean":
+//     case "all_or_0":
+// 	if(!submission[0])
+// 	    return "0";
+// //	if(question.reponses[submission[0].n].validity == "true")
+// //	    return "1";
+// //	if(question.reponses[submission[0].n].validity == "false")
+// //	    return "0";
+// 	return "unknown";
+//     }
     
     
 };

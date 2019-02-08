@@ -99,9 +99,11 @@ exports.logStats = function (roomID,  callback) {
 		let blocID = res[1][0].blocID;
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
-			let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
-			let params = [oneStat.id, Question.correctSubmission(room.question, oneStat.response), blocID, oneStat.response, result.question.strategy, JSON.stringify(room.question)];
-			bdd.query(query,params, (err, res) => {callback(err, res);});
+			Question.correctSubmission(room.question, oneStat.response, (err, value) => {
+			    let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
+			    let params = [oneStat.id, value, blocID, oneStat.response, result.question.strategy, JSON.stringify(room.question)];
+			    bdd.query(query,params, (err, res) => {callback(err, res);});
+			});
 //			console.log("result.question.strategy = ", result.question.strategy);
 		    }, (err) => {
 			console.log(err);
@@ -169,7 +171,7 @@ function tryGetSubmission(userID, roomID, questionID, callback) {
     let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
     let params = [userID, roomID, questionID];
     let a = bdd.query(query, params, (err, res) => {
-//	console.log(err, a.sql, res);
+	console.log(err, a.sql, res);
 	callback(err, res[0]);
     });
 };
@@ -180,7 +182,6 @@ exports.getSubmission = function(userID, roomID, questionID, callback) {
 	    subm.customQuestion = JSON.parse(subm.customQuestion);
 	    subm.response = JSON.parse(subm.response);
 	    subm.customQuestion.allResponses = subm.customQuestion.reponses;
-
 	    callback(err, subm);
 	}
 	else
@@ -220,24 +221,40 @@ exports.fillSubmissions = function(userID, roomID, callback) {
     });
 };
 // = function(userID, roomID, questionID, callback) {
-exports.setValidity = function(roomID, userID, questionID, i, validity, callback) {
+exports.setValidity = function(roomID, userID, questionID, i, points, callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	subm.customQuestion.reponses[i].validity = validity;
-	subm.response[i].validity = validity;
-	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
-	let params2 = [roomID, userID, questionID];
-	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
-	
-	bdd.query(query2, params2, (err, res) => {
-	    let query = "UPDATE stats SET response = ?, customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
-	    let params = [JSON.stringify(subm.response), JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
-	    let q = bdd.query(query, params, (err, res) => {
-		if (err) {
-		    console.log("err = ", err);
-//		    console.log(q.sql);
-		}
-		callback(err, res);
+	Question.getByID(questionID, (err, question) => {
+	    //	    subm.customQuestion.reponses[i].validity = validity;
+	    subm.response[i].points = points;
+	    // subm.response[i].validity = validity;
+	    // let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
+	    // let params2 = [roomID, userID, questionID];
+	    Question.correctSubmission(question, subm.response, (err, value) => {
+		
+	    	let query = "UPDATE stats SET response = ?, correct = ? WHERE roomID = ? AND userID = ? AND questionID = ?";
+	    	let params = [JSON.stringify(subm.response), value, roomID, userID, questionID];
+	    	let q = bdd.query(query, params, (err, res) => {
+	    	    if (err) {
+	    		console.log("err = ", err);
+	    		//		    console.log(q.sql);
+	    	    }
+	    	    callback(err, res);
+	    	});
+		
 	    });
+	    //	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
+	    
+	    // bdd.query(query2, params2, (err, res) => {
+	    // 	let query = "UPDATE stats SET response = ?, customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
+	    // 	let params = [JSON.stringify(subm.response), JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
+	    // 	let q = bdd.query(query, params, (err, res) => {
+	    // 	    if (err) {
+	    // 		console.log("err = ", err);
+	    // 		//		    console.log(q.sql);
+	    // 	    }
+	    // 	    callback(err, res);
+	    // 	});
+	    // });
 	});
     });
 };

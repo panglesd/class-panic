@@ -110,27 +110,20 @@ function formatQuestionFromBody(body, files) {
 	else if (files["correcFile-"+i]) correcFilesInfo = [files["correcFile-"+i]];
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
-	    validity: body["correctness-"+i],
+//	    validity: body["correctness-"+i],
+	    selectedPoints: parseInt(body["selected-points-"+i]),
+	    unSelectedPoints: parseInt(body["unselected-points-"+i]),
+	    maxPoints: parseInt(body["max-points-"+i]),
 	    texted: body["texted-"+i]=="true" ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
 	    coef: body["coeff-"+i],
 	    correcFilesInfo: correcFilesInfo
 	};
-	// console.log(files);
-	// if(body["hasFile-"+i]) {
-	//     if(files["correcFile-"+i]) {
-	// 	files["correcFile-"+i].name = sanit_fn(files["correcFile-"+i].name);
-	// 	filesData[i] = files["correcFile-"+i];
-	// 	reponse[i].correcFileInfo=[files["correcFile-"+i].name];
-	//     }
-	// }
 	if(reponse[i].texted) 
 	    reponse[i].correction = body["correction-"+i];
 	i++;
     }
-//    question.reponse = JSON.stringify(reponse);
     question.reponses = reponse;
-//    return [question, filesData];
     return question;
 }
 // Create

@@ -92,7 +92,7 @@ Utiliser $...$ pour mettre des maths.
 		<div
 		    class="text"
 		    style="text-align:left;margin:3px;">
-		    <input name="coeff-<%= i %>" type="number" value="<%= reponsePossible.coef %>"><label for="coef-<%= i %>"> : Coefficient</label>
+		    Cette réponse peut rapporter  <input style="width:30px;" name="max-points-<%= i %>" type="number" value="<%= reponsePossible.maxPoints %>"> points. La selectionner apporte par défaut <input style="width:30px;" name="selected-points-<%= i %>" type="number" value="<%= reponsePossible.selectedPoints %>"> points et ne pas la sélectionner en rapporte  <input name="unselected-points-<%= i %>" type="number" value="<%= reponsePossible.unSelectedPoints %>"  style="width:30px;" >.
 		</div>		
 	<!--    Boutons pour le management       -->
 		<% if(canModify) { %>
