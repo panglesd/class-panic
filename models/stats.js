@@ -100,8 +100,8 @@ exports.logStats = function (roomID,  callback) {
 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 		    async.forEachSeries(stats,(oneStat, callback) => {
 			Question.correctSubmission(room.question, oneStat.response, (err, value) => {
-			    let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `strategy`, `customQuestion`) VALUES (?,?,?,?,?,?)";
-			    let params = [oneStat.id, value, blocID, oneStat.response, result.question.strategy, JSON.stringify(room.question)];
+			    let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`) VALUES (?,?,?,?,?)";
+			    let params = [oneStat.id, value, blocID, oneStat.response, JSON.stringify(room.question)];
 			    bdd.query(query,params, (err, res) => {callback(err, res);});
 			});
 //			console.log("result.question.strategy = ", result.question.strategy);
@@ -275,26 +275,29 @@ exports.setCustomComment = function(roomID, userID, questionID, i, customComment
 };
 
 exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
-    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	subm.customQuestion.strategy = strategy;
-	if(strategy == "manual") {
-	    subm.customQuestion.mark = "" + mark;
-	}
-	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
-	let params2 = [roomID, userID, questionID];
-	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
-//	console.log("validity2 = ", validity2);
+    callback("setStrategy est deprecié", null);
+}
+// exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
+//     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+// 	subm.customQuestion.strategy = strategy;
+// 	if(strategy == "manual") {
+// 	    subm.customQuestion.mark = "" + mark;
+// 	}
+// 	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
+// 	let params2 = [roomID, userID, questionID];
+// 	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
+// //	console.log("validity2 = ", validity2);
 	
-	bdd.query(query2, params2, (err, res) => {
-	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
-	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
-	    let q = bdd.query(query, params, (err, res) => {
-		if (err) {
-		    console.log("err = ", err);
-//		    console.log(q.sql);
-		}
-		callback(err, res);
-	    });
-	});
-    });
-};
+// 	bdd.query(query2, params2, (err, res) => {
+// 	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
+// 	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
+// 	    let q = bdd.query(query, params, (err, res) => {
+// 		if (err) {
+// 		    console.log("err = ", err);
+// //		    console.log(q.sql);
+// 		}
+// 		callback(err, res);
+// 	    });
+// 	});
+//     });
+// };

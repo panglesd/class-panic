@@ -244,8 +244,8 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	if(er) console.log(er);
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)", [
-	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.strategy, question.coef
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
+	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.coef
 	], function (err, r) {
 	    if(err) console.log(err);
 	    let questionID = r.insertId;
@@ -345,8 +345,8 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 		question.reponses.forEach((rep, n_ans) => {
 		    newQuestion.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
 		});
-		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `strategy` = ?, `coef` = ? WHERE `id` = ?",
-			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], (err, res) => {callback(err, questionID);});
+		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ? WHERE `id` = ?",
+			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, questionID], (err, res) => {callback(err, questionID);});
 //		bdd.query("UPDATE `questions` SET reponses = ? WHERE id = ?", [JSON.stringify(question.reponses), questionID], (err) => {callback(err, questionID);});
 	    }
 	});

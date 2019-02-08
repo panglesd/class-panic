@@ -65,7 +65,7 @@ function returnHTMLQuestion (i) {
 '			Cette réponse est'+
 '			<input type="radio" value="true" name="correctness-'+i+'" id="true-'+i+'"/>'+
 '			<label for="true-'+i+'"> Juste </label>'+
-'			<input type="radio" id="tocorrect-'+i+'" value="to_correct" name="correctness-'+i+'"/>'+
+'			<input checked type="radio" id="tocorrect-'+i+'" value="to_correct" name="correctness-'+i+'"/>'+
 '			<label for="tocorrect-'+i+'"> À corriger </label>'+
 '			<input type="radio" id="false-'+i+'"  value="false" name="correctness-'+i+'"/>'+
 '			<label for="false-'+i+'"> Fausse </label>'+
