@@ -57,8 +57,8 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
      var server = "<%= server %>";
-     var socket = io.connect(server+'/manage');
-     
+//     var socket = io.connect(server+'/manage');
+     var socket = io.connect("https://wim.choum.net"+'/manage');     
      function getOrder() {
 	 tmp = [];
 	 i=0;
