@@ -112,20 +112,21 @@ function formatQuestionFromBody(body, files) {
 	else if (files["correcFile-"+i]) correcFilesInfo = [files["correcFile-"+i]];
 	let strategy = {
 	    selected: {
-		vrai: body["selected-true-"+i],
-		faux: body["selected-false-"+i]
+		vrai: parseInt(body["selected-true-"+i]),
+		faux: parseInt(body["selected-false-"+i])
 	    },
 	    unselected: {
-		vrai: body["unselected-true-"+i],
-		faux: body["unselected-false-"+i]
+		vrai: parseInt(body["unselected-true-"+i]),
+		faux: parseInt(body["unselected-false-"+i])
 	    }
-	}
+	};
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
 	    // selectedPoints: parseInt(body["selected-points-"+i]),
 	    // unSelectedPoints: parseInt(body["unselected-points-"+i]),
 	    strategy: strategy,
+	    coef: parseInt(body["coef-rep-"+i]),
 	    maxPoints: parseInt(body["max-points-"+i]),
 	    texted: body["texted-"+i]=="true" ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",

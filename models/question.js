@@ -411,21 +411,40 @@ exports.correctSubmission = function(question, submission, callback) {
     let totPoints = 0;
     submission.forEach((repSubm, index) => {
 	let rep = question.reponses[index];
+	console.log("rep = ", rep);
+	console.log("repSubm = ", repSubm);
 	if(typeof(repSubm.points) == "number")
 	    submPoints += repSubm.points;
 	else {
 	    if(repSubm.selected) {
-		if(repSubm.validity == "true") submPoints += rep.selected.vrai;
-		if(repSubm.validity == "false") submPoints += rep.selected.vrai;
+		// if(repSubm.validity == "true") submPoints += rep.strategy.selected.vrai;
+		// if(repSubm.validity == "false") submPoints += rep.strategy.selected.faux;
+		// if(repSubm.validity == "slide") submPoints += (repSubm.pourcentage*rep.strategy.selected.vrai + (1-repSubm.pourcentage)*rep.strategy.selected.faux;
+		console.log(typeof(repSubm.validity));
+		if(typeof(repSubm.validity)=="number")
+		    submPoints += repSubm.validity*rep.strategy.selected.vrai + (1-repSubm.validity)*rep.strategy.selected.faux;
+		else if(typeof(repSubm.validity)=="string")
+		    submPoints = "";
+		else if(typeof(rep.validity)=="number")
+		    submPoints += rep.validity*rep.strategy.selected.vrai + (1-rep.validity)*rep.strategy.selected.faux;
 	    }
 	    if(!repSubm.selected) {
-		if(repSubm.validity == "true") submPoints += rep.unselected.vrai;
-		if(repSubm.validity == "false") submPoints += rep.unselected.vrai;
+		// if(repSubm.validity == "true") submPoints += rep.strategy.unselected.vrai;
+		// if(repSubm.validity == "false") submPoints += rep.strategy.unselected.faux;
+		if(typeof(repSubm.validity)=="number")
+		    submPoints += repSubm.validity*rep.strategy.unselected.vrai + (1-repSubm.validity)*rep.strategy.unselected.faux;
+		else if(typeof(repSubm.validity)=="string")
+		    submPoints = "";
+		else if(typeof(rep.validity)=="number")
+		    submPoints += rep.validity*rep.strategy.unselected.vrai + (1-rep.validity)*rep.strategy.unselected.faux;
 	    }
 	}
 	totPoints += rep.maxPoints;
     });
-    callback(null, submPoints);
+    if(typeof(submPoints)=="number")
+	callback(null, submPoints);
+    else
+	callback(null, "?");
 //     switch(markInfo.strategy ? markInfo.strategy : question.strategy) {
 //     case "manual":
 // 	if(markInfo.mark)

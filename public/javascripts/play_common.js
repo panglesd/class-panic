@@ -119,7 +119,7 @@ function createResponse(question, rep, index) {
     customComment.id="customComment-"+index;
     customComment.classList.add("customComment");
     customComment.placeholder="Commentaires de correction";
-    customComment.required=true;
+    customComment.required=true; // HACK pour que customComment ne s'affiche que s'il contient quelque chose...
     //	console.log("rep=",reponse);
     if(typeof(setCustomComment) == "function")
 	customComment.addEventListener("input", (ev) => {
@@ -135,6 +135,11 @@ function addCorrection(question, elem, rep, index) {
     // Si la correction est présente
     if(rep.validity != "to_correct") {
 	elem.classList.add(rep.validity);
+	if(typeof(rep.validity) == "number")
+	    elem.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(128*(1-rep.validity)) +","+ Math.floor(128*rep.validity)+",0)";
+	else
+	    elem.style.boxShadow =  "";
+
     }
     if(rep.texted) {
 	if(rep.correction){
@@ -143,7 +148,7 @@ function addCorrection(question, elem, rep, index) {
 	    legend.innerText = "Corrigé";
 	    divCorrec.appendChild(legend);
 	    divCorrec.classList.add("correcArea");
-	    let correcText = document.createTextNode(rep.correction)
+	    let correcText = document.createTextNode(rep.correction);
 //	    divCorrec.textContent = /* "Correction : " + */ rep.correction;
 	    divCorrec.appendChild(correcText);
 	    elem.insertBefore(divCorrec, elem.querySelector("textarea").nextSibling);
@@ -189,19 +194,16 @@ function addAdminInterface(question, setValidity, setStrategy){
 	let elemRep = document.querySelector("#r"+index);
 	let button = document.createElement("button");
 	button.addEventListener("click",(ev) => {
-	    setValidity(index,"true");
+	    setValidity(index,1);
 	});
 	let button2 = document.createElement("button");
 	button2.addEventListener("click",(ev) => {
-	    setValidity(index,"false");
+	    setValidity(index,0);
 	});
 	let button3 = document.createElement("button");
 	button3.addEventListener("click",(ev) => {
 	    setValidity(index,"to_correct");
 	});
-	let customNote = document.createElement("input");
-	customNote.type="number";
-	customNote.id="customNote-"+index;
 	button.textContent = "Forcer à juste";
 	button2.textContent = "Forcer à faux";
 	button3.textContent = "Décorriger";
@@ -209,8 +211,23 @@ function addAdminInterface(question, setValidity, setStrategy){
 	elemRep.appendChild(button3);
 	elemRep.appendChild(button2);
 	let noteCust = document.createElement("span"); noteCust.innerText = " Note custom : "; noteCust.style.fontSize = "19px";
+	let customNote = document.createElement("input");
+	customNote.type="number";
+	customNote.id="customNote-"+index;
 	elemRep.appendChild(noteCust);
 	elemRep.appendChild(customNote);
+	let vraiFaux = document.createElement("span"); vraiFaux.innerText = " Réussite sur 10 : "; vraiFaux.style.fontSize = "19px";
+	elemRep.appendChild(vraiFaux);
+	let vraiFauxInput = document.createElement("input");
+	vraiFauxInput.type="number";
+	vraiFauxInput.classList.add("pourcentage");
+	vraiFauxInput.step="0.1";
+	vraiFauxInput.value=rep.validity;
+	vraiFauxInput.id="vraiFauxInput-"+index;
+	vraiFauxInput.addEventListener("input", (ev) => {
+	    setValidity(index, parseFloat(vraiFauxInput.value));
+	});
+	elemRep.appendChild(vraiFauxInput);
 	elemRep.querySelector(".customComment").required = false;
 
     });
@@ -289,8 +306,16 @@ function afficheSubmission (submission) {
 	}
 	console.log("we are here");
 	elemReponse.classList.remove("to_correct", "true", "false");
-	if(reponse.validity) {
-	    elemReponse.classList.add(reponse.validity);
+	// if(reponse.validity) {
+	//     elemReponse.classList.add(reponse.validity);
+	// }
+	if(typeof(reponse.validity) == "number") {
+	    elemReponse.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(188*(1-reponse.validity)) +","+ Math.floor(138*reponse.validity)+",0)";
+	    elemReponse.querySelector(".pourcentage").value = reponse.validity;
+	}
+	else if (typeof(reponse.validity) == "string"){
+	    elemReponse.style.boxShadow =  "";
+	    elemReponse.querySelector(".pourcentage").value = "";
 	}
 	if(reponse.customComment)
 	    elemReponse.querySelector(".customComment").value = reponse.customComment;
