@@ -331,7 +331,7 @@ function afficheSubmission (submission) {
 				 questReponse.strategy.unselected.vrai,
 				 questReponse.strategy.unselected.faux);
 	totalCoef += maxPoints;
-	if(submReponse.validity) {
+	if(typeof(submReponse.validity)=="number") {
 	    let note = "";
 	    if(submReponse.selected) 
 		note = submReponse.validity*questReponse.strategy.selected.vrai + (1-submReponse.validity)* questReponse.strategy.selected.faux;
