@@ -130,7 +130,6 @@ function formatQuestionFromBody(body, files) {
 	    maxPoints: parseInt(body["max-points-"+i]),
 	    texted: body["texted-"+i]=="true" ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
-	    coef: body["coeff-"+i],
 	    correcFilesInfo: correcFilesInfo
 	};
 	if(reponse[i].texted) 

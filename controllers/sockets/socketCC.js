@@ -65,6 +65,9 @@ module.exports = function(io) {
 	    });
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
+		if(!socket.room.status.showCorrecPerso) {
+		    delete(submission.correct);
+		}
 		submission.response.forEach((rep) => {
 		    if(!socket.room.status.showCorrecPerso) {
 			delete(rep.validity);

@@ -433,7 +433,7 @@ socketCC.on('newSubmission', function (submission) {
     // 	afficheQuestion(submission.customQuestion);
     // 	addAdminInterface(submission.customQuestion, setValidity, setStrategy);
     // }
-    afficheSubmission(submission.response);
+    afficheSubmission(submission);
 });
 
 /*********************************************************************/

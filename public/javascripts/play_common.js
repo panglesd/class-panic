@@ -229,10 +229,14 @@ function addAdminInterface(question, setValidity, setStrategy){
 	});
 	elemRep.appendChild(vraiFauxInput);
 	elemRep.querySelector(".customComment").required = false;
+	let note = document.createElement("div");
+	note.classList.add("note");
+	elemRep.appendChild(note);
 
     });
     let elem = document.createElement('div');
     elem.classList.add("reponse");
+    elem.classList.add("summary");
     elem.classList.add("notSelected");
     elem.innerHTML = "Stratégie de correction : <select id='strategy'>" +
 	"<option value='all_or_0' "+("all_or_0"==question.strategy ? "selected>" : ">")+"all_or_0</option>"+
@@ -289,40 +293,61 @@ function addAdminInterface(question, setValidity, setStrategy){
 //socketCC.on('newSubmission', function (submission) {
 function afficheSubmission (submission) {
     console.log("affSubm with ", submission);
-    submission.forEach((reponse, index) => {
-	console.log("reponse ", reponse);
+    let totalPoints = 0;
+    let totalCoef = 0;
+    submission.response.forEach((submReponse, index) => {
+	console.log("reponse ", submReponse);
+	let questReponse = currentQuestion.reponses[index];
 	let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[index];
 	elemReponse.classList.remove("notSelected");
 	elemReponse.classList.remove("selected");
-	elemReponse.classList.add(reponse.selected ? "selected" : "notSelected");
+	elemReponse.classList.add(submReponse.selected ? "selected" : "notSelected");
 	
 	let ta = elemReponse.querySelector("textarea");
 	if(ta)
-	    ta.value = reponse.text;
+	    ta.value = submReponse.text;
 	//    });
-	console.log("reponse.hasFile = ", reponse.hasFile);
+	console.log("reponse.hasFile = ", submReponse.hasFile);
 	if(elemReponse.querySelector(".filesInfo")) {
-	    affFileInfo(elemReponse,reponse.filesInfo,index);
+	    affFileInfo(elemReponse,submReponse.filesInfo,index);
 	}
 	console.log("we are here");
 	elemReponse.classList.remove("to_correct", "true", "false");
 	// if(reponse.validity) {
 	//     elemReponse.classList.add(reponse.validity);
 	// }
-	if(typeof(reponse.validity) == "number") {
-	    elemReponse.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(188*(1-reponse.validity)) +","+ Math.floor(138*reponse.validity)+",0)";
-	    elemReponse.querySelector(".pourcentage").value = reponse.validity;
+	if(typeof(submReponse.validity) == "number") {
+	    elemReponse.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(188*(1-submReponse.validity)) +","+ Math.floor(138*submReponse.validity)+",0)";
+	    elemReponse.querySelector(".pourcentage").value = submReponse.validity;
 	}
-	else if (typeof(reponse.validity) == "string"){
+	else if (typeof(submReponse.validity) == "string"){
 	    elemReponse.style.boxShadow =  "";
 	    elemReponse.querySelector(".pourcentage").value = "";
 	}
-	if(reponse.customComment)
-	    elemReponse.querySelector(".customComment").value = reponse.customComment;
-
+	if(submReponse.customComment)
+	    elemReponse.querySelector(".customComment").value = submReponse.customComment;
+	let maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				 questReponse.strategy.selected.faux,
+				 questReponse.strategy.unselected.vrai,
+				 questReponse.strategy.unselected.faux);
+	totalCoef += maxPoints;
+	if(submReponse.validity) {
+	    let note = "";
+	    if(submReponse.selected) 
+		note = submReponse.validity*questReponse.strategy.selected.vrai + (1-submReponse.validity)* questReponse.strategy.selected.faux;
+	    else
+		note = submReponse.validity*questReponse.strategy.unselected.vrai + (1-submReponse.validity)* questReponse.strategy.unselected.faux;
+	    totalPoints += note;
+	    elemReponse.querySelector(".note").innerText = note+"/"+maxPoints;
+	}
 	// Ici gérer les corrections personnelles par reponse
 	// elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
     });
+    if(submission.correct) {
+	let noteFinale = document.createElement("div");
+	noteFinale.textContent = submission.correct+"/"+totalCoef;
+	document.querySelector("#wrapperAnswer").appendChild(noteFinale);
+    }
     // Ici gérer les corrections personnelles de la question
     // document.querySelector(".correcPersoGlobal").innerText = submission.correcPerso
     // Notes etc...

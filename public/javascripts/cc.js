@@ -133,9 +133,9 @@ socketCC.on('newQuestion', function (reponse) {
     currentQuestion=reponse;
 //    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
 
-    let temp2 = reponse.submission.response;
+    //let temp2 = reponse.submission.response;
     afficheQuestion(reponse);
-    afficheSubmission(temp2);
+    afficheSubmission(reponse.submission);
     socketCC.emit("sendCorrection", currentQuestion.id);
     socketCC.emit("sendList");
 });
