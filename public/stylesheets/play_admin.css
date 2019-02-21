@@ -133,15 +133,15 @@ li.inactiveQuestion {
     color:white;
 }
 
-.customComment:invalid {
-    display:none;
-}
+/* .customComment:invalid { */
+/*     display:none; */
+/* } */
 .customComment {
     display: block;
     width: 100%;
 }
 
-.correcFilesArea {
+.fileCorrecWrapper {
     font-size: 0.7em;
     padding: 5px;
     margin: 5px;

@@ -44,6 +44,22 @@ function afficheQuestion(question) {
 	let elem = createResponse(question, rep, index);
 	wrapper.appendChild(elem);
     });
+
+    // Pour le résumé :
+
+    let summaryWrapper = document.createElement('div');
+    summaryWrapper.classList.add("reponse");
+    summaryWrapper.classList.add("summary");
+    summaryWrapper.classList.add("notSelected");
+    summaryWrapper.innerHTML += "Note finale : <span id='note'>N/A</span> Coéf : <span id='coef'>N/A</span>";
+    summaryWrapper.style.display = "none";
+    wrapper.appendChild(summaryWrapper);
+
+    if(question.coef) {
+	document.querySelector(".summary").style.display="";
+	document.querySelector(".summary #coef").textContent = question.coef;
+    }
+
 };
 
 function createResponse(question, rep, index) {
@@ -84,6 +100,18 @@ function createResponse(question, rep, index) {
 	}
 	elem.appendChild(textarea);
     }
+    // Ajout du texte de correction
+    let correcWrapper = document.createElement("fieldset");
+    correcWrapper.style.display = "none";
+    let legend = document.createElement("legend");
+    legend.innerText = "Corrigé";
+    correcWrapper.appendChild(legend);
+    correcWrapper.classList.add("correcWrapper");
+    let correc = document.createElement("div"); correc.classList.add("correc");
+    correcWrapper.appendChild(correc);
+    elem.appendChild(correcWrapper);
+
+    
     // Si besoin, ajout d'un input type=file
     if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
 	let fileInfo = document.createElement("ul");
@@ -112,6 +140,16 @@ function createResponse(question, rep, index) {
     // A commenter ?
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
     console.log("rep = ", rep);
+
+    let fileCorrecWrapper = document.createElement("fieldset");
+    fileCorrecWrapper.classList.add("fileCorrecWrapper");
+    fileCorrecWrapper.style.display="none";
+    let legendCorrec = document.createElement("legend");
+    legendCorrec.innerText = "Fichiers Corrigés";
+    fileCorrecWrapper.appendChild(legendCorrec);
+    elem.appendChild(fileCorrecWrapper);
+
+
     if(rep.validity)
 	addCorrection(question, elem, rep, index);
     
@@ -119,14 +157,14 @@ function createResponse(question, rep, index) {
     customComment.id="customComment-"+index;
     customComment.classList.add("customComment");
     customComment.placeholder="Commentaires de correction";
-    customComment.required=true; // HACK pour que customComment ne s'affiche que s'il contient quelque chose...
+    customComment.style.display = "none";
+//    customComment.required=true; // HACK pour que customComment ne s'affiche que s'il contient quelque chose...
     //	console.log("rep=",reponse);
     if(typeof(setCustomComment) == "function")
 	customComment.addEventListener("input", (ev) => {
 	    setCustomComment(index, customComment.value);
 	});
     elem.appendChild(customComment);
-
     return elem;
 //    wrapper.appendChild(elem);
 }
@@ -139,28 +177,16 @@ function addCorrection(question, elem, rep, index) {
 	    elem.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(128*(1-rep.validity)) +","+ Math.floor(128*rep.validity)+",0)";
 	else
 	    elem.style.boxShadow =  "";
-
     }
     if(rep.texted) {
 	if(rep.correction){
-	    let divCorrec = document.createElement("fieldset");
-	    let legend = document.createElement("legend");
-	    legend.innerText = "Corrigé";
-	    divCorrec.appendChild(legend);
-	    divCorrec.classList.add("correcArea");
-	    let correcText = document.createTextNode(rep.correction);
-//	    divCorrec.textContent = /* "Correction : " + */ rep.correction;
-	    divCorrec.appendChild(correcText);
-	    elem.insertBefore(divCorrec, elem.querySelector("textarea").nextSibling);
+	    elem.querySelector(".correcWrapper").style.display = "";
+	    elem.querySelector(".correcWrapper .correc").innerText = rep.correction;
 	}
     }
     if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
 	if(rep.correcFilesInfo) {
-	    let divForCorrection = document.createElement("fieldset");
-	    let legend = document.createElement("legend");
-	    legend.innerText = "Fichiers Corrigés";
-	    divForCorrection.appendChild(legend);
-	    divForCorrection.classList.add("correcFilesArea");
+	    elem.querySelector(".fileCorrecWrapper").style.display="";
 	    rep.correcFilesInfo.forEach((fileInfo) => {
 		let divOneCorrection = document.createElement("div");
 		divOneCorrection.classList.add("correcFileArea");
@@ -170,21 +196,10 @@ function addCorrection(question, elem, rep, index) {
 		linkToCorrection.style.color = "blue";
 		linkToCorrection.textContent = /*"Correction : "+*/fileInfo;
 		divOneCorrection.appendChild(linkToCorrection);
-		divForCorrection.appendChild(divOneCorrection);
+		elem.querySelector(".fileCorrecWrapper").appendChild(divOneCorrection);
 	    });
-	    elem.appendChild(divForCorrection);
 	}
     }
-    // let customComment = document.createElement("textarea");
-    // customComment.id="customComment-"+index;
-    // customComment.classList.add("customComment");
-    // customComment.placeholder="Commentaires de correction";
-    // customComment.required=true;
-    // //	console.log("rep=",reponse);
-    // customComment.addEventListener("input", (ev) => {
-    // 	setCustomComment(index, customComment.value);
-    // });
-    // elem.appendChild(customComment);
 
     return elem;}
 
@@ -228,61 +243,20 @@ function addAdminInterface(question, setValidity, setStrategy){
 	    setValidity(index, parseFloat(vraiFauxInput.value));
 	});
 	elemRep.appendChild(vraiFauxInput);
-	elemRep.querySelector(".customComment").required = false;
+	elemRep.querySelector(".customComment").style.display = "";
 	let note = document.createElement("div");
 	note.classList.add("note");
 	elemRep.appendChild(note);
 
     });
-    let elem = document.createElement('div');
-    elem.classList.add("reponse");
-    elem.classList.add("summary");
-    elem.classList.add("notSelected");
-    elem.innerHTML = "Stratégie de correction : <select id='strategy'>" +
-	"<option value='all_or_0' "+("all_or_0"==question.strategy ? "selected>" : ">")+"all_or_0</option>"+
-	"<option value='QCM' "+("QCM"==question.strategy ? "selected>" : ">")+"QCM</option>"+
-	"<option value='manual' "+("manual"==question.strategy ? "selected>" : ">")+"manual</option>"+
-	"</select>";
-    if(question.strategy=="manual") {
-	//	elem.innerHTML += "<input type='number' id='mark' min='-1' max='1' step='0.05'>";
-	let mark = document.createElement("input");
-	mark.id="mark";
-	mark.type = "number";
-	mark.min="-1";
-	mark.max="1";
-	mark.value = "1";
-	mark.step = "0.05";
-	elem.appendChild(mark);
-    }
-    elem.innerHTML += "Note finale : <span id='note'>"+"N/A"+"</span> Coéf : <span id='coef'>"+"N/A"+"</span>";
-    let mark = elem.querySelector("#mark");
+    let summary = document.querySelector(".summary");
+    let customMarkWrapper = document.createElement("div");
+    customMarkWrapper.innerHTML = "Choisir sa note : <input type='number' id='mark' step='0.1'>";
+    let mark = customMarkWrapper.querySelector("#mark");
     if(mark) {
 	mark.addEventListener("input", (ev) => {console.log("change");setStrategy();});
-	mark.value = question.mark;
     }
-    let select = elem.querySelector("select");
-    //    console.log("we add event listener for ", select);
-    select.addEventListener("change", (ev) => {
-	// console.log(ev, "updated");
-	let mark = document.querySelector("#mark");
-	if (select.value == "manual" && !mark) {
-	    let mark = document.createElement("input");
-	    mark.id="mark";
-	    mark.type = "number";
-	    mark.min="-1";
-	    mark.max="1";
-	    mark.value = "1";
-	    mark.step = "0.05";
-	    // mark.value = 1;
-	    mark.addEventListener("change", (ev) => {setStrategy();});
-	    select.parentNode.insertBefore(mark, ev.target.nextSibling);
-	}
-	else if(mark) {
-	    mark.parentNode.removeChild(mark);
-	}
-	setStrategy();
-    });
-    wrapper.appendChild(elem);
+    summary.appendChild(customMarkWrapper);
 }
 	
 
@@ -294,7 +268,7 @@ function addAdminInterface(question, setValidity, setStrategy){
 function afficheSubmission (submission) {
     console.log("affSubm with ", submission);
     let totalPoints = 0;
-    let totalCoef = 0;
+    let totalMaxPoints = 0;
     submission.response.forEach((submReponse, index) => {
 	console.log("reponse ", submReponse);
 	let questReponse = currentQuestion.reponses[index];
@@ -324,13 +298,15 @@ function afficheSubmission (submission) {
 	    elemReponse.style.boxShadow =  "";
 	    elemReponse.querySelector(".pourcentage").value = "";
 	}
-	if(submReponse.customComment)
+	if(submReponse.customComment) {
 	    elemReponse.querySelector(".customComment").value = submReponse.customComment;
+	    elemReponse.querySelector(".customComment").style.display = "";
+	}
 	let maxPoints = Math.max(questReponse.strategy.selected.vrai,
 				 questReponse.strategy.selected.faux,
 				 questReponse.strategy.unselected.vrai,
 				 questReponse.strategy.unselected.faux);
-	totalCoef += maxPoints;
+	totalMaxPoints += maxPoints;
 	if(typeof(submReponse.validity)=="number") {
 	    let note = "";
 	    if(submReponse.selected) 
@@ -344,9 +320,12 @@ function afficheSubmission (submission) {
 	// elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
     });
     if(submission.correct) {
-	let noteFinale = document.createElement("div");
-	noteFinale.textContent = submission.correct+"/"+totalCoef;
-	document.querySelector("#wrapperAnswer").appendChild(noteFinale);
+	document.querySelector(".summary").style.display="";
+	let noteFinale = document.querySelector("#note");
+	noteFinale.textContent = submission.correct+"/"+totalMaxPoints;
+	let mark = document.querySelector(".summary #mark");
+	if(mark)
+	    mark.value = submission.correct;
     }
     // Ici gérer les corrections personnelles de la question
     // document.querySelector(".correcPersoGlobal").innerText = submission.correcPerso
