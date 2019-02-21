@@ -82,47 +82,6 @@ function gotoQuestion(i) {
 }
 
 /*********************************************************************/
-/*                 lorsque l'on reçoit les nouvelles statistiques    */
-/*********************************************************************/
-
-// socketCC.on('newStats', function (newStats) {
-//     console.log(newStats);
-//     let ula = document.createElement("ul");
-//     ula.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
-//     newStats.forEach(function (stat) {
-// 	let li = document.createElement("li");
-// 	//li.id = stat.id;
-// 	li.innerHTML = '<div style="display:flex; justify-content: space-between;"></div>';
-// 	li.firstChild.innerText = stat.fullName;
-// 	ula.appendChild(li);
-// 	let ul = document.createElement("ul");
-// 	li.appendChild(ul);
-// 	JSON.parse(stat.response).forEach((ans) => {
-// 	    let li = document.createElement("li");
-// 	    let color="white";
-// 	    console.log("ans is", ans);
-// 	    if(ans.n>=0) {
-// 		if(currentQuestionOfAdmin.reponses[ans.n].validity == "true") 
-// 		    color="green";
-// 		else if(currentQuestionOfAdmin.reponses[ans.n].validity == "false") 
-// 		    color="red";
-// 		ans.response2 = currentQuestionOfAdmin.reponses[ans.n].reponse;
-// 	    }
-// 	    else 
-// 		ans.response2 = "?";
-// 	    li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*//*stat.fullName+*/' <span>'+ans.response2+' '+ans.text+'</span></div>';
-// 	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
-// 	    li.onclick = ((ev) => {console.log(ans);gotoQuestion(ans.indexSet);});
-// 	    ul.appendChild(li);
-// 	    console.log(ul);
-// 	});
-// 	console.log(li);
-//     });
-//     document.querySelector("#stats ul").innerHTML = ula.innerHTML;
-//     document.querySelector(".window").innerHTML = document.querySelector("#stats").outerHTML;
-// });
-
-/*********************************************************************/
 /*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
@@ -184,7 +143,7 @@ function chooseAnswer(i) {
 		a.classList.toggle("selected");	    
 	}
     }
-    else {
+    else { // Cas ou il y a un fichier/un textarea
 	console.log("content-determined");
 	let elem = document.querySelector("#r"+i);
 	let flag = false;
@@ -208,7 +167,6 @@ function chooseAnswer(i) {
 
 function sendAnswer() {
     let reponses = [];
-//    document.querySelectorAll(".reponse.selected").forEach((elem) => {
     document.querySelectorAll(".reponse").forEach((elem) => {
 	let atom = {};
 	atom.selected = elem.classList.contains("selected");

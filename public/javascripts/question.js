@@ -92,7 +92,7 @@ function returnHTMLQuestion (i) {
 '			<div'+
 '			    class="text"'+
 '				   style="text-align:left;margin:3px;">'+
-'			    Cette réponse est sur  <input style="width:30px;" name="max-points-'+i+'" type="number" value="1"> points.<br>'+
+'			    Cette réponse est sur  <input style="width:30px;" name="max-points-'+i+'" type="number" value="1"> points, et a pour coef  <input style="width:30px;" name="coef-rep-'+i+'" type="number" value="1">.<br>'+
 '			    <table>'+
 '				<tr>'+
 '				    <td></td>'+

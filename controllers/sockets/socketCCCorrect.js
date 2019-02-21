@@ -138,8 +138,8 @@ module.exports = function(io) {
 		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	    });
 	});
-	socket.on('setStrategy', function (roomID, studentID, questionID, strategy, mark) {
-	    Stats.setStrategy(roomID, studentID, questionID, [strategy, mark], (err) => {
+	socket.on('setGlobalGrade', function (roomID, studentID, questionID, mark) {
+	    Stats.setGlobalGrade(roomID, studentID, questionID, mark, (err) => {
 		if(err) throw err;
 		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	    });

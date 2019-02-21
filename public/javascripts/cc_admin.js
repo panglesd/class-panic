@@ -95,18 +95,9 @@ function setCustomComment(i, customComment) {
 }
 
 
-function setStrategy() {
+function setGlobalGrade(i) {
     console.log("setStrategy is on!");
-    let strategy = document.querySelector("#strategy").value;
-    if(strategy == "manual") {
-	let val = parseFloat(document.querySelector("#mark").value);
-	val = Math.max(-1, val);
-	val = Math.min(1, val);
-	/*console.log("val is", val);*/
-	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestion.id, strategy, val);
-    }
-    else
-	socketCC.emit("setStrategy", roomID, currentStudent.userID, currentQuestion.id, strategy);
+	socketCC.emit("setGlobalGrade", roomID, currentStudent.userID, currentQuestion.id, i);
 }
 
 /*********************************************************************/
@@ -411,7 +402,7 @@ socketCC.on('newQuestion', function (question) {
     if(notTheSame) {
 	console.log("question is", question);
 	afficheQuestion(question);
-	addAdminInterface(question, setValidity, setStrategy);
+	addAdminInterface(question, setValidity, setGlobalGrade);
     }
     sendSubmission();
 });

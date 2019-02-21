@@ -21,7 +21,7 @@ html {
     cursor:pointer;
 }
 
-.reponse {
+.reponse, .summary {
 //    display:inline-block;
     display:block;
     padding:20px;
@@ -31,8 +31,11 @@ html {
     background-color:#F5F5DC;
     color:#165a70;
     transition: all .2s ease-in-out;
-    cursor:pointer;
     margin:30px;  
+}
+reponse {
+    cursor:pointer;
+    
 }
 
 .selected {

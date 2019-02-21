@@ -48,7 +48,7 @@ function afficheQuestion(question) {
     // Pour le résumé :
 
     let summaryWrapper = document.createElement('div');
-    summaryWrapper.classList.add("reponse");
+//    summaryWrapper.classList.add("reponse");
     summaryWrapper.classList.add("summary");
     summaryWrapper.classList.add("notSelected");
     summaryWrapper.innerHTML += "Note finale : <span id='note'>N/A</span> Coéf : <span id='coef'>N/A</span>";
@@ -203,7 +203,7 @@ function addCorrection(question, elem, rep, index) {
 
     return elem;}
 
-function addAdminInterface(question, setValidity, setStrategy){
+function addAdminInterface(question, setValidity, setGlobalGrade){
     let wrapper = document.querySelector("#wrapperAnswer");
     question.reponses.forEach((rep, index) => {
 	let elemRep = document.querySelector("#r"+index);
@@ -254,7 +254,7 @@ function addAdminInterface(question, setValidity, setStrategy){
     customMarkWrapper.innerHTML = "Choisir sa note : <input type='number' id='mark' step='0.1'>";
     let mark = customMarkWrapper.querySelector("#mark");
     if(mark) {
-	mark.addEventListener("input", (ev) => {console.log("change");setStrategy();});
+	mark.addEventListener("input", (ev) => {console.log("change");setGlobalGrade(parseFloat(mark.value));});
     }
     summary.appendChild(customMarkWrapper);
 }

@@ -273,9 +273,16 @@ exports.setCustomComment = function(roomID, userID, questionID, i, customComment
     });
 };
 
-exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
-    callback("setStrategy est deprecié", null);
-}
+exports.setGlobalGrade = function(roomID, userID, questionID, mark, callback) {
+     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+	 let query = "UPDATE stats SET correct = ? WHERE id = ?";
+	 let params = [mark, subm.statsID];
+	 bdd.query(query, params, (err, res) => {
+	     callback(err, res);
+	 });
+     });
+//    callback("setStrategy est deprecié", null);
+};
 // exports.setStrategy = function(roomID, userID, questionID, [strategy, mark], callback) {
 //     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
 // 	subm.customQuestion.strategy = strategy;
