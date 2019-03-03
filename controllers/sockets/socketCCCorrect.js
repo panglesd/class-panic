@@ -145,6 +145,13 @@ module.exports = function(io) {
 	    });
 	});
 	
+	socket.on('setAutoCorrect', function (roomID, studentID, questionID) {
+	    Stats.setAutoCorrect(roomID, studentID, questionID, (err) => {
+		if(err) throw err;
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+	    });
+	});
+	
 	/******************************************/
 	/*  Un admin me demande la liste des questions*/
 	/******************************************/

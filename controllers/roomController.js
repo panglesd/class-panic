@@ -153,17 +153,20 @@ exports.room_create_post = function(req, res) {
 	if(req.body.questionSet) {
 	    // Construction de l'objet newRoom depuis les données du formulaire.
 	    let newRoom = parseBodytoNewRoom(req.body);
-	    Room.create(req.session.user, newRoom, req.course.id, function (err,r) {
+	    Room.create(req.session.user, newRoom, req.course.id, function (err, newRoom) {
 		//	    res.redirect(config.PATH+'/manage/room');
 		//	    console.log(req.body);
 		if(err) {
 //		    console.log("err is", err)
 		    req.msgs.push("Impossible de créer la room !");
-		    courseController.course_manage(req,res);
+		    renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);
+			courseController.course_manage(req,res);
 		}
 		else {
 		    req.msgs.push("Room  créée !");
-		    courseController.course_manage(req,res);
+		    req.room = newRoom;
+		    exports.room_manage(req, res);
+//		    courseController.course_manage(req,res);
 		}
 	    });
 	}

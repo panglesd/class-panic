@@ -87,6 +87,7 @@
 */
 var async = require("async");
 let bdd = require("./bdd");
+let Stats = require("./stats");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
 
@@ -152,7 +153,10 @@ exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
 	let q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
-	callback(err, q);
+	exports.maxPointsOfQuestion(q, (err, maxP)=> {
+	    q.maxPoints = maxP;
+	    callback(err, q);
+	});
     });
 };
 
@@ -171,7 +175,7 @@ exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
 	  "questions LEFT OUTER JOIN "+
 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
-     glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
+     let glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
 	 console.log(err);
 	 console.log("gler", glere.sql);
 	let q = row[0];
@@ -337,7 +341,8 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	    });
 	}, (err) => {
 	    if(err) // Il y a eu une erreur lors de l'enregistrement des fichiers : on préfère tout supprimer (il faudrait aussi supprimer les fichiers enregistrés...)
-		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
+		// VRAIMENT ??????????????????
+ 		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
 		    // fs.rm(path);
 		    callback(err);
 		});
@@ -346,7 +351,11 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 		    newQuestion.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
 		});
 		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ? WHERE `id` = ?",
-			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, questionID], (err, res) => {callback(err, questionID);});
+			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, questionID], (err, res) => {
+			      updateGradesOfQuestion(question, (err, res) => {
+				  callback(err, questionID);
+			      });
+			  });
 //		bdd.query("UPDATE `questions` SET reponses = ? WHERE id = ?", [JSON.stringify(question.reponses), questionID], (err) => {callback(err, questionID);});
 	    }
 	});
@@ -379,98 +388,86 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 /*       Correction des questions                                      */
 /***********************************************************************/
 
-// function returnGradeRep(validity, strategy) {
-//     let n,p;
-//     switch(strategy) {
-//     case "QCM":
-// 	n=2; p=1; break;
-//     default:
-// 	n=1; p=0;
-//     }
-//     return (n * validity - p);
-// }
-// function assignGradeQuestion(question, submission, mergingStrategy) {
-//     switch(mergingStrategy) {
-//     case "normal":
-// 	let maxGrade=0;
-// 	question.reponses.forEach((rep, index) => {
-// 	    maxGrade += returnGradeRep(rep.validity ? rep.validity : 1, question.strategy);
-// 	});
-// 	if(maxGrade < 0) maxGrade = 0-maxGrade;
-// 	if(maxGrade == 0) maxGrade = 1;
-// 	let grade = 0;
-// 	submission.forEach((rep, index) => {
-// 	    if(rep.selected)
-// 		grade += returnGradeRep(rep.validity ? rep.validity : 1, question.strategy);
-// 	});
-//     }    
-// } 
+exports.updateGradesOfQuestion = function(question, callback) {
+    Stats.getStats({questionID: question.id}, (err, statsL) => {
+	async.forEach(statsL,(submission, callbackForEach) => {
+	    exports.correctAndLogSubmission(question, submission, callbackForEach);  
+	}, (err) => {
+	    callback(err);
+	});
+    });
+};
+
+exports.correctAndLogSubmission = function(question, submission, callback) {
+    console.log("WE CCALL CORRECANDLOGSUBM");
+    exports.correctSubmission(question, submission, (err, grade) => {
+	console.log("conclusion : ", grade, "points !!!");
+	let query = "UPDATE `stats` SET correct = ? WHERE id = ?";
+	let params = [grade, submission.statsID];
+	bdd.query(query, params, (err,res) => { callback(err,res);});
+    });
+};
+
+exports.maxPointsOfQuestion = function(question, callback) {
+    let maxPointsTotal = 0;
+    question.reponses.forEach((questReponse) => {
+	let maxPoints;
+	if(questReponse.validity == "true")
+	    maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				 questReponse.strategy.unselected.vrai);
+	else if (questReponse.validity == "false")
+	    maxPoints = Math.max(questReponse.strategy.selected.faux,
+				 questReponse.strategy.unselected.faux);
+	else 
+	    maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				 questReponse.strategy.selected.faux,
+				 questReponse.strategy.unselected.vrai,
+				 questReponse.strategy.unselected.faux);
+	questReponse.maxPoints = maxPoints;
+	maxPointsTotal += maxPoints;
+    });
+    callback(null, maxPointsTotal);
+};
 
 exports.correctSubmission = function(question, submission, callback) {
     let submPoints = 0;
     let totPoints = 0;
-    submission.forEach((repSubm, index) => {
-	let rep = question.reponses[index];
-	console.log("rep = ", rep);
-	console.log("repSubm = ", repSubm);
-	if(typeof(repSubm.points) == "number")
-	    submPoints += repSubm.points;
-	else {
-	    if(repSubm.selected) {
-		// if(repSubm.validity == "true") submPoints += rep.strategy.selected.vrai;
-		// if(repSubm.validity == "false") submPoints += rep.strategy.selected.faux;
-		// if(repSubm.validity == "slide") submPoints += (repSubm.pourcentage*rep.strategy.selected.vrai + (1-repSubm.pourcentage)*rep.strategy.selected.faux;
-		console.log(typeof(repSubm.validity));
-		if(typeof(repSubm.validity)=="number")
+    console.log(submission);
+    if(submission.strategy=="manual") {
+	console.log("MMAAAAAAAAAAAAANUAL");
+	callback(null, submission.correct);
+    }
+    else {
+	console.log("COMPUUUUUUUUUUUUTED");
+	submission.response.forEach((repSubm, index) => {
+	    let rep = question.reponses[index];
+	    console.log("rep = ", rep);
+	    console.log("repSubm = ", repSubm);
+	    // Is the following really necessary ? No !
+	    // if(typeof(repSubm.points) == "number")
+	    // 	submPoints += repSubm.points;
+	    // else 
+		if(typeof(repSubm.validity) == "number") {
+		if(repSubm.selected) 
 		    submPoints += repSubm.validity*rep.strategy.selected.vrai + (1-repSubm.validity)*rep.strategy.selected.faux;
-		else if(typeof(repSubm.validity)=="string")
-		    submPoints = "";
-		else if(typeof(rep.validity)=="number")
-		    submPoints += rep.validity*rep.strategy.selected.vrai + (1-rep.validity)*rep.strategy.selected.faux;
-	    }
-	    if(!repSubm.selected) {
-		// if(repSubm.validity == "true") submPoints += rep.strategy.unselected.vrai;
-		// if(repSubm.validity == "false") submPoints += rep.strategy.unselected.faux;
-		if(typeof(repSubm.validity)=="number")
+		if(!repSubm.selected) 
 		    submPoints += repSubm.validity*rep.strategy.unselected.vrai + (1-repSubm.validity)*rep.strategy.unselected.faux;
-		else if(typeof(repSubm.validity)=="string")
-		    submPoints = "";
-		else if(typeof(rep.validity)=="number")
-		    submPoints += rep.validity*rep.strategy.unselected.vrai + (1-rep.validity)*rep.strategy.unselected.faux;
 	    }
-	}
-	totPoints += rep.maxPoints;
-    });
-    if(typeof(submPoints)=="number")
-	callback(null, submPoints);
-    else
-	callback(null, "?");
-//     switch(markInfo.strategy ? markInfo.strategy : question.strategy) {
-//     case "manual":
-// 	if(markInfo.mark)
-// 	    return markInfo.mark; // CALLBACK !!!
-// 	return "unknown";
-//     case "QCM":
-// 	let tot = 0;
-// 	let maxGrade = 0;
-// 	submission.forEach((rep) => {
-// 	    if(rep.validity == "to_correct")
-// 		callback("has unknown value", null);
-// 	    if(rep.selected)
-// 		tot += 2*rep.validity - 1;
-// 	    maxGrade += Math.max(0, 2*rep.validity -1);
-// 	});
-// 	return tot*1./(maxGrade != 0 ? maxGrade : 1);
-//     case "Mean":
-//     case "all_or_0":
-// 	if(!submission[0])
-// 	    return "0";
-// //	if(question.reponses[submission[0].n].validity == "true")
-// //	    return "1";
-// //	if(question.reponses[submission[0].n].validity == "false")
-// //	    return "0";
-// 	return "unknown";
-//     }
-    
-    
+	    else {
+		let repValidity;
+		if(rep.validity == "true") repValidity = 1;
+		else if(rep.validity == "false") repValidity = 0;
+		else repValidity = NaN;
+		if(repSubm.selected)
+		    submPoints += (repValidity)*rep.strategy.selected.vrai + (1-repValidity)*rep.strategy.selected.faux;
+		if(!repSubm.selected)
+		    submPoints += (repValidity)*rep.strategy.unselected.vrai + (1-repValidity)*rep.strategy.unselected.faux;
+	    }
+	    totPoints += rep.maxPoints;
+	});
+	if(isNaN(submPoints))
+	    callback(null, "?");
+	else
+	    callback(null, submPoints);
+    }
 };

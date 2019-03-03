@@ -100,6 +100,11 @@ function setGlobalGrade(i) {
 	socketCC.emit("setGlobalGrade", roomID, currentStudent.userID, currentQuestion.id, i);
 }
 
+function setAutoCorrect() {
+    console.log("setStrategy is off!");
+	socketCC.emit("setAutoCorrect", roomID, currentStudent.userID, currentQuestion.id);
+}
+
 /*********************************************************************/
 /*                 pour afficher une question                        */
 /*********************************************************************/
@@ -402,7 +407,7 @@ socketCC.on('newQuestion', function (question) {
     if(notTheSame) {
 	console.log("question is", question);
 	afficheQuestion(question);
-	addAdminInterface(question, setValidity, setGlobalGrade);
+	addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect);
     }
     sendSubmission();
 });

@@ -203,7 +203,7 @@ function addCorrection(question, elem, rep, index) {
 
     return elem;}
 
-function addAdminInterface(question, setValidity, setGlobalGrade){
+function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect){
     let wrapper = document.querySelector("#wrapperAnswer");
     question.reponses.forEach((rep, index) => {
 	let elemRep = document.querySelector("#r"+index);
@@ -231,7 +231,7 @@ function addAdminInterface(question, setValidity, setGlobalGrade){
 	customNote.id="customNote-"+index;
 	elemRep.appendChild(noteCust);
 	elemRep.appendChild(customNote);
-	let vraiFaux = document.createElement("span"); vraiFaux.innerText = " Réussite sur 10 : "; vraiFaux.style.fontSize = "19px";
+	let vraiFaux = document.createElement("span"); vraiFaux.innerText = " Réussite sur 1 : "; vraiFaux.style.fontSize = "19px";
 	elemRep.appendChild(vraiFaux);
 	let vraiFauxInput = document.createElement("input");
 	vraiFauxInput.type="number";
@@ -251,10 +251,14 @@ function addAdminInterface(question, setValidity, setGlobalGrade){
     });
     let summary = document.querySelector(".summary");
     let customMarkWrapper = document.createElement("div");
-    customMarkWrapper.innerHTML = "Choisir sa note : <input type='number' id='mark' step='0.1'>";
+    customMarkWrapper.innerHTML = "Choisir la note : <input type='number' id='mark' step='0.1'>"+"<div style='display:none' class='reautomatiser'>La note est choisie par le correcteur <input type='button' class='strategy' value='Calculer la note automatiquement'></div>";
     let mark = customMarkWrapper.querySelector("#mark");
     if(mark) {
 	mark.addEventListener("input", (ev) => {console.log("change");setGlobalGrade(parseFloat(mark.value));});
+    }
+    let reAuto = customMarkWrapper.querySelector(".strategy");
+    if(reAuto) {
+	reAuto.addEventListener("click", (ev) => {console.log("change");setAutoCorrect();});
     }
     summary.appendChild(customMarkWrapper);
 }
@@ -302,11 +306,19 @@ function afficheSubmission (submission) {
 	    elemReponse.querySelector(".customComment").value = submReponse.customComment;
 	    elemReponse.querySelector(".customComment").style.display = "";
 	}
-	let maxPoints = Math.max(questReponse.strategy.selected.vrai,
-				 questReponse.strategy.selected.faux,
-				 questReponse.strategy.unselected.vrai,
-				 questReponse.strategy.unselected.faux);
-	totalMaxPoints += maxPoints;
+	let maxPoints = questReponse.maxPoints;
+	// if(questReponse.validity == "true")
+	//     maxPoints = Math.max(questReponse.strategy.selected.vrai,
+	// 			 questReponse.strategy.unselected.vrai);
+	// else if (questReponse.validity == "false")
+	//     maxPoints = Math.max(questReponse.strategy.selected.faux,
+	// 			 questReponse.strategy.unselected.faux);
+	// else 
+	//     maxPoints = Math.max(questReponse.strategy.selected.vrai,
+	// 			 questReponse.strategy.selected.faux,
+	// 			 questReponse.strategy.unselected.vrai,
+	// 			 questReponse.strategy.unselected.faux);
+//	totalMaxPoints += maxPoints;
 	if(typeof(submReponse.validity)=="number") {
 	    let note = "";
 	    if(submReponse.selected) 
@@ -322,11 +334,18 @@ function afficheSubmission (submission) {
     if(submission.correct) {
 	document.querySelector(".summary").style.display="";
 	let noteFinale = document.querySelector("#note");
-	noteFinale.textContent = submission.correct+"/"+totalMaxPoints;
+	noteFinale.textContent = submission.correct+"/"+currentQuestion.maxPoints; // totalMaxPoints;
 	let mark = document.querySelector(".summary #mark");
 	if(mark)
 	    mark.value = submission.correct;
+	    let autoCalcul = document.querySelector(".summary .reautomatiser");
+	if(submission.strategy == "manual")
+	    autoCalcul.style.display = "";
+	else 
+	    autoCalcul.style.display = "none";
     }
+//	autoCalcul.value = submission.strategy == "manual" ? "Automatiser la correction" : "Choisir une note fixe";
+//	autoCalcul
     // Ici gérer les corrections personnelles de la question
     // document.querySelector(".correcPersoGlobal").innerText = submission.correcPerso
     // Notes etc...

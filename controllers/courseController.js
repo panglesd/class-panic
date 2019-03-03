@@ -13,11 +13,11 @@ var async = require('async');
 
 // Render courses.ejs
 
-renderCourses = function(user, msgs, req, res) {
+let renderCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -30,17 +30,17 @@ renderCourses = function(user, msgs, req, res) {
 	},
 	function (err, results) {
 //	    console.log(results);
-	    res.render('courses', results)
+	    res.render('courses', results);
 	});
-}
+};
 
 // Render course.ejs
 
-renderCourse = function(user, course, msgs, req, res) {
+let renderCourse = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -59,18 +59,18 @@ renderCourse = function(user, course, msgs, req, res) {
 	},
 	function (err, results) {
 //	    console.log(results);
-	    res.render('course', results)
+	    res.render('course', results);
 	});
-}
+};
 
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderCourseManage = function (user, course, msgs, req, res) {
+let renderCourseManage = function (user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Administrer "+course.name)},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Administrer "+course.name);},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -101,11 +101,11 @@ renderCourseManage = function (user, course, msgs, req, res) {
 
 // Render manage_courses.ejs
 
-renderManageCourses = function(user, msgs, req, res) {
+let renderManageCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: ... une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -123,7 +123,7 @@ renderManageCourses = function(user, msgs, req, res) {
 	    }*/
 	},
 	function (err, results) {
-	    res.render('manage_courses', results)
+	    res.render('manage_courses', results);
 	});
 };
 

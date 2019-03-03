@@ -28,6 +28,7 @@ module.exports = function(io) {
     function sendListQuestion(socket, callback) {
 	game.questionListForCC(socket.request.session.user, socket.room.id, function (err, questionList) {
 	    questionList.forEach((question) => {
+		delete(question.maxPoints);
 		delete(question.correct);
 //		if(question.texted)   // Pas besoin car on n'envoie pas les réponses possibles...
 //		    delete(question.correction);
@@ -54,27 +55,32 @@ module.exports = function(io) {
 	//     callback();
 	// });
 	Question.getByIndex(index, socket.room.id, (err, question) => {
-	    question.reponses.forEach((rep) => {
-		if(!socket.room.status.showTruth) {
+	    if(!socket.room.status.showTruth) {
+		delete(question.maxPoints);
+		delete(question.coef);
+		delete(question.strategy);
+		question.reponses.forEach((rep) => {
 		    delete(rep.validity);
-		    if(rep.texted) {
-			delete(rep.correction);
-		    }
+		    delete(rep.coef);
+		    delete(rep.correcFilesInfo);
+		    delete(rep.maxPoints);
+		    delete(rep.correction);
+		    delete(rep.strategy);
 		    delete(rep.correcFileInfo);
-		}
-	    });
+		});
+	    }
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
 		if(!socket.room.status.showCorrecPerso) {
 		    delete(submission.correct);
-		}
-		submission.response.forEach((rep) => {
-		    if(!socket.room.status.showCorrecPerso) {
+		    delete(submission.customQuestion);
+		    delete(submission.questionText);delete(submission.setText);delete(submission.roomText);
+		    submission.response.forEach((rep) => {
 			delete(rep.validity);
 			delete(rep.customComment);
 			// delete commentaire perso etc...
-		    }
-		});
+		    });
+		}
 		socket.emit("newQuestion", question);
 		callback();
 	    });

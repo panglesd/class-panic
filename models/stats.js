@@ -74,46 +74,46 @@ exports. getStats = function (filter, callback) {
 /*       Logger les statistiques d'une room                            */
 /***********************************************************************/
 
-exports.logStats = function (roomID,  callback) {
-    Room.getByID(roomID, (err, room) => {
-//	console.log(room);
-	async.parallel({
-	    set : function (callback) { Set.getByID(room.questionSet, callback); },
-	    question : function (callback) {
-		if(room.question.id)
-		    Question.getByID(room.question.id, callback);
-		else
-		    callback(null, {id:null});
-	    },
-	    room : function (callback) { callback(null, room); },
-	    course : function (callback) { Course.getByID(room.courseID, callback); }
-	}, (err, result) => {
-	    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
-	    let params = [ result.set.id, JSON.stringify(result.set),
-			   result.room.id, JSON.stringify(result.room) ,
-			   result.question.id, /*JSON.stringify(result.question)*/ JSON.stringify(room.question) ,
-			   result.course.id, JSON.stringify(result.course) //,
-			   /*JSON.stringify(room.question)*/ ];
-	    bdd.query(query, params, (err, res) => {
-		console.log(err);
-		let blocID = res[1][0].blocID;
-		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
-		    async.forEachSeries(stats,(oneStat, callback) => {
-			Question.correctSubmission(room.question, oneStat.response, (err, value) => {
-			    let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`) VALUES (?,?,?,?,?)";
-			    let params = [oneStat.id, value, blocID, oneStat.response, JSON.stringify(room.question)];
-			    bdd.query(query,params, (err, res) => {callback(err, res);});
-			});
-//			console.log("result.question.strategy = ", result.question.strategy);
-		    }, (err) => {
-			console.log(err);
-			callback();
-		    });
-		});
-	    });
-	});
-    });
-};
+// exports.logStats = function (roomID,  callback) {
+//     Room.getByID(roomID, (err, room) => {
+// //	console.log(room);
+// 	async.parallel({
+// 	    set : function (callback) { Set.getByID(room.questionSet, callback); },
+// 	    question : function (callback) {
+// 		if(room.question.id)
+// 		    Question.getByID(room.question.id, callback);
+// 		else
+// 		    callback(null, {id:null});
+// 	    },
+// 	    room : function (callback) { callback(null, room); },
+// 	    course : function (callback) { Course.getByID(room.courseID, callback); }
+// 	}, (err, result) => {
+// 	    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";
+// 	    let params = [ result.set.id, JSON.stringify(result.set),
+// 			   result.room.id, JSON.stringify(result.room) ,
+// 			   result.question.id, /*JSON.stringify(result.question)*/ JSON.stringify(room.question) ,
+// 			   result.course.id, JSON.stringify(result.course) //,
+// 			   /*JSON.stringify(room.question)*/ ];
+// 	    bdd.query(query, params, (err, res) => {
+// 		console.log(err);
+// 		let blocID = res[1][0].blocID;
+// 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
+// 		    async.forEachSeries(stats,(oneStat, callback) => {
+// 			Question.correctSubmission(room.question, oneStat.response, (err, value) => {
+// 			    let query = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?, 'computed')";
+// 			    let params = [oneStat.id, value, blocID, oneStat.response, JSON.stringify(room.question)];
+// 			    bdd.query(query,params, (err, res) => {callback(err, res);});
+// 			});
+// //			console.log("result.question.strategy = ", result.question.strategy);
+// 		    }, (err) => {
+// 			console.log(err);
+// 			callback();
+// 		    });
+// 		});
+// 	    });
+// 	});
+//     });
+// };
 
 /***********************************************************************/
 /*       Récupérer la liste des réponses d'une room                    */
@@ -170,6 +170,8 @@ function tryGetSubmission(userID, roomID, questionID, callback) {
     console.log("tryGetSubmission is called");
     let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
     let params = [userID, roomID, questionID];
+    console.log(query, params, callback);
+    console.log(questionID);
     let a = bdd.query(query, params, (err, res) => {
 	console.log(err, a.sql, res);
 	callback(err, res[0]);
@@ -225,11 +227,15 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
 	Question.getByID(questionID, (err, question) => {
 	    //	    subm.customQuestion.reponses[i].validity = validity;
-//	    subm.response[i].points = points;
-	    subm.response[i].validity = validity;
+	    //	    subm.response[i].points = points;
+	    if(typeof(validity)=="number" )
+		subm.response[i].validity = validity;
+	    else
+		subm.response[i].validity = NaN;
+//		delete(subm.response[i].validity);
 	    // let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 	    // let params2 = [roomID, userID, questionID];
-	    Question.correctSubmission(question, subm.response, (err, value) => {
+	    Question.correctSubmission(question, subm, (err, value) => {
 	    	let query = "UPDATE stats SET response = ?, correct = ? WHERE id = ?";
 	    	let params = [JSON.stringify(subm.response), value, subm.statsID];
 	    	let q = bdd.query(query, params, (err, res) => {
@@ -275,10 +281,25 @@ exports.setCustomComment = function(roomID, userID, questionID, i, customComment
 
 exports.setGlobalGrade = function(roomID, userID, questionID, mark, callback) {
      exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	 let query = "UPDATE stats SET correct = ? WHERE id = ?";
-	 let params = [mark, subm.statsID];
+	 let query = "UPDATE stats SET correct = ?, strategy = 'manual' WHERE id = ?";
+	 let params = [mark ? mark : "?", subm.statsID];
 	 bdd.query(query, params, (err, res) => {
 	     callback(err, res);
+	 });
+     });
+    //    callback("setStrategy est deprecié", null);
+};
+exports.setAutoCorrect = function(roomID, userID, questionID, callback) {
+     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+	 let query = "UPDATE stats SET strategy = 'computed' WHERE id = ?";
+	 let params = [subm.statsID];
+	 bdd.query(query, params, (err, res) => {
+	     Question.getByID(questionID, (err, question)=> {
+		 exports.getSubmission(userID, roomID, questionID, (err, subm2) => {
+		     Question.correctAndLogSubmission(question, subm2, callback);
+		     //		 callback(err, res);
+		 });
+	     });
 	 });
      });
 //    callback("setStrategy est deprecié", null);

@@ -99,8 +99,10 @@ exports.create = function (user, newRoom, courseID, callback) {
 	else {
 	    if(question) 
 		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`,`type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(newRoom.status),JSON.stringify(question), courseID, newRoom.type], function(err, rows) {
-		    if(err) console.log(err);
-		    callback(err, rows);
+		    if(err) {console.log(err);callback(err, null);}
+		    else
+			exports.getByID(rows.insertId, callback);
+//			callback(err, rows);
 		});
 	    else 
 		callback(err);

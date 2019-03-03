@@ -121,43 +121,75 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 		oldAnswer.response.forEach((rep, index) => {
 		    newAnswer[index].filesInfo = rep.filesInfo;
 		});
-		Question.correctSubmission(question, newAnswer, (err, value) => {
-		    let query2 = "UPDATE `stats` SET `response` = ?,  `correct` = ? WHERE userID = ? AND blocID = ?";
-		    let toLog = bdd.query(
-			query2,
-			[JSON.stringify(newAnswer), value, user.id, answ[1][0].blocID],
-			(err, res) => { callback(err, false);}
-		    );
+		let query2 = "UPDATE `stats` SET `response` = ?,  `correct` = ? WHERE userID = ? AND blocID = ?";
+		let params2 = [JSON.stringify(newAnswer), "?", user.id, answ[1][0].blocID];
+		bdd.query(query2, params2, (err, res) => {
+		    Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
+			Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, false);});
+//			callback(err, false);
+		    });
 		});
+		// Question.correctSubmission(question, newAnswer, (err, value) => {
+		//     let query2 = "UPDATE `stats` SET `response` = ?,  `correct` = ? WHERE userID = ? AND blocID = ?";
+		//     let toLog = bdd.query(
+		// 	query2,
+		// 	[JSON.stringify(newAnswer), value, user.id, answ[1][0].blocID],
+		// 	(err, res) => { callback(err, false);}
+		//     );
+		// });
 	    }
 	    // Si jamais on a déjà une entrée statsBloc qui correspond
 	    // Mais pas d'entrée stats qui correspond
 	    else if (answ[1][0]) {
-		Question.correctSubmission(question, newAnswer, (err, value) => {
-		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`) VALUES (?,?,?,?,?)";     // Puis on insère un stats
-		    let params2 = [user.id, value, answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
-		    bdd.query(query2, params2, (err, res) => {
-			callback(err, true);
+		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?,'computed')";     // Puis on insère un stats
+		let params2 = [user.id, "?", answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
+		bdd.query(query2, params2, (err, res) => {
+		    Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
+			Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, true);});
+//			callback(err, false);
 		    });
 		});
+		// Question.correctSubmission(question, newAnswer, (err, value) => {
+		//     let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?,'computed')";     // Puis on insère un stats
+		//     let params2 = [user.id, value, answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
+		//     bdd.query(query2, params2, (err, res) => {
+		// 	callback(err, true);
+		//     });
+		// });
 	    }
 	    // Si jamais on n'a pas d'entrée statsBloc qui correspond
 	    else {
-		Question.correctSubmission(question, newAnswer, (err, value) => {
-		    let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";   // On commence par insérer un statsBloc
-		    let params = [ set.id, JSON.stringify(set),
-				   room.id, JSON.stringify(room) ,
-				   question.id, JSON.stringify(question) ,
-				   course.id, JSON.stringify(course) ];
-		    bdd.query(query, params, (err, tabID) => {
-			let blocID = tabID[1][0].blocID;
-			let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`) VALUES (?,?,?,?,?)";     // Puis on insère un stats
-			let params2 = [user.id, value, blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
-			bdd.query(query2, params2, (err, res) => {
-			    callback(err, true);
+		let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";   // On commence par insérer un statsBloc
+		let params = [ set.id, JSON.stringify(set),
+			       room.id, JSON.stringify(room) ,
+			       question.id, JSON.stringify(question) ,
+			       course.id, JSON.stringify(course) ];
+		bdd.query(query, params, (err, tabID) => {
+		    let blocID = tabID[1][0].blocID;
+		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?,'computed')";     // Puis on insère un stats
+		    let params2 = [user.id, "?", blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
+		    bdd.query(query2, params2, (err, res) => {
+			Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
+			    Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, true);});
+			    //			callback(err, false);
 			});
 		    });
 		});
+		// Question.correctSubmission(question, newAnswer, (err, value) => {
+		//     let query = "INSERT INTO `statsBloc`(`setID`,`setText`, `roomID`, `roomText`, `questionID`,`questionText`, `courseID`, `courseText`) VALUES (?,?,?,?,?,?,?,?); SELECT LAST_INSERT_ID() as blocID;";   // On commence par insérer un statsBloc
+		//     let params = [ set.id, JSON.stringify(set),
+		// 		   room.id, JSON.stringify(room) ,
+		// 		   question.id, JSON.stringify(question) ,
+		// 		   course.id, JSON.stringify(course) ];
+		//     bdd.query(query, params, (err, tabID) => {
+		// 	let blocID = tabID[1][0].blocID;
+		// 	let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?,'computed')";     // Puis on insère un stats
+		// 	let params2 = [user.id, value, blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
+		// 	bdd.query(query2, params2, (err, res) => {
+		// 	    callback(err, true);
+		// 	});
+		//     });
+		// });
 	    }		    
 	});
     });
