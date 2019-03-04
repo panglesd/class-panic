@@ -168,7 +168,7 @@ module.exports = function(io) {
 	socket.on('chosenAnswer', function (answer, questionIndex) {
 	    	    console.log("answer = ", answer);
 	    if(socket.room.status.acceptSubm) {
-		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+//		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    // A gérer autrement à cause de la réorganisation
 		    // if(answer.length != 0 && question.type != "multi")
 		    // 	answer = [answer[0]];
@@ -176,7 +176,7 @@ module.exports = function(io) {
 			sendListQuestion(socket, function() {});
 			//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
 		    });
-		});
+//		});
 	    }
 	});
 	/******************************************/
@@ -185,8 +185,9 @@ module.exports = function(io) {
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
 	    if(socket.room.status.acceptSubm){
-		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		    if(question.allResponses[n_ans].hasFile != "none") {
+//		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, questiona) => {
+		Question.getByIndex(questionIndex, socket.room.id,(err, question) => {
+		    if(question.reponses[n_ans].hasFile != "none") {
 			let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
 			console.log("path = ", path);
 			mkdirp(path, (err) => {
@@ -218,7 +219,7 @@ module.exports = function(io) {
 		 
 	socket.on('removeFile', function (n_ans, fileName, questionIndex) {
 	    if(socket.room.status.acceptSubm){
-		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+		Question.getByIndex(questionIndex, socket.room.id,(err, question) => {
 		    console.log("calling logFile");
 		    game.removeFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, fileName,(err) => {
 			sendQuestionFromIndex(socket, questionIndex,() => {});

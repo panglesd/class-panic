@@ -176,31 +176,28 @@ exports.getByIndex = function (questionIndex, roomID, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `indexSet` = ? AND class = (SELECT questionSet FROM rooms WHERE id = ?)", [questionIndex, roomID], function (err, rows) {
 	console.log(err);
 	let q = rows[0];
-	q.reponses = JSON.parse(q.reponses);
-	exports.maxPointsOfQuestion(q, (err, maxP)=> {
-	    q.maxPoints = maxP;
-	    callback(err, q);
-	});
-    });
-};
-
-exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
-    let query = 
-	"SELECT enonce, questionID, questions.id as id, description, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
-	  "questions LEFT OUTER JOIN "+
-	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
-	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
-     let glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
-	 console.log(err);
-	 console.log("gler", glere.sql);
-	let q = row[0];
-//	console.log(q);
-	q.allResponses = JSON.parse(q.allResponses);
-	if(q.userResponse)
-	    q.userResponse = JSON.parse(q.userResponse);
+	formatQuestion(q);
 	callback(err, q);
     });
 };
+
+// exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
+//     let query = 
+// 	"SELECT enonce, questionID, questions.id as id, description, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
+// 	  "questions LEFT OUTER JOIN "+
+// 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
+// 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
+//      let glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
+// 	 console.log(err);
+// 	 console.log("gler", glere.sql);
+// 	let q = row[0];
+// //	console.log(q);
+// 	q.allResponses = JSON.parse(q.allResponses);
+// 	if(q.userResponse)
+// 	    q.userResponse = JSON.parse(q.userResponse);
+// 	callback(err, q);
+//     });
+// };
 
 exports.getOwnedByID = function (user, questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionId, user.id], function (err, rows) {
