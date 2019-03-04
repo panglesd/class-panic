@@ -198,7 +198,11 @@ exports.fileForAdmin = function(req, res) {
 exports.fileCorrectForAdmin = function(req, res) {
     console.log("yooo");
     if(req.subscription.isTDMan){
-	exports.fileCorrectForStudent(req,res);
+	Question.getFileCorrect(req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
+	    console.log("yo");
+	    docController.serveFile(data, sanit_fn(req.params.fileName), res);
+	});
+	// exports.fileCorrectForStudent(req,res);
 //	console.log(req.params);
     }
     else
