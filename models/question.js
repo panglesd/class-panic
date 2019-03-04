@@ -95,31 +95,45 @@ var fs = require("fs");
 /*       Getters pour les question : listes                            */
 /***********************************************************************/
 
+let formatQuestion = function (question) {
+    question.reponses = JSON.parse(question.reponses);
+    exports.maxPointsOfQuestion(question, (err, maxP)=> {
+	question.maxPoints = maxP;
+    });
+};
+
 // List of all questions
 
 exports.questionList = function (callback) {
-    bdd.query("SELECT * FROM `questions`", callback);
+    bdd.query("SELECT * FROM `questions`", (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
+    });
 };
 
 // List of all owned questions
 
 exports.ownedList = function (user, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE owner = ?", [user.id], (err, res) => {callback(err,res);});
+    bdd.query("SELECT * FROM `questions` WHERE owner = ?", [user.id],  (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
+    });;
 };
 
 // List by set ID
 
 exports.listBySetID = function (setID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ? ORDER BY indexSet", [setID], (err, qList) => {
-	qList.forEach((qu) => {
-	    qu.reponses = JSON.parse(qu.reponses);
-	});
+    bdd.query("SELECT * FROM `questions` WHERE `class` = ? ORDER BY indexSet", [setID],  (err, qList) => {
+	qList.forEach(formatQuestion);
 	callback(err, qList);	
     });
 };
 
 exports.listOwnedBySetID = function (user, setID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ? AND `owner` = ? ORDER BY indexSet", [setID, user.id], callback);
+    bdd.query("SELECT * FROM `questions` WHERE `class` = ? AND `owner` = ? ORDER BY indexSet", [setID, user.id],  (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
+    });
 };
 
 // List by room ID
@@ -138,8 +152,9 @@ exports.listOwnedByRoomID = function (user, id, callback) {
 };
 
 exports.listByCourseID = function (courseID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ORDER BY indexSet", [courseID], function(err, qList) {
-	callback(err, qList);
+    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ORDER BY indexSet", [courseID],  (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
     });
 };
 
@@ -152,11 +167,8 @@ exports.listByCourseID = function (courseID, callback) {
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
 	let q = rows[0];
-	q.reponses = JSON.parse(q.reponses);
-	exports.maxPointsOfQuestion(q, (err, maxP)=> {
-	    q.maxPoints = maxP;
-	    callback(err, q);
-	});
+	formatQuestion(q);
+	callback(err, q);
     });
 };
 
