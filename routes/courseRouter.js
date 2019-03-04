@@ -158,7 +158,7 @@ router.get('/:courseID/control/:roomID', game_controller.room_admin);
 // GET request for admining a room.
 router.get('/:courseID/correct/:roomID', game_controller.room_cc_admin);
 router.get('/:courseID/correct/:roomID/filePerso/:questionID/:answerNumber/:userID/:fileName', game_controller.fileForAdmin);
-router.get('/:courseID/correct/:roomID/fileCorrect/:questionID/:answerNumber/:userID/:fileName', game_controller.fileCorrectForAdmin);
+router.get('/:courseID/correct/:roomID/fileCorrect/:questionID/:answerNumber/:fileName', game_controller.fileCorrectForAdmin);
 
 
 
