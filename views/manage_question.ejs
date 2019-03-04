@@ -58,10 +58,10 @@ Utiliser $...$ pour mettre des maths.
 		    style="width:100%"><%= reponsePossible.reponse %></textarea>
 		<!--    Réponse custom ou non            -->
 		<fieldset>
-		    <legend>Type de question</legend>
+		    <legend><span class="legend"> Type de question</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
 		    <div class="wrapperFieldset">
-			<input type="checkbox" class="texted-hidden" name="texted-<%= i %>" <%= reponsePossible.texted ? "checked" : ""%>> <label for="texted-<%= i %>">Possède un champs texte.</label>
-			<input name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
+			<input class="texted" type="checkbox" class="texted-hidden" name="texted-<%= i %>" <%= reponsePossible.texted ? "checked" : ""%>> <label for="texted-<%= i %>">Possède un champs texte.</label>
+			<input class="filed" name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
 			<!-- <div
 			     class="text <%= reponsePossible.texted ? "texted" : "" %>"
 			     style="text-align:left;margin:3px;">
@@ -71,7 +71,7 @@ Utiliser $...$ pour mettre des maths.
 		</fieldset>
 		<!--    Peut-on rendre un fichier ?      -->
 		<fieldset>
-		    <legend>Correction</legend>
+		    <legend><span class="legend">Correction</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
 		    <div class="wrapperFieldset">
 			Cette réponse est
 			<input type="radio" value="true" name="correctness-<%= i %>" id="true-<%= i %>" <%= reponsePossible.validity == "true" ? "checked" : "" %>/>
@@ -106,12 +106,12 @@ Utiliser $...$ pour mettre des maths.
 		</fieldset>		<!--    Coefficient                      -->
 		
 		<fieldset>
-		    <legend>Notation</legend>
+		    <legend><span class="legend">Notation</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
 		    <div class="wrapperFieldset">
 			<div
 			    class="text"
 				   style="text-align:left;margin:3px;">
-			    Cette réponse est sur  <input style="width:30px;" name="max-points-<%= i %>" type="number" value="<%= reponsePossible.maxPoints %>"> points, et a pour coef  <input style="width:30px;" name="coef-rep-<%= i %>" type="number" value="<%= reponsePossible.coef %>">.<br>
+			    Cette réponse est sur  <input style="width:30px;" name="max-points-<%= i %>" type="number" value="<%= reponsePossible.maxPoints %>"> points, et a pour coef  <input class="coef" style="width:30px;" name="coef-rep-<%= i %>" type="number" value="<%= reponsePossible.coef %>">.<br>
 			    <table>
 				<tr>
 				    <td></td>

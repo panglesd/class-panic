@@ -360,3 +360,13 @@ input[type=checkbox] {
 .select.set-to_correct {
     color:white
 }
+.hidden {
+    display:none;
+}
+
+legend span {
+    margin-right:10px;
+}
+legend .legend {
+    font-size:1.2em;
+}
