@@ -84,7 +84,7 @@ exports.students = function(courseID, callback) {
 }
 
 exports.subscribeStudent = function(studentID, courseID, callback) {
-    query = "INSERT INTO subscription(courseID, userID) VALUES (?,?) ON DUPLICATE KEY UPDATE courseID = courseID";
+    query = "INSERT INTO subscription(courseID, userID, `isTDMan`, `canRoomCreate`, `canRoomUpdate`, `canRoomDelete`, `canSetUpdate`, `canSetCreate`, `canSetDelete`, `canSubscribe`, `canOwnRoom`, `canAllRoom`, `canOwnSet`, `canAllSet`, `canAddDocs`) VALUES (?,?, 0,0,0,0,0,0,0,0,0,0,0,0,0) ON DUPLICATE KEY UPDATE courseID = courseID";
     bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res);});
 }
 exports.subscribeTDMan = function(studentID, courseID, permission, callback) {
