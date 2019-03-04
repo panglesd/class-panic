@@ -165,7 +165,10 @@ exports.getByIndex = function (questionIndex, roomID, callback) {
 	console.log(err);
 	let q = rows[0];
 	q.reponses = JSON.parse(q.reponses);
-	callback(err, q);
+	exports.maxPointsOfQuestion(q, (err, maxP)=> {
+	    q.maxPoints = maxP;
+	    callback(err, q);
+	});
     });
 };
 
@@ -458,9 +461,14 @@ exports.correctSubmission = function(question, submission, callback) {
 		if(rep.validity == "true") repValidity = 1;
 		else if(rep.validity == "false") repValidity = 0;
 		else repValidity = NaN;
-		if(repSubm.selected)
-		    submPoints += (repValidity)*rep.strategy.selected.vrai + (1-repValidity)*rep.strategy.selected.faux;
+		if(repSubm.selected){
+		    if(rep.strategy.selected.vrai != rep.strategy.selected.faux)
+			submPoints += (repValidity)*rep.strategy.selected.vrai + (1-repValidity)*rep.strategy.selected.faux;
+		    else
+			submPoints += rep.strategy.selected.vrai;
+		}
 		if(!repSubm.selected)
+		    if(rep.strategy.unselected.vrai != rep.strategy.unselected.faux)
 		    submPoints += (repValidity)*rep.strategy.unselected.vrai + (1-repValidity)*rep.strategy.unselected.faux;
 	    }
 	    totPoints += rep.maxPoints;

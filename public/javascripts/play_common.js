@@ -173,8 +173,11 @@ function addCorrection(question, elem, rep, index) {
     // Si la correction est présente
     if(rep.validity != "to_correct") {
 	elem.classList.add(rep.validity);
-	if(typeof(rep.validity) == "number")
-	    elem.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(128*(1-rep.validity)) +","+ Math.floor(128*rep.validity)+",0)";
+	let repValidity;
+	if(rep.validity == "true") repValidity = 1;
+	if(rep.validity == "false") repValidity = 0;
+	if(typeof(repValidity)=="number")
+	    elem.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(128*(1-repValidity)) +","+ Math.floor(128*repValidity)+",0)";
 	else
 	    elem.style.boxShadow =  "";
     }
@@ -298,7 +301,7 @@ function afficheSubmission (submission) {
 	    elemReponse.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(188*(1-submReponse.validity)) +","+ Math.floor(138*submReponse.validity)+",0)";
 	    elemReponse.querySelector(".pourcentage").value = submReponse.validity;
 	}
-	else if (typeof(submReponse.validity) == "string"){
+	else if (submReponse.validity == "?"){
 	    elemReponse.style.boxShadow =  "";
 	    elemReponse.querySelector(".pourcentage").value = "";
 	}
