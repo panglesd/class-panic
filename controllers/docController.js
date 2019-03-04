@@ -63,6 +63,7 @@ const allMime = {
     ".ogv": "video/ogg",
     ".ogx": "application/ogg",
     ".otf": "font/otf",
+    ".php": "text/plain",
     ".png": "image/png",
     ".pdf": "application/pdf",
     ".ppt": "application/vnd.ms-powerpoint",
