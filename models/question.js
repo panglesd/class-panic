@@ -353,18 +353,18 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	    });
 	}, (err) => {
 	    if(err) // Il y a eu une erreur lors de l'enregistrement des fichiers : on préfère tout supprimer (il faudrait aussi supprimer les fichiers enregistrés...)
-		// VRAIMENT ??????????????????
- 		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
+		// VRAIMENT ?????????????????? c'etait un reste de "create"
+// 		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
 		    // fs.rm(path);
 		    callback(err);
-		});
+//		});
 	    else {
 		question.reponses.forEach((rep, n_ans) => {
 		    newQuestion.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
 		});
 		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ? WHERE `id` = ?",
 			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, questionID], (err, res) => {
-			      updateGradesOfQuestion(question, (err, res) => {
+			      exports.updateGradesOfQuestion(question, (err, res) => {
 				  callback(err, questionID);
 			      });
 			  });
