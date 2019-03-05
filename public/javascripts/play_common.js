@@ -181,30 +181,26 @@ function addCorrection(question, elem, rep, index) {
 	else
 	    elem.style.boxShadow =  "";
     }
-    if(rep.texted) {
-	if(rep.correction){
-	    elem.querySelector(".correcWrapper").style.display = "";
-	    elem.querySelector(".correcWrapper .correc").innerText = rep.correction;
-	}
+    if(rep.correction){
+	elem.querySelector(".correcWrapper").style.display = "";
+	elem.querySelector(".correcWrapper .correc").innerText = rep.correction;
     }
-    if(rep.hasFile == true || ["single","multi","true"].includes(rep.hasFile)) {
-	if(rep.correcFilesInfo) {
-	    elem.querySelector(".fileCorrecWrapper").style.display="";
-	    rep.correcFilesInfo.forEach((fileInfo) => {
-		let divOneCorrection = document.createElement("div");
-		divOneCorrection.classList.add("correcFileArea");
-		let linkToCorrection = document.createElement("a");
-		linkToCorrection.href = "fileCorrect/"+question.id+"/"+index+"/"+fileInfo;
-		linkToCorrection.target = "_blank";
-		linkToCorrection.style.color = "blue";
-		linkToCorrection.textContent = /*"Correction : "+*/fileInfo;
-		divOneCorrection.appendChild(linkToCorrection);
-		elem.querySelector(".fileCorrecWrapper").appendChild(divOneCorrection);
-	    });
-	}
+    if(rep.correcFilesInfo.length>0) {
+	elem.querySelector(".fileCorrecWrapper").style.display="";
+	rep.correcFilesInfo.forEach((fileInfo) => {
+	    let divOneCorrection = document.createElement("div");
+	    divOneCorrection.classList.add("correcFileArea");
+	    let linkToCorrection = document.createElement("a");
+	    linkToCorrection.href = "fileCorrect/"+question.id+"/"+index+"/"+fileInfo;
+	    linkToCorrection.target = "_blank";
+	    linkToCorrection.style.color = "blue";
+	    linkToCorrection.textContent = /*"Correction : "+*/fileInfo;
+	    divOneCorrection.appendChild(linkToCorrection);
+	    elem.querySelector(".fileCorrecWrapper").appendChild(divOneCorrection);
+	});
     }
-
-    return elem;}
+    return elem;
+}
 
 function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect){
     let wrapper = document.querySelector("#wrapperAnswer");

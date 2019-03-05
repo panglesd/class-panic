@@ -131,10 +131,11 @@ function formatQuestionFromBody(body, files) {
 	    maxPoints: parseInt(body["max-points-"+i]),
 	    texted: body["texted-"+i] ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
-	    correcFilesInfo: correcFilesInfo
+	    correcFilesInfo: correcFilesInfo,
+	    correction: body["correction-"+i]
 	};
-	if(reponse[i].texted) 
-	    reponse[i].correction = body["correction-"+i];
+	// if(reponse[i].texted) 
+	//     reponse[i].
 	i++;
     }
     question.reponses = reponse;
