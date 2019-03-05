@@ -37,16 +37,17 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 		else
 		    callback(null,
 			     {
-				 reponses : [{
-				     reponse: "",
-				     validity: "to_correct",
-				     coef: 1,
-				     texted: false,
-				     correcFilesInfo: [],
-				     strategy: { selected: { vrai: 1, faux: 0}, unselected: { vrai: 0, faux: 0}},
-				     maxPoints:1
-				     // correcFilesInfo: [{fileName:"test.pdf"},{fileName:"test2.pdf"}]
-				 }],
+				 reponses : [// {
+				 //     reponse: "",
+				 //     validity: "to_correct",
+				 //     coef: 1,
+				 //     texted: false,
+				 //     correcFilesInfo: [],
+				 //     strategy: { selected: { vrai: 1, faux: 0}, unselected: { vrai: 0, faux: 0}},
+				 //     maxPoints:1
+				 //     // correcFilesInfo: [{fileName:"test.pdf"},{fileName:"test2.pdf"}]
+				 // }
+					    ],
 				 coef:1,
 				 enonce: "",
 				 description:"",
