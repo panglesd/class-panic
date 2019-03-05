@@ -51,7 +51,7 @@ function afficheQuestion(question) {
 //    summaryWrapper.classList.add("reponse");
     summaryWrapper.classList.add("summary");
     summaryWrapper.classList.add("notSelected");
-    summaryWrapper.innerHTML += "Note finale : <span id='note'>N/A</span> Coéf : <span id='coef'>N/A</span>";
+    summaryWrapper.innerHTML += "Note finale : <span id='note'>N/A</span> Coefficient : <span id='coef'>N/A</span>";
     summaryWrapper.style.display = "none";
     wrapper.appendChild(summaryWrapper);
 
@@ -145,7 +145,7 @@ function createResponse(question, rep, index) {
     fileCorrecWrapper.classList.add("fileCorrecWrapper");
     fileCorrecWrapper.style.display="none";
     let legendCorrec = document.createElement("legend");
-    legendCorrec.innerText = "Fichiers Corrigés";
+    legendCorrec.innerText = "Fichiers de correction";
     fileCorrecWrapper.appendChild(legendCorrec);
     elem.appendChild(fileCorrecWrapper);
 
@@ -295,7 +295,9 @@ function afficheSubmission (submission) {
 	// }
 	if(typeof(submReponse.validity) == "number") {
 	    elemReponse.style.boxShadow =  "0 0 8px 10px rgb("+ Math.floor(188*(1-submReponse.validity)) +","+ Math.floor(138*submReponse.validity)+",0)";
-	    elemReponse.querySelector(".pourcentage").value = submReponse.validity;
+	    let temp;
+	    if((temp = elemReponse.querySelector(".pourcentage")))
+		temp.value = submReponse.validity;
 	}
 	else if (submReponse.validity == "?"){
 	    elemReponse.style.boxShadow =  "";
@@ -325,7 +327,9 @@ function afficheSubmission (submission) {
 	    else
 		note = submReponse.validity*questReponse.strategy.unselected.vrai + (1-submReponse.validity)* questReponse.strategy.unselected.faux;
 	    totalPoints += note;
-	    elemReponse.querySelector(".note").innerText = note+"/"+maxPoints;
+	    let temp;
+	    if((temp = elemReponse.querySelector(".note")))
+		temp.innerText = note+"/"+maxPoints;
 	}
 	// Ici gérer les corrections personnelles par reponse
 	// elemReponse.querySelector(".correcPerso").innerText = reponse.correcPerso
@@ -337,11 +341,13 @@ function afficheSubmission (submission) {
 	let mark = document.querySelector(".summary #mark");
 	if(mark)
 	    mark.value = submission.correct;
-	    let autoCalcul = document.querySelector(".summary .reautomatiser");
-	if(submission.strategy == "manual")
-	    autoCalcul.style.display = "";
-	else 
-	    autoCalcul.style.display = "none";
+	let autoCalcul = document.querySelector(".summary .reautomatiser");
+	if(autoCalcul) {
+	    if(submission.strategy == "manual")
+		autoCalcul.style.display = "";
+	    else 
+		autoCalcul.style.display = "none";
+	}
     }
 //	autoCalcul.value = submission.strategy == "manual" ? "Automatiser la correction" : "Choisir une note fixe";
 //	autoCalcul
