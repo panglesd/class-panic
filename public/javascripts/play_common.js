@@ -366,7 +366,7 @@ function affFileInfo(elemReponse, filesInfo, n_ans) {
     filesInfo.forEach((fileInfo) => {
 	console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
 	let fileInfoElem = document.createElement("li");
-	fileInfoElem.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+(currentStudent.id ? (currentStudent.id+"/" ): "")+fileInfo.fileName+"'></a></td></tr>"+
+	fileInfoElem.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+(typeof(currentStudent)!="undefined" ? (currentStudent.id+"/" ): "")+fileInfo.fileName+"'></a></td></tr>"+
 	    //		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
 	"<tr><td>Date : </td><td  style='padding-left: 10px;' class='tstamp'></td></tr>"+
 	    (typeof removeFile == "function" ? "<tr><td></td><td  style='padding-left: 10px;' class='delete'><a style='color:#990000'>Supprimer</a></td></tr>" : "")+
