@@ -11,26 +11,50 @@ var Question = require("./question");
 
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
-//	console.log(this.sql);
-	resu[0].question = JSON.parse(resu[0].question);
-	resu[0].status = JSON.parse(resu[0].status);
-	callback(err, resu[0]);});
+	//	console.log(this.sql);
+	if(err) {
+	    console.log(err);
+	    callback(err, null);
+	}
+	else if(resu[0]) {
+	    resu[0].question = JSON.parse(resu[0].question);
+	    resu[0].status = JSON.parse(resu[0].status);
+	    callback(err, resu[0]);
+	}
+	else
+	    callback("Aucune room d'id "+roomID);
+    });
 };
 
 exports.getOwnedByID = function(user, roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [roomID, user.id], function (err, resu) {
-	resu[0].question = JSON.parse(resu[0].question);
-	resu[0].status = JSON.parse(resu[0].status);
-	callback(err, resu[0]);
+	if(err) {
+	    console.log(err);
+	    callback(err, null);
+	}
+	else if(resu[0]) {
+	    resu[0].question = JSON.parse(resu[0].question);
+	    resu[0].status = JSON.parse(resu[0].status);
+	    callback(err, resu[0]);
+	}
+	else
+	    callback("Aucune room d'id "+roomID);
     });
 };
 
 exports.getControllableByID = function(user, roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `rooms`.courseID IN (SELECT courseID FROM subscription WHERE userID= ? AND isTDMan=1) AND id = ?", [user.id, roomID], function (err, resu) {
-	console.log(err);
-	resu[0].question = JSON.parse(resu[0].question);
-	resu[0].status = JSON.parse(resu[0].status);
-	callback(err, resu[0]);
+	if(err) {
+	    console.log(err);
+	    callback(err, null);
+	}
+	else if(resu[0]) {
+	    resu[0].question = JSON.parse(resu[0].question);
+	    resu[0].status = JSON.parse(resu[0].status);
+	    callback(err, resu[0]);
+	}
+	else
+	    callback("Aucune room d'id "+roomID);
     });
 };
 
@@ -80,9 +104,11 @@ exports.getFromOwnedCourse = function (user, courseID, callback) {
 
 // By Name
 
-exports.getByName= function (room, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) { callback(rows[0]); });
-};
+// exports.getByName= function (room, callback) {
+//     bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) {
+// 	callback(rows[0]);
+//     });
+// };
 
 /***********************************************************************/
 /*       Gestion CRUD des rooms                                        */
