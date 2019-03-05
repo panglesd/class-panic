@@ -129,7 +129,7 @@ function formatQuestionFromBody(body, files) {
 	    strategy: strategy,
 	    coef: parseInt(body["coef-rep-"+i]),
 	    maxPoints: parseInt(body["max-points-"+i]),
-	    texted: body["texted-"+i]=="true" ? true : false,
+	    texted: body["texted-"+i] ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
 	    correcFilesInfo: correcFilesInfo
 	};
