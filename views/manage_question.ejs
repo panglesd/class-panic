@@ -12,7 +12,7 @@
 <h2> <%= newQuestion ? "Création" : "Modification" %> d'une question</h2>
 <!--	Vous pouvez vous connecter &agrave; l'une des salles suivantes :-->
 <form  encType="multipart/form-data"  id="newQuestion" method="post" action="<%= config.PATH %>/course/<%= course.id %>/set/<%= set.id %>/question/<%= newQuestion ? "create" : (question.id+"/update") %>">
-    <ul class="room" id="listeQue">
+    <ul class="room">
 	<li class="room">
 	    <span class="froom">Énoncé :</span>
 	    <textarea <%= canModify ? "" : "readonly" %> name="enonce" style="width:100%;height:50px;" placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"><%= question.enonce %></textarea>
@@ -31,143 +31,160 @@ Utiliser $...$ pour mettre des maths.
 "><%= question.description %></textarea>
 	    </label>
 	</li>
-	<label><input <%- canModify ? "" : "onclick='return false'" %> name="multi" id="multi" style="vertical-align: middle;" type="checkbox" <%= question.type == "multi" ? "checked" : "" %>>Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><br>
-	<label>Préremplir la question en mode
-	    <select <%- canModify ? "" : "onclick='return false'" %> name="strategy" id="strategy" >
-		<option <%= question.strategy == "manual" ? "selected" : "" %>  value="normal">Normal : 1 point par question juste</option>
-		<option <%= question.strategy == "QCM" ? "selected" : "" %>  value="QCM">QCM : 1 par réponse juste, -1 par erreur </option>
-		<option <%= question.strategy == "all_or_0" ? "selected" : "" %> value="hardQCM">QCM, on perd des points par réponse oubliées</option>
-	    </select><br>
-	    <div> Description de comment corriger </div> <br>
+	<fieldset>
+	    <legend>Options</legend>
+	    <label><input <%- canModify ? "" : "onclick='return false'" %> name="multi" id="multi" style="vertical-align: middle;" type="checkbox" <%= question.type == "multi" ? "checked" : "" %>>Multi-réponses (les étudiants peuvent répondre plusieurs réponses)</label><br>
+	    <!-- <div> Description de comment corriger </div> <br> -->
+	    <div> Corriger <input required onchange="updateGlobalNota(this)" type="radio" name="corrType" value="answerByAnswer" <%= question.correcType == "answerByAnswer" ? "checked" : "" %>> réponse par réponse, <input required onchange="updateGlobalNota(this)" type="radio" name="corrType" value="globally" <%= question.correcType == "globally" ? "checked" : "" %>> avec un barème global </div> <br>
 	    Coefficient :
 	    <select <%- canModify ? "" : "onclick='return false'" %> name="coef" id="coef">
 		<% for(let i=1; i<10; i++){%><option <%= question.coef == i ? "selected" : ""%>><%= i %></option> <% } %>
 	    </select>
-	</label>
-	<% question.reponses.forEach( function(reponsePossible, i) { %>
-	    <li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
-		<!--    Numéro de réponse                -->
-		<span class="froom nreponse"> Réponse <%= i %> :</span>
-		<!--    Texte de la réponse              -->
-		<textarea
-		    rows="2"
-		    <%= canModify ? "" : "readonly" %>
-		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
-		    class="value-reponse-textarea"
-		    name="value-reponse-<%= i %>"
-		    style="width:100%"><%= reponsePossible.reponse %></textarea>
-		<!--    Réponse custom ou non            -->
-		<fieldset>
-		    <legend><span class="legend"> Type de question</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
-		    <div class="wrapperFieldset">
-			<input class="texted" type="checkbox" class="texted-hidden" name="texted-<%= i %>" <%= reponsePossible.texted ? "checked" : ""%>> <label for="texted-<%= i %>">Possède un champs texte.</label>
-			<input class="filed" name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
-			<!-- <div
-			     class="text <%= reponsePossible.texted ? "texted" : "" %>"
-			     style="text-align:left;margin:3px;">
-			     <span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span>
-			     </div> -->
-		    </div>
-		</fieldset>
-		<!--    Peut-on rendre un fichier ?      -->
-		<fieldset>
-		    <legend><span class="legend">Correction</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
-		    <div class="wrapperFieldset">
-			Cette réponse est
-			<input type="radio" value="true" name="correctness-<%= i %>" id="true-<%= i %>" <%= reponsePossible.validity == "true" ? "checked" : "" %>/>
-			<label for="true-<%= i %>"> Juste </label>
-			<input type="radio" id="tocorrect-<%= i %>"  <%= reponsePossible.validity == "to_correct" ? "checked" : "" %> value="to_correct" name="correctness-<%= i %>"/>
-			<label for="tocorrect-<%= i %>"> À corriger </label>
-			<input type="radio" id="false-<%= i %>"  <%= reponsePossible.validity == "false" ? "checked" : "" %> value="false" name="correctness-<%= i %>"/>
-			<label for="false-<%= i %>"> Fausse </label>
-			<textarea
-			    rows="2"
-			    class="correction-textarea"
-			    name="correction-<%= i %>"
-			    style="width:100%"
-			    placeholder="Commentaire ou correction" ><%= reponsePossible.correction %></textarea>
-			<!-- placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %> -->
-			<div
-			    class="text"
-			    style="text-align:left;margin:3px;">
-			    
-			    <!--		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple </span> -->
-			    <div>
-				<span style="font-size: 1em;">Ajouter des fichiers pour la correction : </span><input name="correcFile-<%= i %>" multiple type="file">
-				<span style="font-size: 1em;">Enlever des fichiers :</span>
-				<select multiple name="delete-<%= i %>">
-				    <!-- <option value="prout1">Tout garder</option> -->
-				    <% reponsePossible.correcFilesInfo.forEach((fileInfo) => { %>
-					<option value="<%= fileInfo %>"><%= fileInfo %></option>
-				    <% }); %>
-				</select>
-			    </div>
-			</div></div>		
-		</fieldset>		<!--    Coefficient                      -->
-		
-		<fieldset>
-		    <legend><span class="legend">Notation</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
-		    <div class="wrapperFieldset">
-			<div
-			    class="text"
-				   style="text-align:left;margin:3px;">
-			    Cette réponse est sur  <input style="width:30px;" name="max-points-<%= i %>" type="number" value="<%= reponsePossible.maxPoints %>"> points, et a pour coef  <input class="coef" style="width:30px;" name="coef-rep-<%= i %>" type="number" value="<%= reponsePossible.coef %>">.<br>
-			    <table>
-				<tr>
-				    <td></td>
-				    <td>Faux</td>
-				    <td>Juste</td></tr>
-				<tr>
-				    <td>Selectionnée</td>
-				    <td>
-					<input style="width:30px;" name="selected-false-<%= i %>" type="number" value="<%= reponsePossible.strategy.selected.faux %>"> points par défaut
-				    </td>
-				    <td>
-					<input style="width:30px;" name="selected-true-<%= i %>" type="number" value="<%= reponsePossible.strategy.selected.vrai %>"> points par défaut
-				    </td>
-				</tr>
-				<tr>
-				    <td>Non selectionnée</td>
-				    <td>
-					<input style="width:30px;" name="unselected-false-<%= i %>" type="number" value="<%= reponsePossible.strategy.unselected.faux %>"> points par défaut
-				    </td>
-				    <td>
-					<input style="width:30px;" name="unselected-true-<%= i %>" type="number" value="<%= reponsePossible.strategy.unselected.vrai %>"> points par défaut
-				    </td>
-				</tr>
-			    </table>
-			    <!-- Juste et sélectionnée, elle apporte par défaut <input style="width:30px;" name="selected-points-<%= i %>" type="number" value="<%= reponsePossible.selectedPoints %>"> points. -->
-			    <!-- et ne pas la sélectionner en rapporte  <input name="unselected-points-<%= i %>" type="number" value="<%= reponsePossible.unSelectedPoints %>"  style="width:30px;" >. -->
-			    <% if(canModify) { %>
-				<!-- <div>
-				     <ul>
-				     <li class="set-true select <%= reponsePossible.validity=="true" ? "selected" : "" %>" >
-				     Réponse juste
-				     </li>
-				     <li class="set-to_correct select <%= reponsePossible.validity=="to_correct" ? "selected" : "" %>" >
-				     Réponse à corriger
-				     </li>
-				     <li class="set-false select <%= reponsePossible.validity=="false" ? "selected" : "" %>" >
-				     Réponse fausse
-				     </li>
-				     </ul>
-				     </div> -->
-			    <% } %>
-			</div>		
-		    </div>		</fieldset>	<!--    Boutons pour le management       -->
-		    <div>
-			<ul>
-			    <li style="display:inline-block; margin-right:20px;">
-				<a class="room remove">Enlever cette réponse</a>
-			    </li>
-			</ul>
-		    </div>
-	    </li>
+	    <!-- </label> -->
+ 	    Préremplir la question en mode
+	    <select <%- canModify ? "" : "onclick='return false'" %> name="strategy" id="strategy" >
+		<option <%= question.strategy == "manual" ? "selected" : "" %>  value="normal">Normal : 1 point par question juste</option>
+		<option <%= question.strategy == "QCM" ? "selected" : "" %>  value="QCM">QCM : 1 par réponse juste, -1 par erreur </option>
+		<option <%= question.strategy == "all_or_0" ? "selected" : "" %> value="hardQCM">QCM, on perd des points par réponse oubliées</option>
+	    </select>
+	</fieldset>
+	<fieldset id="listeQue">
+	    <legend> Réponses </legend>
+	    <% question.reponses.forEach( function(reponsePossible, i) { %>
+		<li class="reponse <%= reponsePossible.validity //? "true" : "false" %>">
+		    <!--    Numéro de réponse                -->
+		    <span class="froom nreponse"> Réponse <%= i %> :</span>
+		    <!--    Texte de la réponse              -->
+		    <textarea
+			rows="2"
+			<%= canModify ? "" : "readonly" %>
+			placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"
+			class="value-reponse-textarea"
+			name="value-reponse-<%= i %>"
+			style="width:100%"><%= reponsePossible.reponse %></textarea>
+		    <!--    Réponse custom ou non            -->
+		    <fieldset class="fieldTypeDeQuestion">
+			<legend><span class="legend"> Type de question</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
+			<div class="wrapperFieldset">
+			    <input class="texted" type="checkbox" class="texted-hidden" name="texted-<%= i %>" <%= reponsePossible.texted ? "checked" : ""%>> <label for="texted-<%= i %>">Possède un champs texte.</label>
+			    <input class="filed" name="hasFile-<%= i %>" type="checkbox" <%= ["single", "multiple", "true"].includes(reponsePossible.hasFile) ? "checked" : "" %>><span class="fileToggle">Ajouter un upload de fichier</span>
+			    <!-- <div
+				 class="text <%= reponsePossible.texted ? "texted" : "" %>"
+				 style="text-align:left;margin:3px;">
+				 <span><%= reponsePossible.texted ? "Enlever le" : "Ajouter un" %> champs texte</span>
+				 </div> -->
+			</div>
+		    </fieldset>
+		    <!--    Peut-on rendre un fichier ?      -->
+		    <fieldset class="fieldCorrection">
+			<legend><span class="legend">Correction</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
+			<div class="wrapperFieldset">
+			    Cette réponse est
+			    <input type="radio" value="true" name="correctness-<%= i %>" id="true-<%= i %>" <%= reponsePossible.validity == "true" ? "checked" : "" %>/>
+			    <label for="true-<%= i %>"> Juste </label>
+			    <input type="radio" id="tocorrect-<%= i %>"  <%= reponsePossible.validity == "to_correct" ? "checked" : "" %> value="to_correct" name="correctness-<%= i %>"/>
+			    <label for="tocorrect-<%= i %>"> À corriger </label>
+			    <input type="radio" id="false-<%= i %>"  <%= reponsePossible.validity == "false" ? "checked" : "" %> value="false" name="correctness-<%= i %>"/>
+			    <label for="false-<%= i %>"> Fausse </label>
+			    <textarea
+				rows="2"
+				class="correction-textarea"
+				name="correction-<%= i %>"
+				style="width:100%"
+				placeholder="Commentaire ou correction" ><%= reponsePossible.correction %></textarea>
+			    <!-- placeholder="Vous pouvez rentrer la correction/justification/explication" ><%= reponsePossible.texted ? reponsePossible.correction : "" %> -->
+			    <div
+				class="text"
+				style="text-align:left;margin:3px;">
+				
+				<!--		    <input name="multipleFile-<%= i %>" type="checkbox">Multiple </span> -->
+				<div>
+				    <span style="font-size: 1em;">Ajouter des fichiers pour la correction : </span><input name="correcFile-<%= i %>" multiple type="file">
+				    <span style="font-size: 1em;">Enlever des fichiers :</span>
+				    <select multiple name="delete-<%= i %>">
+					<!-- <option value="prout1">Tout garder</option> -->
+					<% reponsePossible.correcFilesInfo.forEach((fileInfo) => { %>
+					    <option value="<%= fileInfo %>"><%= fileInfo %></option>
+					<% }); %>
+				    </select>
+				</div>
+			    </div></div>		
+		    </fieldset>		<!--    Coefficient                      -->
+		    
+		    <fieldset class="fieldNotation">
+			<legend><span class="legend">Notation</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>
+			<div class="wrapperFieldset">
+			    <div
+				class="text"
+				style="text-align:left;margin:3px;">
+				Cette réponse est sur  <input style="width:30px;" name="max-points-<%= i %>" type="number" value="<%= reponsePossible.maxPoints %>"> points, et a pour coef  <input class="coef" style="width:30px;" name="coef-rep-<%= i %>" type="number" value="<%= reponsePossible.coef %>">.<br>
+				<input type="button" value="Normal">
+				<input type="button" value="QCM">
+				<input type="button" value="QCM Hardcore">
+				<input type="button" value="QCM Ultra Hardcore">
+				<table>
+				    <tr>
+					<td></td>
+					<td>Faux</td>
+					<td>Juste</td></tr>
+				    <tr>
+					<td>Selectionnée</td>
+					<td>
+					    <input style="width:30px;" name="selected-false-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy) != "undefined" ? reponsePossible.strategy.selected.faux : "" %>"> points par défaut
+					</td>
+					<td>
+					    <input style="width:30px;" name="selected-true-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.selected.vrai : "" %>"> points par défaut
+					</td>
+				    </tr>
+				    <tr>
+					<td>Non selectionnée</td>
+					<td>
+					    <input style="width:30px;" name="unselected-false-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.unselected.faux : "" %>"> points par défaut
+					</td>
+					<td>
+					    <input style="width:30px;" name="unselected-true-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.unselected.vrai : "" %>"> points par défaut
+					</td>
+				    </tr>
+				</table>
+				<!-- Juste et sélectionnée, elle apporte par défaut <input style="width:30px;" name="selected-points-<%= i %>" type="number" value="<%= reponsePossible.selectedPoints %>"> points. -->
+				<!-- et ne pas la sélectionner en rapporte  <input name="unselected-points-<%= i %>" type="number" value="<%= reponsePossible.unSelectedPoints %>"  style="width:30px;" >. -->
+				<% if(canModify) { %>
+				    <!-- <div>
+					 <ul>
+					 <li class="set-true select <%= reponsePossible.validity=="true" ? "selected" : "" %>" >
+					 Réponse juste
+					 </li>
+					 <li class="set-to_correct select <%= reponsePossible.validity=="to_correct" ? "selected" : "" %>" >
+					 Réponse à corriger
+					 </li>
+					 <li class="set-false select <%= reponsePossible.validity=="false" ? "selected" : "" %>" >
+					 Réponse fausse
+					 </li>
+					 </ul>
+					 </div> -->
+				<% } %>
+			    </div>		
+			</div>		</fieldset>	<!--    Boutons pour le management       -->
+			<div>
+			    <ul>
+				<li style="display:inline-block; margin-right:20px;">
+				    <a class="room remove">Enlever cette réponse</a>
+				</li>
+			    </ul>
+			</div>
+		</li>
 	    <% }); %>
 	    <% if(canModify) { %>
 		<div  id="ajoutrep"></div>
-		<li onclick="addAnswer()" class="room"> <span class="froom">+</span></li>
-		<input type="submit" value="Enregistrer cette question">
+		<li class="room" onclick="addAnswer()"><span class="froom">+</span></li>
+	</fieldset>
+	<fieldset class="notaGlobalWrapper">
+	    <legend> Critères de correction </legend>
+	    <div class="notaGlobalList">
+	    </div>
+	    <span onclick="addCriteria()"> Ajouter un critère </span>
+	</fieldset>
+	<input type="submit" value="Enregistrer cette question">
 	    <% } %>
     </ul>
 </form>
@@ -188,6 +205,10 @@ Utiliser $...$ pour mettre des maths.
 <% } %>
 <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script>
 <script>
-autosize(document.querySelectorAll('textarea'));
+ autosize(document.querySelectorAll('textarea'));
+ <% question.criteres.forEach((critere, index) => { %>
+ addCriteria(<%- JSON.stringify(critere) %>);
+ <% }); %> 
+ 
 </script>
 <%- include('admin_footer'); -%>

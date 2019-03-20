@@ -71,14 +71,19 @@ module.exports = function(io) {
 	    }
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
-		if(!socket.room.status.showCorrecPerso) {
+		delete(submission.customQuestion);
+		delete(submission.questionText);delete(submission.setText);delete(submission.roomText);
+		if(!socket.room.status.showNotes) {
 		    delete(submission.correct);
-		    delete(submission.customQuestion);
-		    delete(submission.questionText);delete(submission.setText);delete(submission.roomText);
 		    submission.response.forEach((rep) => {
 			delete(rep.validity);
-			delete(rep.customComment);
-			// delete commentaire perso etc...
+		    });
+		}
+		if(!socket.room.status.showCorrecPerso) {
+		    // delete commentaire perso etc...
+		    // delete(submission.customComment)
+		    submission.response.forEach((rep) => {
+			delete(rep.customComment);			
 		    });
 		}
 		socket.emit("newQuestion", question);
@@ -86,7 +91,7 @@ module.exports = function(io) {
 	    });
 	});
     };
-
+    
     
     io.of('/cc').on('connection', function(socket) {
 

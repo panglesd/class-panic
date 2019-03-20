@@ -51,7 +51,9 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 				 coef:1,
 				 enonce: "",
 				 description:"",
-				 type:"multi"
+				 type:"multi",
+				 correcType: "1",
+				 criteres:[]
 			     });
 	    },
 	    course : function(callback) {
@@ -111,7 +113,32 @@ function formatQuestionFromBody(body, files) {
 	let correcFilesInfo = [];
 	if(Array.isArray(files["correcFile-"+i])) correcFilesInfo = files["correcFile-"+i];
 	else if (files["correcFile-"+i]) correcFilesInfo = [files["correcFile-"+i]];
-	let strategy = {
+	// let strategy;
+	//     strategy = {
+	// 	selected: {
+	// 	    vrai: parseInt(body["selected-true-"+i]),
+	// 	    faux: parseInt(body["selected-false-"+i])
+	// 	},
+	// 	unselected: {
+	// 	    vrai: parseInt(body["unselected-true-"+i]),
+	// 	    faux: parseInt(body["unselected-false-"+i])
+	// 	}
+	//     };
+	reponse[i]= {
+	    reponse: body["value-reponse-"+i] ,
+	    validity: body["correctness-"+i],
+	    // selectedPoints: parseInt(body["selected-points-"+i]),
+	    // unSelectedPoints: parseInt(body["unselected-points-"+i]),
+	    // strategy: strategy,
+	    coef: parseInt(body["coef-rep-"+i]),
+	    maxPoints: parseInt(body["max-points-"+i]),
+	    texted: body["texted-"+i] ? true : false,
+	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
+	    correcFilesInfo: correcFilesInfo,
+	    correction: body["correction-"+i]
+	};
+//	if(body["corrType"]=="answerByAnswer")
+	reponse[i].strategy = {
 	    selected: {
 		vrai: parseInt(body["selected-true-"+i]),
 		faux: parseInt(body["selected-false-"+i])
@@ -121,24 +148,24 @@ function formatQuestionFromBody(body, files) {
 		faux: parseInt(body["unselected-false-"+i])
 	    }
 	};
-	reponse[i]= {
-	    reponse: body["value-reponse-"+i] ,
-	    validity: body["correctness-"+i],
-	    // selectedPoints: parseInt(body["selected-points-"+i]),
-	    // unSelectedPoints: parseInt(body["unselected-points-"+i]),
-	    strategy: strategy,
-	    coef: parseInt(body["coef-rep-"+i]),
-	    maxPoints: parseInt(body["max-points-"+i]),
-	    texted: body["texted-"+i] ? true : false,
-	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
-	    correcFilesInfo: correcFilesInfo,
-	    correction: body["correction-"+i]
-	};
 	// if(reponse[i].texted) 
 	//     reponse[i].
 	i++;
     }
     question.reponses = reponse;
+    question.correcType = body["corrType"];
+    let criteres = [];
+    //    if(body["corrType"]=="globally") {
+    let j=0;
+    while(typeof body["criteria-name-"+j] != "undefined") {
+	criteres[j] = {
+	    name:body["criteria-name-"+j],
+	    coef:body["criteria-coef-"+j]
+	};
+	j++;
+    }
+    //}
+    question.criteres = criteres;
     return question;
 }
 // Create

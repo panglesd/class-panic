@@ -140,6 +140,7 @@ function parseBodytoNewRoom(body) {
     newRoom.status.acceptSubm = body.acceptSubm ? true : false;
     newRoom.status.showTruth = body.showTruth ? true : false;
     newRoom.status.showCorrecPerso = body.showCorrecPerso ? true : false;
+    newRoom.status.showNotes = body.showNotes ? true : false;
     newRoom.name = body.name;
     newRoom.questionSet = body.questionSet;
     newRoom.type = body.type;

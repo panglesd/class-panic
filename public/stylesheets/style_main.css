@@ -370,3 +370,10 @@ legend span {
 legend .legend {
     font-size:1.2em;
 }
+
+.notaAnswer .notaGlobalWrapper {
+    display: none;
+}
+.notaGlobal .fieldNotation {
+    display: none;
+}

@@ -97,6 +97,7 @@ var fs = require("fs");
 
 let formatQuestion = function (question) {
     question.reponses = JSON.parse(question.reponses);
+    question.criteres = JSON.parse(question.criteres);
     exports.maxPointsOfQuestion(question, (err, maxP)=> {
 	question.maxPoints = maxP;
     });
@@ -259,9 +260,9 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
     
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
-	if(er) console.log(er);
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [
-	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.coef
+	if(er) console.log(er); // Il faudrait regrouper reponses, description, type, coef, correcType et criteres dans un seul objet... 
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`, `coef`, `correcType`, `criteres`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.coef, question.correcType, JSON.stringify(question.criteres)
 	], function (err, r) {
 	    if(err) console.log(err);
 	    let questionID = r.insertId;
@@ -362,8 +363,8 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 		question.reponses.forEach((rep, n_ans) => {
 		    newQuestion.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
 		});
-		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ? WHERE `id` = ?",
-			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, questionID], (err, res) => {
+		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ?, `correcType` = ?, `criteres` = ? WHERE `id` = ?",
+			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, newQuestion.correcType, JSON.stringify(newQuestion.criteres), questionID], (err, res) => {
 			      exports.updateGradesOfQuestion(question, (err, res) => {
 				  callback(err, questionID);
 			      });
@@ -422,22 +423,29 @@ exports.correctAndLogSubmission = function(question, submission, callback) {
 
 exports.maxPointsOfQuestion = function(question, callback) {
     let maxPointsTotal = 0;
-    question.reponses.forEach((questReponse) => {
-	let maxPoints;
-	if(questReponse.validity == "true")
-	    maxPoints = Math.max(questReponse.strategy.selected.vrai,
-				 questReponse.strategy.unselected.vrai);
-	else if (questReponse.validity == "false")
-	    maxPoints = Math.max(questReponse.strategy.selected.faux,
-				 questReponse.strategy.unselected.faux);
-	else 
-	    maxPoints = Math.max(questReponse.strategy.selected.vrai,
-				 questReponse.strategy.selected.faux,
-				 questReponse.strategy.unselected.vrai,
-				 questReponse.strategy.unselected.faux);
-	questReponse.maxPoints = maxPoints;
-	maxPointsTotal += maxPoints;
-    });
+    if(question.correcType=="answerByAnswer") {
+	question.reponses.forEach((questReponse) => {
+	    let maxPoints;
+	    if(questReponse.validity == "true")
+		maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				     questReponse.strategy.unselected.vrai);
+	    else if (questReponse.validity == "false")
+		maxPoints = Math.max(questReponse.strategy.selected.faux,
+				     questReponse.strategy.unselected.faux);
+	    else 
+		maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				     questReponse.strategy.selected.faux,
+				     questReponse.strategy.unselected.vrai,
+				     questReponse.strategy.unselected.faux);
+	    questReponse.maxPoints = maxPoints;
+	    maxPointsTotal += maxPoints;
+	});
+    }
+    else {
+	question.criteres.forEach((critere) => {
+	    maxPointsTotal += critere.coef; 
+	});
+    }
     callback(null, maxPointsTotal);
 };
 

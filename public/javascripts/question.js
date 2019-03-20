@@ -131,13 +131,17 @@ function returnHTMLQuestion (i) {
 '			</div></div>		'+
 '		</fieldset>		<!--    Coefficient                      -->'+
 '		'+
-'		<fieldset class="fieldCorrection">'+
+'		<fieldset class="fieldNotation">'+
 '		    <legend><span class="legend">Notation</span> <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>'+
 '		    <div class="wrapperFieldset">'+
 '			<div'+
 '			    class="text"'+
 '				   style="text-align:left;margin:3px;">'+
 '			    Cette réponse est sur  <input style="width:30px;" name="max-points-'+i+'" type="number" value="1"> points, et a pour coef  <input class="coef" style="width:30px;" name="coef-rep-'+i+'" type="number" value="1">.<br>'+
+'			    <input type="button" value="Normal">'+
+'			    <input type="button" value="QCM">'+
+'			    <input type="button" value="QCM Hardcore">'+
+'			    <input type="button" value="QCM Ultra Hardcore">'+
 '			    <table>'+
 '				<tr>'+
 '				    <td></td>'+
@@ -240,4 +244,39 @@ function renumber() {
 function removeElement(elem) {
     elem.remove();
     renumber();
+}
+
+
+function updateGlobalNota(elem) {
+    console.log(elem);
+    if(elem.value == "answerByAnswer") {
+	document.querySelector("#newQuestion").classList.remove("notaGlobal");
+	document.querySelector("#newQuestion").classList.add("notaAnswer");
+    }
+    else if(elem.value == "globally") {
+	document.querySelector("#newQuestion").classList.remove("notaAnswer");	
+	document.querySelector("#newQuestion").classList.add("notaGlobal");
+    }
+}
+updateGlobalNota(document.querySelector('input[name="corrType"]:checked'));
+
+function addCriteria(criteria) {
+    let criteriaBase = document.createElement("div");
+    let i = document.querySelectorAll(".notaGlobalList .criteria").length;
+    criteriaBase.classList.add("criteria");
+    criteriaBase.innerHTML = 'Critère : <input class="criteriaName" name="criteria-name-'+i+'" type="text" placeholder="Critère"/> Coefficient : <input class="criteriaCoef" name="criteria-coef-'+i+'" type="number"/> <span class="remove">Enlever</span>';
+    criteriaBase.querySelector(".remove").addEventListener("click", (ev) => { removeElement(criteriaBase); refreshCriteriaNumbers();});
+    if(criteria) {
+	criteriaBase.querySelector(".criteriaName").value = criteria.name;
+	criteriaBase.querySelector(".criteriaCoef").value = criteria.coef;
+    }
+    document.querySelector(".notaGlobalList").appendChild(criteriaBase);
+}
+function refreshCriteriaNumbers() {
+    document.querySelectorAll(".notaGlobalList .criteria").forEach((crit, i) => {
+	crit.querySelector(".criteriaName").name = "criteria-name-"+i;
+	crit.querySelector(".criteriaCoef").name = "criteria-coef-"+i;
+    });
+    
+    
 }
