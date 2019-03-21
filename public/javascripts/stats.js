@@ -13,16 +13,12 @@ function update() {
 	    "dateEnd"];
     
     list.forEach(function (cond) {
-	//	 console.log(cond);
 	window[cond] = document.querySelector("#"+cond);
-	console.log(window[cond]);
-	console.log(window[cond].value);
 	if(window[cond].value)
 	    filter[cond] = window[cond].value;
     });
     socketStats.emit("stats", filter);
     
-    console.log("filter", filter);
 }
 
 socketStats.on("newStats", (filter, res2) => {
@@ -97,55 +93,55 @@ socketStats.on("newStats", (filter, res2) => {
 		innerHTML += "<td rowspan='"+data.response.length+"'> " + data.correct + "</td>";
 		let d = new Date(Date.parse(data.time));
 		let options = {weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "numeric", minute:"numeric"};
-		innerHTML += "<td rowspan='"+data.response.length+"'> " + d.toLocaleDateString('fr-FR', options) + "</td>"
+		innerHTML += "<td rowspan='"+data.response.length+"'> " + d.toLocaleDateString('fr-FR', options) + "</td>";
 		//		"<tr><td rowspan='"+data.response.length+"'> " + data.fullName + "</td>" +
 	    }
-	    innerHTML += "</tr>"
+	    innerHTML += "</tr>";
 	});
-    })
+    });
     table.innerHTML = "<tr><th>Nom</th><th>Énoncé</th><th>Réponse</th><th>Justification</th><th>Salle</th><th>Set</th><th>Correction</th><th>Date</th></tr>"+
-	innerHTML
+	innerHTML;
     table.querySelectorAll("td.set").forEach((td) => {
 	td.addEventListener("click", (ev) => {
 	    console.log(td.id.split("set-")[1]);
 	    if(document.querySelector("#setID").value ==td.id.split("set-")[1])
-		document.querySelector("#setID").value = ""
+		document.querySelector("#setID").value = "";
 	    else
-		document.querySelector("#setID").value=td.id.split("set-")[1]
-	    update()
-	})
+		document.querySelector("#setID").value=td.id.split("set-")[1];
+	    update();
+	});
     });
     table.querySelectorAll("td.room").forEach((td) => {
 	td.addEventListener("click", (ev) => {
 	    console.log(td.id.split("room-")[1]);
 	    if(document.querySelector("#roomID").value ==td.id.split("room-")[1])
-		document.querySelector("#roomID").value = ""
+		document.querySelector("#roomID").value = "";
 	    else
-		document.querySelector("#roomID").value=td.id.split("room-")[1]
-	    update()
-	})
+		document.querySelector("#roomID").value=td.id.split("room-")[1];
+	    update();
+	});
     });
     table.querySelectorAll("td.user").forEach((td) => {
 	td.addEventListener("click", (ev) => {
 	    console.log(td.id.split("user-")[1]);
 	    if(document.querySelector("#studentNumber").value ==td.querySelector(".studentNumber").id.split("studentNumber-")[1])
-		document.querySelector("#studentNumber").value = ""
+		document.querySelector("#studentNumber").value = "";
 	    else
-		document.querySelector("#studentNumber").value=td.querySelector(".studentNumber").id.split("studentNumber-")[1]
-	    update()
-	})
+		document.querySelector("#studentNumber").value=td.querySelector(".studentNumber").id.split("studentNumber-")[1];
+	    update();
+	});
     });
     table.querySelectorAll("td.enonce").forEach((td) => {
 	td.addEventListener("click", (ev) => {
 	    console.log(td.id.split("enonce-")[1]);
 	    if(document.querySelector("#questionID").value ==td.id.split("enonce-")[1])
-		document.querySelector("#questionID").value = ""
+		document.querySelector("#questionID").value = "";
 	    else
-		document.querySelector("#questionID").value=td.id.split("enonce-")[1]
-	    update()
-	})
+		document.querySelector("#questionID").value=td.id.split("enonce-")[1];
+	    update();
+	});
     });
-    wrapper.appendChild(table)
+    wrapper.appendChild(table);
     
 });
 update();

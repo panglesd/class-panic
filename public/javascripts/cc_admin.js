@@ -96,12 +96,17 @@ function setCustomComment(i, customComment) {
 
 
 function setGlobalGrade(i) {
-    console.log("setStrategy is on!");
 	socketCC.emit("setGlobalGrade", roomID, currentStudent.userID, currentQuestion.id, i);
 }
 
+function gradeCriteria(i, grade) {
+    socketCC.emit("gradeCriteria", roomID, currentStudent.userID, currentQuestion.id, i, grade);
+}
+
+function setGlobalComment(comment) {
+    socketCC.emit("setGlobalComment", roomID, currentStudent.userID, currentQuestion.id, comment);
+}
 function setAutoCorrect() {
-    console.log("setStrategy is off!");
 	socketCC.emit("setAutoCorrect", roomID, currentStudent.userID, currentQuestion.id);
 }
 
@@ -131,9 +136,8 @@ socketCC.on('newQuestion', function (question) {
     notTheSame = notTheSame || !document.querySelector("#question");
     notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != question.id;
     if(notTheSame || !notTheSame) {
-	console.log("question is", question);
 	afficheQuestion(question);
-	addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect);
+	addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect, gradeCriteria, setGlobalComment);
     }
     sendSubmission();
 });
@@ -163,7 +167,6 @@ socketCC.on('newSubmission', function (submission) {
 /*********************************************************************/
 
 socketCC.on('newUserList', function (studentList) {
-//    console.log("studentList = ", studentList);
     let ul = document.createElement("ul");
     ul.id = "chooseSFromSet";
     ul.innerHTML = '<li id="chooseStudentNext"> Choisir l\'élève à corriger :</li>';
@@ -195,18 +198,12 @@ socketCC.on('newUserList', function (studentList) {
 	//	else
 	//	    elem.classList.remove("answered");
     });
-    //	console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
     //	document.querySelector(".currentQuestion").classList.remove("currentQuestion");
-    //	console.log(currentQuestionOfCC.id);
     //	document.querySelector("#q-"+currentQuestionOfCC.id).classList.add("currentQuestion");
     currentStudentList = studentList;
     if(!currentStudent) {
 	currentStudent = studentList[0];
     }
-//    console.log("doit");
     document.querySelector("li#s-"+currentStudent.id).classList.add("currentStudent");
-//    console.log('document.querySelecto = ', document.querySelector("li#s-"+currentStudent.id).classList);
-//    console.log("studentList[0].userID = ", studentList[0].userID);
-    console.log("callling sendList");
     socketCC.emit("sendList", roomID, currentStudent.userID);
 });

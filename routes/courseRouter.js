@@ -46,13 +46,11 @@ router.get('/', course_controller.course_manage_all);
 
 router.use('/:courseID/', function (req, res, next) {
     Course.getByID(parseInt(req.params.courseID), (err, course) => {
-//	console.log(parseInt(req.params.courseID));
 	if(!err) {
 	    User.getSubscription(req.session.user, course, (err, subscription) => {
 		if(subscription) {
 		    req.subscription = subscription;
 		    req.course = course;
-//		    console.log(subscription);
 //		    if(req.subscription.isTDMan)
 			next();
 //		    else
@@ -140,7 +138,6 @@ router.use('/:courseID/:command/:roomID', (req, res, next) => {
     });
 });
 router.use('/:courseID/:command/:roomID/:fileType/:questionID', (req, res, next) => {
-    console.log(req.params);
     Question.getByID(req.params.questionID, (err, question) => {
 	req.question = question;
 	next();

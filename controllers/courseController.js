@@ -29,7 +29,6 @@ let renderCourses = function(user, msgs, req, res) {
 	    }          
 	},
 	function (err, results) {
-//	    console.log(results);
 	    res.render('courses', results);
 	});
 };
@@ -58,7 +57,6 @@ let renderCourse = function(user, course, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
 	    res.render('course', results);
 	});
 };
@@ -94,7 +92,6 @@ let renderCourseManage = function (user, course, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-	    //		console.log(results);
 	    res.render('manage_course', results);
 	});
 };
@@ -181,7 +178,7 @@ exports.subscribe_list = function(req, res) {
 		callback(null, req.course);
 	    },
 	    students :  function (callback) {
-		Course.students(req.course.id, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
+		Course.students(req.course.id, (err, res) => {if(err) console.log(err); callback(err, res)});
 	    },
 	    msgs : function(callback) {
 		callback(null, "");
@@ -202,9 +199,7 @@ exports.course_create_post = function(req, res) {
     if(req.body.name) {
 	Course.create(req.session.user, req.body, function (err,r) {
 	    //	    res.redirect(config.PATH+'/manage/room');
-	    //	    console.log(req.body);
 	    if(err) {
-//		console.log(err);
 		renderManageCourses(req.session.user, ["Impossible de créer le cours !"], req, res);
 	    }
 	    else
@@ -239,7 +234,7 @@ exports.course_delete_post = function(req, res) {
 exports.course_update_post = function(req, res) {
     Course.update(req.session.user, req.course.id, req.body, function (err, id) {
 	if(err) {
-//	    console.log(err);
+	    console.log(err);
 	    req.msgs.push("Impossible de modifier le cours");
 	    exports.course_manage(req, res);
 //	    renderRoomManage(req.session.user, req.params.id, req.msgs, res);

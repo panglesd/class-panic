@@ -61,9 +61,7 @@ exports. getStats = function (filter, callback) {
     }
 
     bdd.query(query, param, function(err, rows) {
-//	console.log(this.sql);
-//	console.log(err, rows);
-	console.log(err);
+	if(err) console.log(err);
 	callback(err, rows);
     });
 
@@ -76,7 +74,6 @@ exports. getStats = function (filter, callback) {
 
 // exports.logStats = function (roomID,  callback) {
 //     Room.getByID(roomID, (err, room) => {
-// //	console.log(room);
 // 	async.parallel({
 // 	    set : function (callback) { Set.getByID(room.questionSet, callback); },
 // 	    question : function (callback) {
@@ -95,7 +92,6 @@ exports. getStats = function (filter, callback) {
 // 			   result.course.id, JSON.stringify(result.course) //,
 // 			   /*JSON.stringify(room.question)*/ ];
 // 	    bdd.query(query, params, (err, res) => {
-// 		console.log(err);
 // 		let blocID = res[1][0].blocID;
 // 		Game.getStatsFromOwnedRoomID(roomID, (err, stats) => {
 // 		    async.forEachSeries(stats,(oneStat, callback) => {
@@ -104,9 +100,7 @@ exports. getStats = function (filter, callback) {
 // 			    let params = [oneStat.id, value, blocID, oneStat.response, JSON.stringify(room.question)];
 // 			    bdd.query(query,params, (err, res) => {callback(err, res);});
 // 			});
-// //			console.log("result.question.strategy = ", result.question.strategy);
 // 		    }, (err) => {
-// 			console.log(err);
 // 			callback();
 // 		    });
 // 		});
@@ -122,7 +116,6 @@ exports. getStats = function (filter, callback) {
 exports.studentListForCC = function(user, roomID, callback) {
     //    let query = "SELECT userID, pseudo, fullName, studentNumber FROM users INNER JOIN flatStats ON userID = `users`.id WHERE roomID = ? GROUP BY userID";
     Room.getByID(roomID, (err, room) => {
-//	console.log("room = ", room);
 	Course.students(room.courseID, (err, stList) => {
 	    async.forEach(stList, (student, callback) => {
 		exports.grade(student, roomID, (err, grade) => {
@@ -145,19 +138,15 @@ exports.grade = function(student, roomID, callback) {
 	submList.forEach((subm) => {
 	    let cQ = JSON.parse(subm.customQuestion);
 	    totCoef += parseInt(cQ.coef);
-//	    console.log("totCoef = ", totCoef);
 	    
 	    if (tot != "unknown" && subm.correct != "unknown") {
 		tot += parseFloat(subm.correct)*parseInt(cQ.coef);
 //		tot += parseFloat(subm.correct)*parseInt(subm.customQuestion.coef);
 //		tot += parseFloat(subm.correct);
-//		console.log("subm.customQuestion.coef = ", subm.customQuestion.coef);
 	    }
 	    else
 		tot = "unknown";
 	});
-//	console.log("totCoef",totCoef);
-//	console.log("student",student.fullName);
 	if(tot != "unknown")
 //	    callback(err, (tot)/(submList.length));	
 	    callback(err, (tot)/(totCoef == 0 ? 1 : totCoef));	
@@ -167,13 +156,9 @@ exports.grade = function(student, roomID, callback) {
 };
 
 function tryGetSubmission(userID, roomID, questionID, callback) {
-    console.log("tryGetSubmission is called");
     let query = "SELECT * FROM flatStats WHERE userID = ? AND roomID = ? AND questionID = ?";
     let params = [userID, roomID, questionID];
-    console.log(query, params, callback);
-    console.log(questionID);
     let a = bdd.query(query, params, (err, res) => {
-	console.log(err, a.sql, res);
 	callback(err, res[0]);
     });
 };
@@ -183,6 +168,7 @@ exports.getSubmission = function(userID, roomID, questionID, callback) {
 	if(subm) {
 	    subm.customQuestion = JSON.parse(subm.customQuestion);
 	    subm.response = JSON.parse(subm.response);
+	    subm.globalInfo = JSON.parse(subm.globalInfo);
 	    subm.customQuestion.allResponses = subm.customQuestion.reponses;
 	    callback(err, subm);
 	}
@@ -194,7 +180,6 @@ exports.getSubmission = function(userID, roomID, questionID, callback) {
 };
 
 exports.fillSubmissions = function(userID, roomID, callback) {
-    console.log("fillSubmission is called");
     User.userByID(userID, (err, user) => {
 	Room.getByID(roomID, (err, room) => {
 	    Question.listBySetID(room.questionSet, (err, qList) => {
@@ -215,7 +200,6 @@ exports.fillSubmissions = function(userID, roomID, callback) {
 			    callback2();
 		    });
 		}, (err) => {
-		    console.log("finished fillSubmission", err);
 		    callback();
 		});
 	    });
@@ -242,7 +226,6 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 	    	    if (err) {
 	    		console.log("err = ", err);
 	    	    }
-	    		console.log(q.sql);
 	    	    callback(err, res);
 	    	});
 		
@@ -254,8 +237,6 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 	    // 	let params = [JSON.stringify(subm.response), JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
 	    // 	let q = bdd.query(query, params, (err, res) => {
 	    // 	    if (err) {
-	    // 		console.log("err = ", err);
-	    // 		//		    console.log(q.sql);
 	    // 	    }
 	    // 	    callback(err, res);
 	    // 	});
@@ -267,26 +248,47 @@ exports.setCustomComment = function(roomID, userID, questionID, i, customComment
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
 //	subm.customQuestion.reponses[i].customComment = customComment;
 	subm.response[i].customComment = customComment;
-	console.log("subm.response = ", subm);
 	let query = "UPDATE stats SET response = ? WHERE id = ? AND userID = ?";
 	let params = [JSON.stringify(subm.response), subm.statsID, userID];
 	let q = bdd.query(query, params, (err, res) => {
 	    if (err)
 		console.log("err = ", err);
-	    console.log(q.sql);
 	    callback(err, res);
 	});
     });
 };
 
 exports.setGlobalGrade = function(roomID, userID, questionID, mark, callback) {
-     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
-	 let query = "UPDATE stats SET correct = ?, strategy = 'manual' WHERE id = ?";
-	 let params = [mark ? mark : "?", subm.statsID];
-	 bdd.query(query, params, (err, res) => {
-	     callback(err, res);
-	 });
-     });
+    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+	let query = "UPDATE stats SET correct = ?, strategy = 'manual' WHERE id = ?";
+	let params = [mark ? mark : "?", subm.statsID];
+	bdd.query(query, params, (err, res) => {
+	    callback(err, res);
+	});
+    });
+    //    callback("setStrategy est deprecié", null);
+};
+exports.setGlobalComment = function(roomID, userID, questionID, comment, callback) {
+    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+	subm.globalInfo.comment = comment;
+	let query = "UPDATE stats SET globalInfo = ? WHERE id = ?";
+	let params = [JSON.stringify(subm.globalInfo), subm.statsID];
+	bdd.query(query, params, (err, res) => {
+	    callback(err, res);
+	});
+    });
+    //    callback("setStrategy est deprecié", null);
+};
+exports.gradeCriteria = function(roomID, userID, questionID, i, grade, callback) {
+    exports.getSubmission(userID, roomID, questionID, (err, subm) => {
+	subm.globalInfo.criteria = subm.globalInfo.criteria ? subm.globalInfo.criteria : [];
+	subm.globalInfo.criteria[i] = grade;
+	let query = "UPDATE stats SET globalInfo = ? WHERE id = ?";
+	let params = [JSON.stringify(subm.globalInfo), subm.statsID];
+	bdd.query(query, params, (err, res) => {
+	    callback(err, res);
+	});
+    });
     //    callback("setStrategy est deprecié", null);
 };
 exports.setAutoCorrect = function(roomID, userID, questionID, callback) {
@@ -313,15 +315,12 @@ exports.setAutoCorrect = function(roomID, userID, questionID, callback) {
 // 	let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 // 	let params2 = [roomID, userID, questionID];
 // 	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
-// //	console.log("validity2 = ", validity2);
 	
 // 	bdd.query(query2, params2, (err, res) => {
 // 	    let query = "UPDATE stats SET customQuestion = ?, correct = ? WHERE blocID = ? AND userID = ?";
 // 	    let params = [JSON.stringify(subm.customQuestion), validity2, res[0].id, userID];
 // 	    let q = bdd.query(query, params, (err, res) => {
 // 		if (err) {
-// 		    console.log("err = ", err);
-// //		    console.log(q.sql);
 // 		}
 // 		callback(err, res);
 // 	    });

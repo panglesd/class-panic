@@ -18,8 +18,6 @@ module.exports = function(io) {
     
     io.of('/admin').on('connection', function(socket) {
 
-//	console.log("CONNECTION");
-	
 	/******************************************/
 	/*  Middlesware de socket                 */
 	/******************************************/
@@ -27,7 +25,6 @@ module.exports = function(io) {
 	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
 	
 	socket.use(function (packet, next) {
-	    //	    console.log("packet is", packet);
 	    if(packet[0]=="chooseRoom")
 		next();
 	    if(socket.room)
@@ -65,7 +62,7 @@ module.exports = function(io) {
 		if(status != "revealed") {
 		    game.getStatsFromRoomID(socket.room.id, function (r,e) {
 			Room.setStatusForRoomID(socket.room.id, "revealed", function () {tools.broadcastRoomQuestion(socket.room, () => {});});
-			Stats.logStats(socket.room.id, (err) => {console.log(err);});
+			Stats.logStats(socket.room.id, (err) => {if (err) console.log(err);});
 		    });
 		}
 	    });
@@ -98,7 +95,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendQuestionPlease', function () {
-	    //		    console.log(socket.room);
 	    tools.sendRoomOwnedQuestion(socket.request.session.user, socket, socket.room, function() {});
 	});
 	
@@ -107,7 +103,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendStatsPlease', function () {
-	    //		    console.log(socket.room);
 	    tools.sendOwnedStats(socket.room);
 	});
 	
@@ -130,7 +125,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('customQuestion', function (customQuestion) {
-	    //		    console.log(customQuestion);
 	    delete(customQuestion.id);
 	    game.setQuestion(socket.room.id, customQuestion, function () {
 		tools.broadcastRoomQuestion(socket.room, function(err, res) {});
@@ -143,7 +137,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	/*		socket.on('backToSet', function () {
-	//		    console.log("backToSet");
 	game.backToSet(socket.room.id, function(err, res) {
 	broadcastRoomQuestion(socket.room, function(err,res) {})
 	});

@@ -18,7 +18,6 @@ exports.create = function(mainFile, files, courseID, ownerID, callback) {
     let params = [courseID, ownerID, JSON.stringify(formatFiles(mainFile, files))];
     bdd.query(query, params, (err, resID) => {
 	let docID = resID[1][0].id;
-	console.log("docID = ", docID);
 	
 	let path = "storage/course"+courseID+"/doc"+docID+"/";
 	mkdirp(path, (err) => {
@@ -52,7 +51,6 @@ exports.getByID = function(docID, callback) {
     });
 };
 exports.getFileFromDoc = function(doc, fileName, callback) {
-//    console.log(doc.filesInfo);
     if(doc.filesInfo.main == fileName || doc.filesInfo.aux.includes(fileName)) {
 	let path = "storage/course"+doc.courseID+"/doc"+doc.id+"/"+fileName;
 	fs.readFile(path, callback);
@@ -78,7 +76,6 @@ exports.remove = function(docID, callback) {
 exports.removeFile = function(doc, fileName, callback) {
     let query = "UPDATE documents SET filesInfo = ? WHERE id = ?";
     doc.filesInfo.aux = doc.filesInfo.aux.filter((elem) => {return fileName != elem;});
-//    console.log("doc.filesInfo = ", doc.filesInfo);
     let params = [JSON.stringify(doc.filesInfo), doc.id];
     bdd.query(query, params, callback);
 };
@@ -98,5 +95,4 @@ exports.addFile = function(doc, files, callback) {
 	let query = "UPDATE documents SET filesInfo = ? WHERE id = ?";
 	bdd.query(query, params, callback);
     });
-	//    console.log("doc.filesInfo = ", doc.filesInfo);
 };

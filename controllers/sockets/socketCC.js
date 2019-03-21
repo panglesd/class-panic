@@ -119,7 +119,6 @@ module.exports = function(io) {
 	/******************************************/
 
 	socket.on('chooseRoom', function (newRoom) {
-	    console.log("chooseRoom");
 	    if (socket.room) {
 		socket.leave(socket.room.id);
 		delete(socket.room);
@@ -171,7 +170,6 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-	    	    console.log("answer = ", answer);
 	    if(socket.room.status.acceptSubm) {
 //		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    // A gérer autrement à cause de la réorganisation
@@ -194,14 +192,12 @@ module.exports = function(io) {
 		Question.getByIndex(questionIndex, socket.room.id,(err, question) => {
 		    if(question.reponses[n_ans].hasFile != "none") {
 			let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
-			console.log("path = ", path);
 			mkdirp(path, (err) => {
 			    fileName = sanit_fn(fileName);
 			    if(fileName)
 				fs.writeFile(path+fileName, data, (err) => {
 				    if(err) throw err;
 				    md5File(path+fileName, (err, hash) => {
-					console.log("calling logFile");
 					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, Date.now(),(err) => {
 					    sendQuestionFromIndex(socket, questionIndex,() => {});
 //					socket.emit("fileReceived", n_ans, fileName, hash);
@@ -225,7 +221,6 @@ module.exports = function(io) {
 	socket.on('removeFile', function (n_ans, fileName, questionIndex) {
 	    if(socket.room.status.acceptSubm){
 		Question.getByIndex(questionIndex, socket.room.id,(err, question) => {
-		    console.log("calling logFile");
 		    game.removeFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, fileName,(err) => {
 			sendQuestionFromIndex(socket, questionIndex,() => {});
 		    });
@@ -238,7 +233,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	// socket.on('sendStatsPlease', function () {
-	//     //		    console.log(socket.room);
 	//     tools.sendOwnedStats(socket.room);
 	// });
 	

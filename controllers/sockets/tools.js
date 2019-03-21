@@ -42,7 +42,6 @@ module.exports = function (io) {
 	});
     };
     tools.broadcastRoomQuestion = function (room, callback) {
-//	console.log("room", room);
 	tools.sendRoomOwnedQuestion(null, io.of("/admin").to(room.id), room, () => {
 	    tools.sendRoomQuestion(io.of("/student").to(room.id), room, () => {
 		callback();

@@ -11,7 +11,6 @@ var Question = require("./question");
 
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
-	//	console.log(this.sql);
 	if(err) {
 	    console.log(err);
 	    callback(err, null);
@@ -65,7 +64,6 @@ exports.getControllableByID = function(user, roomID, callback) {
 exports.listOfCourse = function (courseID, callback) {
     bdd.query('SELECT * FROM rooms WHERE courseID = ?', [courseID], function(err, rows) {
 	if(err) throw err;
-//	console.log(this.sql);
 	async.parallel(
 	    rows.map(
 		function (room) {
@@ -145,12 +143,11 @@ exports.delete = function (user, room, callback) {
 //Update
 
 exports.update = function (user, room, newRoom, callback) {
-//    console.log([newRoom.name, newRoom.questionSet, room.id, user.id]);
     Question.getFirstOfSet(newRoom.questionSet, (err, question) => {
 	bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ?, id_currentQuestion = ?, status = ?, type = ? WHERE `id` = ? AND `ownerID` = ?',
 		  [newRoom.name, newRoom.questionSet,  question.id, JSON.stringify(newRoom.status), newRoom.type, room.id, user.id],
 		  (err, res) => {
-//		      console.log(err, this.sql);
+		      if(err) console.log(err);
 		      callback(err, res);
 		  });
     });

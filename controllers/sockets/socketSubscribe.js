@@ -49,7 +49,6 @@ module.exports = function(io) {
 	});
 */
 	socket.on('getUser', function (courseID, filter) {
-//	    console.log(filter);
 	    socket.filter = filter;
 	    socket.filter.courseID = socket.course.id;
 	    User.userListByFilter(filter, (err, results) => {
@@ -58,14 +57,12 @@ module.exports = function(io) {
 	});
 	
 	socket.on('subscribeList', function (courseID, studentList) {
-//	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
-//			      console.log("I am going to register ", studentID);
 			      Course.subscribeStudent(studentID, socket.course.id, callback);
 			  },
 			  (err, results) => {
-			      console.log(err);
+			      if(err) console.log(err);
 			      if(!socket.filter)
 				  socket.filter={};
 			      socket.filter.courseID = socket.course.id;
@@ -76,14 +73,9 @@ module.exports = function(io) {
 	});
 
 	socket.on('subscribeListTDMan', function (courseID, studentList, permission) {
-//	    console.log("we got this pemission", permission);
-//	    console.log("socket.course.ownerID",socket.course.ownerID);
-//	    console.log("socket.request.session.user.id",socket.request.session.user.id);
 	    if(socket.course.ownerID == socket.request.session.user.id) {
-		//	    console.log("studentList is", studentList);
 		async.forEach(studentList,
 			      (studentID, callback) => {
-				  //			      console.log("I am going to register ", studentID);
 				  Course.subscribeTDMan(studentID, socket.course.id, permission, callback);
 			      },
 			      (err, results) => {
@@ -97,10 +89,8 @@ module.exports = function(io) {
 	    }
 	});
 	socket.on('unSubscribeList', function (courseID, studentList) {
-	    //	    console.log("studentList is", studentList);
 	    async.forEach(studentList,
 			  (studentID, callback) => {
-			      //			      console.log("I am going to unregister ", studentID);
 			      if(studentID != socket.request.session.user.id)
 				  Course.unSubscribeStudent(studentID, socket.course.id, callback);
 			  },

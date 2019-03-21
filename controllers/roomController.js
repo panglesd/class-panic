@@ -32,7 +32,6 @@ let renderRooms = function(user, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-	    //	    console.log(results);
 	    res.render('courses', results);
 	});
 };
@@ -99,7 +98,6 @@ let renderManageRooms = function(user, course, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
 	    res.render('manage_rooms', results);
 	});
 };
@@ -156,9 +154,8 @@ exports.room_create_post = function(req, res) {
 	    let newRoom = parseBodytoNewRoom(req.body);
 	    Room.create(req.session.user, newRoom, req.course.id, function (err, newRoom) {
 		//	    res.redirect(config.PATH+'/manage/room');
-		//	    console.log(req.body);
 		if(err) {
-//		    console.log("err is", err)
+		    console.log("err is", err);
 		    req.msgs.push("Impossible de créer la room !");
 		    renderRoomManage(req.session.user, req.course, req.room, req.msgs, req, res);
 			courseController.course_manage(req,res);
@@ -211,9 +208,7 @@ exports.room_delete_post = function(req, res) {
 
 exports.room_update_post = function(req, res) {
     if(req.subscription.canAllRoom || (req.subscription.canOwnRoom && req.room.ownerID == req.user.id)) {
-	console.log("req.body = ", req.body);
 	let newRoom = parseBodytoNewRoom(req.body);
-	console.log("newRoom = ", newRoom);
 	Room.update(req.session.user, req.room, newRoom, function (err, id) {
 	    if(err) {
 		req.msgs.push("Impossible de modifier la room");

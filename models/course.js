@@ -10,7 +10,6 @@ var Question = require("./question");
 // By ID
 
 exports.getByID = function(courseID, callback) {
-//    console.log(courseID);
     bdd.query("SELECT * FROM `courses` WHERE `id` = ?", [courseID], function (err, resu) {
 	callback(err, resu[0]);
     });
@@ -18,10 +17,9 @@ exports.getByID = function(courseID, callback) {
 
 
 exports.getOwnedByID = function(user, courseID, callback) {
-    query = "SELECT * FROM `courses` WHERE `id` = ? AND `ownerID` = ?";
-//    console.log(query, courseID, user.id);
+    let query = "SELECT * FROM `courses` WHERE `id` = ? AND `ownerID` = ?";
     bdd.query(query, [courseID, user.id], function (err, resu) {
-//	console.log(err, resu);
+	if(err)	console.log(err);
 	callback(err, resu[0]);
     });
 };
@@ -33,9 +31,8 @@ exports.getOwnedByID = function(user, courseID, callback) {
 // By ID
 
 exports.subscribedCourses = function (user, callback) {
-    query = "SELECT * FROM courses WHERE id IN (SELECT courseID FROM subscription WHERE userID = ?) OR ownerID = ?";
+    let query = "SELECT * FROM courses WHERE id IN (SELECT courseID FROM subscription WHERE userID = ?) OR ownerID = ?";
     bdd.query(query, [user.id, user.id], function(err, rows) {
-//	console.log(rows);
 	callback(err, rows);
     });
 };
@@ -43,7 +40,7 @@ exports.subscribedCourses = function (user, callback) {
 exports.subscribedAsTDMan = function (user, callback) {
     let query = "SELECT * FROM courses WHERE id IN (SELECT courseID FROM subscription WHERE isTDMan = 1 AND userID = ?)";
     bdd.query(query, [user.id], function(err, rows) {
-//	console.log(rows);
+	if(err) console.log(err);
 	callback(err, rows);
     });
 };
@@ -51,7 +48,6 @@ exports.subscribedAsTDMan = function (user, callback) {
 /*exports.getSubscription = function (user, courseID, callback) {
     query = "SELECT * FROM courses INNER JOIN subscription ON courseID = `courses`.`id` INNER JOIN users ON `courses`.`ownerID` = `users`.`id` WHERE userID = ? AND courseID = ?";
     bdd.query(query, [user.id, courseID], function(err, rows) {
-//	console.log(rows);
 	callback(err, rows[0]);
     })
 }*/
@@ -76,20 +72,19 @@ exports.getByName= function (courseName, callback) {
 
 exports.students = function(courseID, callback) {
     let query = "SELECT * FROM subscription INNER JOIN users ON userID = users.id WHERE courseID = ? ORDER BY fullName";
-//    console.log(query, courseID);
     bdd.query(query, [courseID], (err, res) => {
-//	console.log('this sql', this.sql);
+	if(err) console.log(err);
 	callback(err, res);
     });
-}
+};
 
 exports.subscribeStudent = function(studentID, courseID, callback) {
-    query = "INSERT INTO subscription(courseID, userID, `isTDMan`, `canRoomCreate`, `canRoomUpdate`, `canRoomDelete`, `canSetUpdate`, `canSetCreate`, `canSetDelete`, `canSubscribe`, `canOwnRoom`, `canAllRoom`, `canOwnSet`, `canAllSet`, `canAddDocs`) VALUES (?,?, 0,0,0,0,0,0,0,0,0,0,0,0,0) ON DUPLICATE KEY UPDATE courseID = courseID";
-    bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res);});
-}
+    let query = "INSERT INTO subscription(courseID, userID, `isTDMan`, `canRoomCreate`, `canRoomUpdate`, `canRoomDelete`, `canSetUpdate`, `canSetCreate`, `canSetDelete`, `canSubscribe`, `canOwnRoom`, `canAllRoom`, `canOwnSet`, `canAllSet`, `canAddDocs`) VALUES (?,?, 0,0,0,0,0,0,0,0,0,0,0,0,0) ON DUPLICATE KEY UPDATE courseID = courseID";
+    bdd.query(query, [courseID, studentID], (err, res) => {if(err) console.log(err, res); callback(err, res);});
+};
 exports.subscribeTDMan = function(studentID, courseID, permission, callback) {
-    query = "INSERT INTO subscription(courseID, userID, canOwnRoom, canAllRoom, canOwnSet, canAllSet, canSubscribe, isTDMan) VALUES (?, ?, ?, ?, ?, ?, ?, 1 ) ON DUPLICATE KEY UPDATE isTDMan = 1 , canOwnRoom = ? , canAllRoom = ? , canownSet = ? , canAllSet = ? , canSubscribe = ? ";
-    params = [courseID, studentID,
+    let query = "INSERT INTO subscription(courseID, userID, canOwnRoom, canAllRoom, canOwnSet, canAllSet, canSubscribe, isTDMan) VALUES (?, ?, ?, ?, ?, ?, ?, 1 ) ON DUPLICATE KEY UPDATE isTDMan = 1 , canOwnRoom = ? , canAllRoom = ? , canownSet = ? , canAllSet = ? , canSubscribe = ? ";
+    let params = [courseID, studentID,
 	      permission.canOwnRoom,
 	      permission.canAllRoom,
 	      permission.canOwnSet,
@@ -101,13 +96,14 @@ exports.subscribeTDMan = function(studentID, courseID, permission, callback) {
 	      permission.canAllSet,
 	      permission.canSubscribe
 	     ];
-    bdd.query(query, params, (err, res) => {// console.log(this.sql);
-	// console.log(err, res);
+    bdd.query(query, params, (err, res) => {
+	if(err)
+	    console.log(err);
 	callback(err, res);});
-}
+};
 exports.unSubscribeStudent = function(studentID, courseID, callback) {
-    query = "DELETE FROM subscription WHERE courseID = ? AND userID = ?";
-    bdd.query(query, [courseID, studentID], (err, res) => {/*console.log(err, res);*/callback(err, res)});
+    let query = "DELETE FROM subscription WHERE courseID = ? AND userID = ?";
+    bdd.query(query, [courseID, studentID], (err, res) => {if(err) console.log(err, res);callback(err, res);});
 }
 
 
@@ -121,19 +117,19 @@ exports.create = function (user, newCourse, callback) {
     bdd.query('INSERT INTO `courses`(`name`, `ownerID`, `commentaire`) VALUES (?, ?, ?)', [newCourse.name, user.id, newCourse.commentaire], function(err, rows) {
 	callback(err, rows);
     });
-}
+};
 
 // Delete
 
 exports.delete = function (user, courseID, callback) {
-    bdd.query('DELETE FROM `courses` WHERE `id` = ? AND `ownerID` = ?', [courseID, user.id], callback)
-}
+    bdd.query('DELETE FROM `courses` WHERE `id` = ? AND `ownerID` = ?', [courseID, user.id], callback);
+};
 
 //Update
 
 exports.update = function (user, courseID, newCourse, callback) {
-    bdd.query('UPDATE `courses` SET `name`= ?, `commentaire` = ? WHERE `id` = ? AND `ownerID` = ?', [newCourse.name, newCourse.commentaire, courseID, user.id], callback)
-}
+    bdd.query('UPDATE `courses` SET `name`= ?, `commentaire` = ? WHERE `id` = ? AND `ownerID` = ?', [newCourse.name, newCourse.commentaire, courseID, user.id], callback);
+};
 
 
-module.export = []
+module.export = [];

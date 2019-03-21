@@ -140,7 +140,6 @@ exports.listOwnedBySetID = function (user, setID, callback) {
 // List by room ID
 
 exports.listByRoomID = function (id, callback) {
-//    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
     bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id], function(err, qList) {
 	exports.listBySetID(qList[0].id, callback);
     });
@@ -175,7 +174,7 @@ exports.getByID = function (questionId, callback) {
 
 exports.getByIndex = function (questionIndex, roomID, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `indexSet` = ? AND class = (SELECT questionSet FROM rooms WHERE id = ?)", [questionIndex, roomID], function (err, rows) {
-	console.log(err);
+	if(err) console.log(err);
 	let q = rows[0];
 	formatQuestion(q);
 	callback(err, q);
@@ -189,10 +188,7 @@ exports.getByIndex = function (questionIndex, roomID, callback) {
 // 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
 // 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
 //      let glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
-// 	 console.log(err);
-// 	 console.log("gler", glere.sql);
 // 	let q = row[0];
-// //	console.log(q);
 // 	q.allResponses = JSON.parse(q.allResponses);
 // 	if(q.userResponse)
 // 	    q.userResponse = JSON.parse(q.userResponse);
@@ -239,7 +235,6 @@ exports.getFirstOfSet = function (setID, callback) {
 };
 
 exports.getFileCorrect = function (question, n_ans, fileName, callback) {
-    console.log("thequestio is ", question);
     //    question.correcFileInfo = JSON.parse(question.correcFileInfo);
     if(question.reponses[n_ans].correcFilesInfo.includes(fileName)) {
 	let path = "storage/question"+question.id+"/answer"+n_ans+"/"+fileName;
@@ -256,8 +251,6 @@ exports.getFileCorrect = function (question, n_ans, fileName, callback) {
 // Création
 
 exports.questionCreate = function (user, question, /*filesData,*/ setID, callback) {
-    console.log("question = ", question);
-    
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
 	if(er) console.log(er); // Il faudrait regrouper reponses, description, type, coef, correcType et criteres dans un seul objet... 
@@ -271,16 +264,14 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
 		newReponses[n_ans] = {correcFilesInfo:[]};
 		async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
  		    let path = "storage/question"+questionID+"/answer"+n_ans+"/";
-		    console.log("path =", path+file.name);
 		    mkdirp(path, (err) => {
-			console.log(err);
+			if(err) console.log(err);
 			file.mv(path+file.name, (err, res) => {
-			    console.log("adding "+file.name+" a la liste de la reponse numero "+n_ans);
 			    newReponses[n_ans].correcFilesInfo.push(file.name);
 			    callbackFileInfo(err, res);});
 		    });
 		}, (err) => {
-		    console.log(err);
+		    if(err) console.log(err);
 		    callbackRep(err);
 		});
 	    }, (err) => {
@@ -303,7 +294,6 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
 // Suppression
 
 exports.questionDelete = function (user, questionID, callback) {
-    //    console.log("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [question.id, user.id]);
     exports.getOwnedByID(user, questionID, function(err, question) {
 	bdd.query("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionID, user.id], function(err, res) {
 	    if(err)
@@ -318,7 +308,6 @@ exports.questionDelete = function (user, questionID, callback) {
 // Update
 
 exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove, callback) {
-    console.log("filesToRemove = ", filesToRemove);
     function removeElem(array, elem) {
 	let index = array.indexOf(elem);
 	if (index > -1) {
@@ -339,17 +328,15 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	    newReponses[n_ans] = {correcFilesInfo:[]};
 	    async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
  		let path = "storage/question"+questionID+"/answer"+n_ans+"/";
-		console.log("path =", path+file.name);
 		mkdirp(path, (err) => {
-		    console.log(err);
+		    if(err) console.log(err);
 		    file.mv(path+file.name, (err, res) => {
-			console.log("adding "+file.name+" a la liste de la reponse numero "+n_ans);
 			removeElem(question.reponses[n_ans].correcFilesInfo, file.name);
 			question.reponses[n_ans].correcFilesInfo.push(file.name);
 			callbackFileInfo(err, res);});
 		});
 	    }, (err) => {
-		console.log(err);
+		if(err) console.log(err);
 		callbackRep(err);
 	    });
 	}, (err) => {
@@ -380,7 +367,6 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	      async.eachOf(filesData, (file, index, callback) => {
 		  if(file) {
  		      let path = "storage/question"+questionID+"/answer"+index+"/";
-		      console.log("path =", path+file.name);
 		      mkdirp(path, (err) => {
 			  file.mv(path+file.name, callback);
 		      });
@@ -388,7 +374,6 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 		  else
 		      callback();
 	      }, (err) => {
-		  console.log(err);
 		  callback(err, questionID);
 	      })
 	     );
@@ -412,9 +397,7 @@ exports.updateGradesOfQuestion = function(question, callback) {
 };
 
 exports.correctAndLogSubmission = function(question, submission, callback) {
-    console.log("WE CCALL CORRECANDLOGSUBM");
     exports.correctSubmission(question, submission, (err, grade) => {
-	console.log("conclusion : ", grade, "points !!!");
 	let query = "UPDATE `stats` SET correct = ? WHERE id = ?";
 	let params = [grade, submission.statsID];
 	bdd.query(query, params, (err,res) => { callback(err,res);});
@@ -452,17 +435,12 @@ exports.maxPointsOfQuestion = function(question, callback) {
 exports.correctSubmission = function(question, submission, callback) {
     let submPoints = 0;
     let totPoints = 0;
-    console.log(submission);
     if(submission.strategy=="manual") {
-	console.log("MMAAAAAAAAAAAAANUAL");
 	callback(null, submission.correct);
     }
     else {
-	console.log("COMPUUUUUUUUUUUUTED");
 	submission.response.forEach((repSubm, index) => {
 	    let rep = question.reponses[index];
-	    console.log("rep = ", rep);
-	    console.log("repSubm = ", repSubm);
 	    // Is the following really necessary ? No !
 	    // if(typeof(repSubm.points) == "number")
 	    // 	submPoints += repSubm.points;

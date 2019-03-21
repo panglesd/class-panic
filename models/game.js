@@ -33,20 +33,16 @@ exports.questionListForCC = function (user, roomID, callback) {
 	"(SELECT questionID, correct, response FROM stats INNER JOIN statsBloc ON "+
 	"statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser "+
 	"ON statsOfUser.questionID = questions.id WHERE questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet";
-//    console.log("params = ", [user.id, roomID, roomID]);
     bdd.query(query2, [user.id, roomID, roomID], function(err, rows) {
-	console.log(err);
-//	console.log("questionListForCC", rows);
+	if(err) console.log(err);
 	rows.forEach((row) => {
 	    if(row.questionID){
-		console.log(row);
 		row.response = JSON.parse(row.response);
 		row.answered = row.response.length > 0;
 	    }
 	    else
 		row.answered = false;
 	});
-//	console.log("avant =", rows);
 	callback(err, rows);
     });
 };
@@ -59,8 +55,7 @@ exports.questionOwnedFromRoomID = function (user, roomID, callback) {
 
 exports.questionControlledFromRoomID = function (user, roomID, callback) {
     bdd.query("SELECT question FROM rooms WHERE id = ? AND (courseID IN (SELECT courseID from subscription WHERE userID = ? AND isTDMan=1) OR courseID IN (SELECT id FROM courses WHERE ownerID = ?))", [roomID, user.id,user.id], function(err, row) {
-//	console.log(this.sql);
-//	console.log(row[0].question);
+	if(err) console.log(err);
 	callback(err, JSON.parse(row[0].question));
     });
 };
@@ -97,7 +92,6 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
 };
 
 exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) {
-    console.log("newAnswer = ", newAnswer);
     async.parallel({
 	set : function (callback) { Set.getByID(room.questionSet, callback); },
 	question : function (callback) {
@@ -109,20 +103,18 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 	let query = "SELECT * FROM flatStats WHERE `roomID`= ? AND `userID`= ? AND questionID = ?;" + //;
 	    "SELECT * FROM flatStats WHERE `roomID`= ? AND questionID = ?";
 	bdd.query(query, [room.id, user.id, question.id, room.id, question.id], function(err, answ) {
-	    	    console.log("err flatStats", err);		    
+	    if(err) console.log("err flatStats", err);		    
 	    // Si jamais on a déjà une entrée statsBloc qui correspond
 	    // Et une entrée stats qui correspond
 	    if(answ[1][0] && answ[0][0]) {                  
-		console.log("we will update", user.id);
 		// On recopie les données de fichier déjà présentes.
 		let oldAnswer = answ[0][0];
 		oldAnswer.response = JSON.parse(oldAnswer.response);
-		console.log("oldAnswer = ", oldAnswer);
 		oldAnswer.response.forEach((rep, index) => {
 		    newAnswer[index].filesInfo = rep.filesInfo;
 		});
-		let query2 = "UPDATE `stats` SET `response` = ?,  `correct` = ? WHERE userID = ? AND blocID = ?";
-		let params2 = [JSON.stringify(newAnswer), "?", user.id, answ[1][0].blocID];
+		let query2 = "UPDATE `stats` SET `response` = ?,  `correct` = ?, `globalInfo` = ? WHERE userID = ? AND blocID = ?";
+		let params2 = [JSON.stringify(newAnswer), "?", "{}", user.id, answ[1][0].blocID];
 		bdd.query(query2, params2, (err, res) => {
 		    Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
 			Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, false);});
@@ -141,8 +133,8 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 	    // Si jamais on a déjà une entrée statsBloc qui correspond
 	    // Mais pas d'entrée stats qui correspond
 	    else if (answ[1][0]) {
-		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?,'computed')";     // Puis on insère un stats
-		let params2 = [user.id, "?", answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
+		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`, `globalInfo`) VALUES (?,?,?,?,?,'computed', ?)";     // Puis on insère un stats
+		let params2 = [user.id, "?", answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question), "{}"];
 		bdd.query(query2, params2, (err, res) => {
 		    Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
 			Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, true);});
@@ -166,8 +158,8 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 			       course.id, JSON.stringify(course) ];
 		bdd.query(query, params, (err, tabID) => {
 		    let blocID = tabID[1][0].blocID;
-		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`) VALUES (?,?,?,?,?,'computed')";     // Puis on insère un stats
-		    let params2 = [user.id, "?", blocID, JSON.stringify(newAnswer), JSON.stringify(question)];
+		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`, `globalInfo`) VALUES (?,?,?,?,?,'computed', ?)";     // Puis on insère un stats
+		    let params2 = [user.id, "?", blocID, JSON.stringify(newAnswer), JSON.stringify(question), "{}"];
 		    bdd.query(query2, params2, (err, res) => {
 			Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
 			    Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, true);});
@@ -196,9 +188,8 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 };
 
 exports.registerAnswerCC = function (user, room, questionIndex, newAnswer, callback) {
-    console.log("registerAnswerCC is called");
     User.getSubscription(user.id, room.courseID, (err, subscription) => {
-	console.log("err async", err);
+	if(err) console.log("err async", err);
 	if(subscription && room.status.acceptSubm) {
 	    exports.logAnswerCC(user, room, questionIndex, newAnswer, (err, hasCreatedNewBloc) => {
 		if(hasCreatedNewBloc)
@@ -224,7 +215,6 @@ exports.getStatsFromRoomID = function (roomID, callback) {
 
 exports.getStatsFromOwnedRoomID = function (roomID, callback) {
     bdd.query("SELECT `users`.`id`, `poll`.`pseudo`, `users`.`fullName`, `poll`.`response`  FROM `poll` INNER JOIN `users` ON `poll`.`pseudo` = `users`.`pseudo` WHERE `roomID` = ?", [roomID], function(err, row) {
-	/*console.log(row);*/
 	callback(err, row);
     });
 };
@@ -303,7 +293,6 @@ exports.setQuestion = function(roomID, question, callback) {
     exports.flushOldPlayers(roomID, function(err) {
 	// GROS PROBLEME ICI, CODE TROP VIEUX POUR L'EVOLUTION IL VA FALLOIR RASSEMBLER CC ET SONDAGE DANS STATS ET STATSBLOC !
 	let query = "UPDATE rooms SET status = \"pending\", question = ? "+(question.id ? (", id_currentQuestion = " + question.id) : "") +" WHERE id = ?";
-//	console.log(query);
 	bdd.query(query, [JSON.stringify(question), roomID], function(err, res) { callback(err, res);});
     });
 };
@@ -334,17 +323,15 @@ exports.backToSet = function (roomID, callback) {
 exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, hash, timestamp, callback) {
     Stats.getSubmission(userID, roomID, questionID, (err, submission) => {
 	let index = submission.response[n_ans].filesInfo.findIndex((fileInfo)=>{return (fileInfo.fileName == fileName);});
-	console.log("index is ", index);
 	if(index>=0)
 	    submission.response[n_ans].filesInfo[index]={fileName:fileName, hash:hash, timestamp:timestamp};
 	else
 	    submission.response[n_ans].filesInfo.push({fileName:fileName, hash:hash, timestamp:timestamp});
 	if(submission.response[n_ans].filesInfo.length > 0)
 	    submission.response[n_ans].selected=true;
-	console.log("we will save this response", submission.response);
 	let query = "UPDATE `stats` SET `response` = ? WHERE id = ?";
 	bdd.query(query, [JSON.stringify(submission.response), submission.statsID], (err, res) => {
-	    console.log("errfromLogFile", err);
+	    if(err) console.log("errfromLogFile", err);
 	    callback();
 	});
 	
@@ -354,15 +341,13 @@ exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, ha
 exports.removeFile = function(userID, roomID, questionID, n_ans, fileName, callback) {
     Stats.getSubmission(userID, roomID, questionID, (err, submission) => {
 	let index = submission.response[n_ans].filesInfo.findIndex((fileInfo)=>{return (fileInfo.fileName == fileName);});
-	console.log("index is ", index);
 	if(index>=0)
 	    submission.response[n_ans].filesInfo.splice(index,1);
 	if(submission.response[n_ans].filesInfo.length == 0)
 	    submission.response[n_ans].selected=false;
-	console.log("we will save this response", submission.response[1]);
 	let query = "UPDATE `stats` SET `response` = ? WHERE id = ?";
 	bdd.query(query, [JSON.stringify(submission.response), submission.statsID], (err, res) => {
-	    console.log("errfromRemoveFile", err);
+	    if(err) console.log("errfromRemoveFile", err);
 	    callback();
 	});
 	
@@ -373,7 +358,6 @@ exports.removeFile = function(userID, roomID, questionID, n_ans, fileName, callb
 exports.getFileFromSubmission= function(userID, room, question, answerNumber, fileName, callback) {
     Stats.getSubmission(userID, room.id, question.id, (err, subm) => {
 	let path = "storage/course"+room.courseID+"/room"+room.id+"/question"+question.id+"/user"+userID+"/answer"+answerNumber+"/"+fileName;
-	console.log(path);
 	fs.readFile(path, callback);
     });
 

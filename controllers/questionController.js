@@ -31,7 +31,6 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 		callback(null, typeof question == "undefined");
 	    },
 	    question: function (callback) {
-		console.log(question);
 		if(typeof question != "undefined")
 		    callback(null, question);
 		else
@@ -70,8 +69,6 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 	    }
 	},
 	function (err, results) {
-	    //	    console.log(results);
-//	    console.log("question iiiiiiiiiiiiiiiiiis", question);
 	    res.render('manage_question', results);
 	});
 };
@@ -97,7 +94,6 @@ exports.question_update_get = function(req, res) {
 /*         Controlleurs POST pour modifier les questions     */
 /*************************************************************/
 function formatQuestionFromBody(body, files) {
-    console.log("body = ", body);
     let filesData = [];
     let question = {
 	enonce : body.enonce,
@@ -172,9 +168,7 @@ function formatQuestionFromBody(body, files) {
 
 exports.question_create_post = function(req, res) {
     if(req.subscription.canOwnSet) {
-	console.log("req.files is", req.files);
 	let question = formatQuestionFromBody(req.body, req.files);
-	console.log("question = ", question);
 	
 //	let [question, filesData] = formatQuestionFromBody(req.body, req.files);
 	Question.questionCreate(req.session.user, question, /* filesData,*/ req.set.id, function(err, info) {
@@ -233,7 +227,7 @@ exports.question_update_post = function(req, res) {
 exports.question_delete_post = function(req, res) {
     if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
 	Question.questionDelete(req.session.user, req.question.id,  function(err, id) {
-	    //	console.log(err);
+	    if(err)	console.log(err);
 //	    req.params.id = req.params.idSet; // HORRIBLE HACK
 	    if(err) {
 		req.msgs.push("Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !");

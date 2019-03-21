@@ -10,13 +10,11 @@ const saltRounds = 10;;
 
 exports.userList = function (callback) {
     bdd.query('SELECT * FROM users', function(err, rows) {
-//	console.log(rows);
 	callback(rows);
     });
 };
 
 exports.userListByFilter = function (filter, callback) {
-//    console.log("filter is", filter)
     let query = 'SELECT id, pseudo, email, fullName, isAdmin, studentNumber, institution, promotion, courseID, isTDMan FROM '+
 	( "users LEFT OUTER JOIN (SELECT * FROM subscription WHERE `courseID` = ? ) subs ON `users`.`id` = `subs`.`userID`")+
 	' WHERE 1=1 '+
@@ -34,8 +32,6 @@ exports.userListByFilter = function (filter, callback) {
     if(filter.institution)
 	param.push(filter.institution);
     bdd.query(query, param, function(err, rows) {
-//	console.log(this.sql);
-//	console.log(err, rows);
 	callback(err, rows);
     });
 };
@@ -46,7 +42,6 @@ exports.userListByFilter = function (filter, callback) {
 
 exports.userByID = function (userID, callback) {
     bdd.query('SELECT * FROM users WHERE id = ?', [userID],  function(err, rows) {
-//	console.log(rows);
 	callback(err, rows[0]);
     });
 };
@@ -60,8 +55,7 @@ exports.userByID = function (userID, callback) {
 exports.create = function (user, callback) {
     bcrypt.hash(user.password, saltRounds, function(err, hash) {
 	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`, `promotion`, `studentNumber`, `institution`) VALUES (?, ?, ?, ?, ?,?,?,?)', [user.pseudo, hash, user.email, user.nomComplet, user.adminPassword == config.ADMINPASSWD, user.promotion, user.n_etu, user.institution ], function(err, rows) {
-	    //	    console.log(rows);
-	    console.log(err);
+	    if(err) console.log(err);
 	    callback(err,rows);
 	});
     });
@@ -160,7 +154,6 @@ exports.getSubscription = function(user, course, callback) {
     else {
 	let query = "SELECT * FROM subscription WHERE userID = ? AND courseID = ?";
 	bdd.query(query, [user.id, course.id], function (err, res) {
-//	    console.log(this.query);
 	    if(res) 
 		callback(err, res[0]);
 	    else

@@ -130,19 +130,19 @@ Utiliser $...$ pour mettre des maths.
 				    <tr>
 					<td>Selectionnée</td>
 					<td>
-					    <input style="width:30px;" name="selected-false-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy) != "undefined" ? reponsePossible.strategy.selected.faux : "" %>"> points par défaut
+					    <input style="width:30px;" name="selected-false-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy) != "undefined" ? reponsePossible.strategy.selected.faux : "0" %>"> points par défaut
 					</td>
 					<td>
-					    <input style="width:30px;" name="selected-true-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.selected.vrai : "" %>"> points par défaut
+					    <input style="width:30px;" name="selected-true-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.selected.vrai : "1" %>"> points par défaut
 					</td>
 				    </tr>
 				    <tr>
 					<td>Non selectionnée</td>
 					<td>
-					    <input style="width:30px;" name="unselected-false-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.unselected.faux : "" %>"> points par défaut
+					    <input style="width:30px;" name="unselected-false-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.unselected.faux : "0" %>"> points par défaut
 					</td>
 					<td>
-					    <input style="width:30px;" name="unselected-true-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.unselected.vrai : "" %>"> points par défaut
+					    <input style="width:30px;" name="unselected-true-<%= i %>" type="number" value="<%= typeof(reponsePossible.strategy)!= "undefined" ? reponsePossible.strategy.unselected.vrai : "0" %>"> points par défaut
 					</td>
 				    </tr>
 				</table>

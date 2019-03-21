@@ -23,13 +23,12 @@ exports.room_enter = function(req, res) {
 		//		Course.getByID(req.params.idCourse, callback);
 		callback(null, req.course);
 	    },
-	    config : function(callback) { /*console.log(config);*/ callback(null, config); },	
+	    config : function(callback) { callback(null, config); },	
 	    room : function (callback) {
 		Room.getByID(req.params.roomID, (err, res) => {callback(err, res); });
 	    }
 	},
 	function (err, results) {
-//	    console.log("resultsssssss", results, req.params);
 	    res.render('play', results);
 	});
 };
@@ -70,7 +69,6 @@ exports.room_admin = function(req, res) {
 		}
 	    },
 	    function (err, results) {
-//		console.log(results);
 		res.render('play_admin', results);
 	    });
     }
@@ -114,7 +112,6 @@ exports.room_cc = function(req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
 	    res.render('play_CC', results);
 	});
 };
@@ -155,7 +152,6 @@ exports.room_cc_admin = function(req, res) {
 		}
 	    },
 	    function (err, results) {
-		//	    console.log(results);
 		res.render('play_CC_admin', results);
 	    });
     }
@@ -165,17 +161,13 @@ exports.room_cc_admin = function(req, res) {
 
 
 exports.fileForStudent = function(req, res) {
-//    console.log(req.params);
     Game.getFileFromSubmission(req.session.user.id, req.room, req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
-	console.log("yo");
 	docController.serveFile(data, sanit_fn(req.params.fileName), res);
     });
 };
 exports.fileCorrectForStudent = function(req, res) {
-//    console.log(req.params);
     if(req.room.status.showTruth) {
 	Question.getFileCorrect(req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
-	    console.log("yo");
 	    docController.serveFile(data, sanit_fn(req.params.fileName), res);
 	});
     }
@@ -183,11 +175,8 @@ exports.fileCorrectForStudent = function(req, res) {
 	res.end("Impossible de voir la correction car la salle n'est pas dans le bon mode...");
 };
 exports.fileForAdmin = function(req, res) {
-    console.log("yooo");
     if(req.subscription.isTDMan){
-//	console.log(req.params);
 	Game.getFileFromSubmission(req.params.userID, req.room, req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
-	    console.log("yo");
 	    docController.serveFile(data, sanit_fn(req.params.fileName), res);
 	});
     }
@@ -196,14 +185,11 @@ exports.fileForAdmin = function(req, res) {
 };
 
 exports.fileCorrectForAdmin = function(req, res) {
-    console.log("yooo");
     if(req.subscription.isTDMan){
 	Question.getFileCorrect(req.question, req.params.answerNumber, sanit_fn(req.params.fileName), (err, data) => {
-	    console.log("yo");
 	    docController.serveFile(data, sanit_fn(req.params.fileName), res);
 	});
 	// exports.fileCorrectForStudent(req,res);
-//	console.log(req.params);
     }
     else
 	exports.room_cc_admin(req, res);

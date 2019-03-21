@@ -29,7 +29,6 @@ module.exports = function(io) {
 */
 
     function sendQuestionFromIndex (socket, index, callback)  {
-	    console.log("sendQuestionfromindex");
 	// Question.getByIndexCC(index,socket.request.session.user, socket.room.id, (err, question) => {
 	//     socket.emit("newQuestion", question);
 	//     callback();
@@ -69,7 +68,6 @@ module.exports = function(io) {
 	
 	socket.use(function (packet, next) {
 	    console.log("packet is", packet[0]);
-//	    console.log("arg is", packet[1], packet[2]);
 	    // On vérifie que le TDMan est bien un TDMan
 	    if(packet[1])
 		async.waterfall([
@@ -104,15 +102,12 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendAnswer', function (roomID, studentID, questionID) {
-//	    console.log("studentID = ", studentID);
 	    sendAnswer(socket, socket.room, studentID, questionID, function (err) {
 		if(err) throw err;
 	    });
 	});
 	
 	socket.on('sendQuestion', function (roomID, studentID, questionIndex) {
-//	    console.log("studentID = ", studentID);
-	    console.log("studentID = ");
 	    sendQuestionFromIndex(socket, questionIndex, function (err) {
 		if(err) throw err;
 	    });
@@ -123,7 +118,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('setValidity', function (roomID, studentID, questionID, i, validity) {
-	    console.log("customValidity = ", validity);
 	    Stats.setValidity(socket.room.id, studentID, questionID, i, validity,function (err) {
 		if(err) //throw err;
 		    console.error(err);
@@ -131,7 +125,6 @@ module.exports = function(io) {
 	    });
 	});
 	socket.on('setCustomComment', function (roomID, studentID, questionID, i, customComment) {
-	    console.log("customComment = ", customComment);
 	    Stats.setCustomComment(socket.room.id, studentID, questionID, i, customComment,function (err) {
 		if(err) //throw err;
 		    console.error(err);
@@ -140,6 +133,19 @@ module.exports = function(io) {
 	});
 	socket.on('setGlobalGrade', function (roomID, studentID, questionID, mark) {
 	    Stats.setGlobalGrade(roomID, studentID, questionID, mark, (err) => {
+		if(err) throw err;
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+	    });
+	});
+	socket.on('setGlobalComment', function (roomID, studentID, questionID, comment) {
+	    Stats.setGlobalComment(roomID, studentID, questionID, comment, (err) => {
+		if(err) throw err;
+		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
+	    });
+	});
+
+	socket.on('gradeCriteria', function (roomID, studentID, questionID, i, grade) {
+	    Stats.gradeCriteria(roomID, studentID, questionID, i, grade, (err) => {
 		if(err) throw err;
 		sendListStudents(socket.request.session.user, socket, socket.room, function() {});
 	    });
@@ -157,7 +163,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendList', function (roomID, studentID) {
-//	    console.log("this arg : ", socket.room, studentID);
 	    User.userByID(studentID, (err, user) => {
 		game.questionListForCC(user, socket.room.id, function (err, questionList) {
 		    socket.emit("newList", questionList);

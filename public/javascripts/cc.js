@@ -86,7 +86,6 @@ function gotoQuestion(i) {
 /*********************************************************************/
 
 socketCC.on('newQuestion', function (reponse) {
-//    console.log('newQuestion');
     console.log("newQuestion", reponse);
 //    currentQuestionOfAdmin=reponse;
     currentQuestion=reponse;
@@ -124,10 +123,8 @@ socketCC.on('newList', function (questionList) {
 
 function chooseAnswer(i) {
     let chosenAnswer = currentQuestion.reponses[i];
-    console.log(chosenAnswer);
     // Dans le cas où seul le clic détermine si question est selectionnée, (pas de fichier/textarea)
     if(!chosenAnswer.texted && !(chosenAnswer.hasFile == true || ["single","multi","true"].includes(chosenAnswer.hasFile))) {
-	console.log("clic-determined");
 	if(currentQuestion.type!="multi") {
 	    var reponse=document.querySelector(".reponse.selected");
 	    if(reponse)
@@ -144,7 +141,6 @@ function chooseAnswer(i) {
 	}
     }
     else { // Cas ou il y a un fichier/un textarea
-	console.log("content-determined");
 	let elem = document.querySelector("#r"+i);
 	let flag = false;
 	let textarea = elem.querySelector("textarea");
@@ -180,7 +176,6 @@ function sendAnswer() {
     });
     console.log("reponse envoyées : ", reponses);
     socketCC.emit("chosenAnswer", reponses, currentQuestion.indexSet);
-//    console.log("reponses, currentQuestion.indexSet = ", reponses, currentQuestion.indexSet);
 }
 
 /*********************************************************************/

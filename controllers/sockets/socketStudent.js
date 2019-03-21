@@ -17,7 +17,6 @@ module.exports = function(io) {
     let tools = require('./tools.js')(io);
 
     io.of("/student").on('connection', function (socket) {
-	//		console.log("socket.request.session.user is ",socket.request.session.user);
 	/******************************************/
 	/*  Middleware de socket                  */
 	/******************************************/
@@ -25,7 +24,6 @@ module.exports = function(io) {
 	// Si on n'a pas de room défini, la seule chose qu'on peut faire c'est choisir une room
 	
 	socket.use(function (packet, next) {
-	    //	    console.log("packet is", packet);
 	    if(packet[0]=="chooseRoom")
 		next();
 	    if(socket.roomID) {
@@ -42,20 +40,15 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('chooseRoom', function (newRoom) {
-//	    console.log("user try to enter room");
 	    if (socket.room)
 		socket.leave(socket.room.id);
 	    Room.getByID(parseInt(newRoom), function (err, res) {
-//		console.log("user got room", res);
 		Course.getByID(res.courseID, (er, course) => {
 		    User.getSubscription(socket.request.session.user, course, (err, subscription) => {
-//			console.log("user got subscription", subscription);
 			if(subscription) {
 			    socket.room = res;
 			    socket.roomID = res.id;
-//			    console.log("user enter room");
 			    socket.join(newRoom);
-			    //		console.log("socket.request.session.user is ",socket.request.session.user);
 			    game.enterRoom(socket.request.session.user, socket.room, function (err) {
 				tools.sendOwnedStats(socket.room);
 				tools.sendRoomQuestion(socket, socket.room, function () {
@@ -79,7 +72,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('sendQuestionPlease', function () {
-	    //		    console.log(socket.room);
 	    tools.sendRoomQuestion(socket, socket.room, function() {});
 	});
 	
@@ -88,8 +80,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	socket.on('chosenAnswer', function (answer) {
-//	    console.log("answer is", answer);
-//	    console.log("room is", socket.room);
 	    if(answer.length == 0 || socket.room.question.type == "multi")
 		game.registerAnswer(socket.request.session.user, socket.room, answer, function () {
 		    tools.sendOwnedStats(socket.room);

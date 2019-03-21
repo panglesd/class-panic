@@ -51,13 +51,23 @@ function afficheQuestion(question) {
 //    summaryWrapper.classList.add("reponse");
     summaryWrapper.classList.add("summary");
     summaryWrapper.classList.add("notSelected");
-    summaryWrapper.innerHTML += "Note finale : <span id='note'>N/A</span> Coefficient : <span id='coef'>N/A</span>";
+    summaryWrapper.innerHTML += "Note finale : <span id='note'>N/A</span> Coefficient : <span id='coef'>N/A</span> <ul class='criteresWrapper'>Critères : </ul>";
     summaryWrapper.style.display = "none";
     wrapper.appendChild(summaryWrapper);
 
     if(question.coef) {
 	document.querySelector(".summary").style.display="";
 	document.querySelector(".summary #coef").textContent = question.coef;
+    }
+    if(question.criteres) {
+	question.criteres.forEach((critere, index) => {
+	    let critereElem = document.createElement("li");
+	    critereElem.classList.add("critere");
+	    critereElem.innerHTML = "<span id='critereName-"+index+"' class='critereName'></span> : <span class='critereNote' id='critereNote-"+index+"'></span>%, coef : <span class='critereCoef' id='critereCoef-"+index+"'></span>";
+	    critereElem.querySelector(".critereName").innerText = critere.name;
+	    critereElem.querySelector(".critereCoef").innerText = critere.coef;
+	    summaryWrapper.querySelector(".criteresWrapper").appendChild(critereElem);
+	});
     }
 
 };
@@ -69,9 +79,7 @@ function createResponse(question, rep, index) {
     elem.classList.add("notSelected");
     elem.id = "r"+index;    
     // Si besoin est, ajout d'un event listener  A DEPLACER ?
-//    console.log("on ajoute chooseAnswer ???", rep);
     if(!rep.texted && rep.hasFile == "none" && typeof chooseAnswer == "function") {
-//	console.log("on ajoute chooseAnswer !!!");
 	elem.addEventListener("click", function (ev) {
 	    chooseAnswer(index);		    //updateAnswer(index, elem, true);
 	});
@@ -80,7 +88,6 @@ function createResponse(question, rep, index) {
     let span = document.createElement("span");
     elem.innerHTML = "";
     span.innerHTML = md.render(rep.reponse);
-    console.log(span, rep.reponse);
     span.classList.add("markdown");
     elem.appendChild(span);
     // Si besoin, ajout d'un textarea
@@ -93,7 +100,6 @@ function createResponse(question, rep, index) {
 	// Ajout d'un event listener pour le textarea
 	if(typeof chooseAnswer == "function") {
 	    textarea.addEventListener("input", (ev) => {
-		console.log("updateed");
 		chooseAnswer(index);		    //updateAnswer(index, elem, true);
 		//		    sendAnswer();
 	    });
@@ -126,7 +132,6 @@ function createResponse(question, rep, index) {
 	    fileInput.addEventListener('change', function() {
 		var reader = new FileReader();
 		reader.addEventListener('load', function() {
-		    console.log("sending file !");
 		    sendFile(fileInput.files[0].name, index, question.indexSet, reader.result);
 		    elem.classList.replace("notSelected", "selected");
 		});
@@ -139,7 +144,6 @@ function createResponse(question, rep, index) {
     }
     // A commenter ?
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,elem]);
-    console.log("rep = ", rep);
 
     let fileCorrecWrapper = document.createElement("fieldset");
     fileCorrecWrapper.classList.add("fileCorrecWrapper");
@@ -159,7 +163,6 @@ function createResponse(question, rep, index) {
     customComment.placeholder="Commentaires de correction";
     customComment.style.display = "none";
 //    customComment.required=true; // HACK pour que customComment ne s'affiche que s'il contient quelque chose...
-    //	console.log("rep=",reponse);
     if(typeof(setCustomComment) == "function")
 	customComment.addEventListener("input", (ev) => {
 	    setCustomComment(index, customComment.value);
@@ -202,7 +205,7 @@ function addCorrection(question, elem, rep, index) {
     return elem;
 }
 
-function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect){
+function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect, gradeCriteria, setGlobalComment){
     let wrapper = document.querySelector("#wrapperAnswer");
     question.reponses.forEach((rep, index) => {
 	let elemRep = document.querySelector("#r"+index);
@@ -249,17 +252,30 @@ function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect
 
     });
     let summary = document.querySelector(".summary");
+    let globalComment = document.createElement("div");
+    globalComment.innerHTML = "Commentaire global : <textarea style='width:100%;' rows=10 class='globalCommentArea'></textarea>";
+    globalComment.querySelector("textarea").addEventListener("input", (ev) => {
+	setGlobalComment(globalComment.querySelector("textarea").value);
+    });
+    summary.appendChild(globalComment);
     let customMarkWrapper = document.createElement("div");
     customMarkWrapper.innerHTML = "Choisir la note : <input type='number' id='mark' step='0.1'>"+"<div style='display:none' class='reautomatiser'>La note est choisie par le correcteur <input type='button' class='strategy' value='Calculer la note automatiquement'></div>";
     let mark = customMarkWrapper.querySelector("#mark");
     if(mark) {
-	mark.addEventListener("input", (ev) => {console.log("change");setGlobalGrade(parseFloat(mark.value));});
+	mark.addEventListener("input", (ev) => {setGlobalGrade(parseFloat(mark.value));});
     }
     let reAuto = customMarkWrapper.querySelector(".strategy");
     if(reAuto) {
-	reAuto.addEventListener("click", (ev) => {console.log("change");setAutoCorrect();});
+	reAuto.addEventListener("click", (ev) => {setAutoCorrect();});
     }
     summary.appendChild(customMarkWrapper);
+    summary.querySelectorAll(".critere").forEach((critereElem, index) => {
+	critereElem.querySelector(".critereNote").innerHTML = "<input type='number' class='critereInput' id='critereInput-"+index+"'>";
+	let critInput = critereElem.querySelector(".critereInput");
+	critInput.addEventListener("change", (ev) => {
+	    gradeCriteria(index, parseInt(critInput.value));
+	});
+    });
 }
 	
 
@@ -273,7 +289,6 @@ function afficheSubmission (submission) {
     let totalPoints = 0;
     let totalMaxPoints = 0;
     submission.response.forEach((submReponse, index) => {
-	console.log("reponse ", submReponse);
 	let questReponse = currentQuestion.reponses[index];
 	let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[index];
 	elemReponse.classList.remove("notSelected");
@@ -284,11 +299,9 @@ function afficheSubmission (submission) {
 	if(ta)
 	    ta.value = submReponse.text;
 	//    });
-	console.log("reponse.hasFile = ", submReponse.hasFile);
 	if(elemReponse.querySelector(".filesInfo")) {
 	    affFileInfo(elemReponse,submReponse.filesInfo,index);
 	}
-	console.log("we are here");
 	elemReponse.classList.remove("to_correct", "true", "false");
 	// if(reponse.validity) {
 	//     elemReponse.classList.add(reponse.validity);
@@ -349,6 +362,17 @@ function afficheSubmission (submission) {
 		autoCalcul.style.display = "none";
 	}
     }
+    if(submission.globalInfo) {
+	let summary = document.querySelector(".summary");
+	summary.style.display="";
+	summary.querySelector(".globalCommentArea").value = submission.globalInfo.comment;
+	if(submission.globalInfo.criteria) {
+	    let critereElems = summary.querySelectorAll(".critere");
+	    submission.globalInfo.criteria.forEach((critere, index) => {
+		critereElems[index].querySelector(".critereNote").firstChild.value = critere;
+	    });
+	}
+    }
 //	autoCalcul.value = submission.strategy == "manual" ? "Automatiser la correction" : "Choisir une note fixe";
 //	autoCalcul
     // Ici gérer les corrections personnelles de la question
@@ -366,7 +390,6 @@ function affFileInfo(elemReponse, filesInfo, n_ans) {
     let filesInfoElem = elemReponse.querySelector(".filesInfo");
     filesInfoElem.innerHTML = filesInfo.length == 0 ? "Aucun fichier envoyé" : "";
     filesInfo.forEach((fileInfo) => {
-	console.log("affFileinfo with : ", elemReponse, fileInfo, n_ans);
 	let fileInfoElem = document.createElement("li");
 	fileInfoElem.innerHTML = "<table><tr><td>Fichier : </td><td style='padding-left: 10px;'  ><a target='blank' class='fileName' style='color:blue' href='filePerso/"+currentQuestion.id+"/"+n_ans+"/"+(typeof(currentStudent)!="undefined" ? (currentStudent.id+"/" ): "")+fileInfo.fileName+"'></a></td></tr>"+
 	    //		    "<tr><td>Hash md5 : </td><td  style='padding-left: 10px;' class='hash'></td></tr>";
@@ -410,14 +433,13 @@ function affQuestionList(questionList) {
 	ul.id = "chooseQFromSet";
 	ul.innerHTML = '<li id="chooseQuestionNext"> Choisir la question suivante :</li>';
 	questionList.forEach(function (question, index) {
-	    // console.log(question);
 	    let li = document.createElement("li");
 	    li.id = "q-" + question.id;
 	    li.classList.add("q-");
 	    if(question.id == currentQuestion.id)
 		li.classList.add("currentQuestion");
 	    li.addEventListener("click", () => {
-		console.log("sdfggfeer");gotoQuestion(question.indexSet);
+		gotoQuestion(question.indexSet);
 	    });
 	    li.class = ""+(question.id == currentQuestion.id);
 	    li.textContent = question.enonce;

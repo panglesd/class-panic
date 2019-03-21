@@ -139,14 +139,13 @@ exports.doc_list = function(req, res) {
 		callback(null, req.course);
 	    },
 	    students :  function (callback) {
-		Course.students(req.course.id, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
+		Course.students(req.course.id, (err, res) => {if(err) console.log(err); callback(err, res);});
 	    },
 	    msgs : function(callback) {
 		callback(null, "");
 	    },
 	},
 	function (err, results) {
-	    console.log(results.docs);
 	    res.render('manage_docs', results);
 	});
 };
@@ -163,7 +162,6 @@ function serveFile(data, fileName, res) {
     if(!mime)
 	mime = "application/octet-stream";
     res.setHeader('Content-type', mime);
-//    console.log("yo");
     res.end(data);
 }
 exports.serveFile = serveFile;
@@ -174,7 +172,6 @@ exports.doc_get = function (req, res) {
     let doc = req.doc;
     if (doc.courseID == req.course.id) {
 	Doc.getFileFromDoc(doc, fileName, (err, file) => {
-	    console.log(file);
 	    serveFile(file, fileName, res);
 	});
     }
@@ -184,18 +181,15 @@ exports.doc_get = function (req, res) {
 };
 
 exports.doc_add_post = function(req, res) {
-    console.log("we add");
     if(!Array.isArray(req.files.aux)) {
 	req.files.aux = req.files.aux ? [req.files.aux] : [];
     }
     Doc.create(req.files.main, req.files.aux, req.course.id, req.session.user.id, (err) => {
-	console.log("finished adding");
 	exports.doc_list(req, res);
     });
 };
 
 exports.remove = function(req, res) {
-    console.log("iciiiii");
     if(req.subscription.canAddDocs)
 	Doc.remove(req.doc.id, () => {res.redirect(config.PATH+"/course/"+req.course.id+"/doc");});
     else
@@ -203,14 +197,12 @@ exports.remove = function(req, res) {
 };
 
 exports.removeFile = function(req, res) {
-    console.log("iciiiii2");
     if(req.subscription.canAddDocs)
 	Doc.removeFile(req.doc, req.params.name, () => {res.redirect(config.PATH+"/course/"+req.course.id+"/doc");});
     else
 	res.redirect(config.PATH);
 };
 exports.addFile = function(req, res) {
-    console.log("iciiiii2");
     if(!Array.isArray(req.files.newFiles)) {
 	req.files.newFiles = req.files.newFiles ? [req.files.newFiles] : [];
     }

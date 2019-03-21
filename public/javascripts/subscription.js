@@ -48,7 +48,7 @@ function searchStudent(name, n_etu, promotion, institution) {
 	n_etu:n_etu,
 	promotion:promotion,
 	institution:institution
-    }
+    };
     socket.emit("getUser", courseID, search);
 
 }
@@ -56,22 +56,13 @@ function searchStudent(name, n_etu, promotion, institution) {
 function subscribeStudent() {
     let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
     let arr = Array.from(l);
-    console.log("arr is", arr);
-    socket.emit("subscribeList", courseID, arr.map((e) => { return parseInt(e.id)}));
+    socket.emit("subscribeList", courseID, arr.map((e) => { return parseInt(e.id);}));
     // Prevenir l'utilisateur de l'inscription
 }
 function subscribeTDMan() {
     let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
     let arr = Array.from(l);
-    console.log("arr is", arr);
-    console.log({
-		    canOwnRoom: document.querySelector("#canOwnRoom").checked,
-		    canAllRoom: document.querySelector("#canAllRoom").checked,
-		    canOwnSet: document.querySelector("#canOwnSet").checked,
-		    canAllSet: document.querySelector("#canAllSet").checked,
-		    canSubscribe: document.querySelector("#canSubscribe").checked
-    });
-    socket.emit("subscribeListTDMan", courseID, arr.map((e) => { return parseInt(e.id)}),
+    socket.emit("subscribeListTDMan", courseID, arr.map((e) => { return parseInt(e.id);}),
 		{
 		    canOwnRoom: document.querySelector("#canOwnRoom").checked,
 		    canAllRoom: document.querySelector("#canAllRoom").checked,
@@ -85,8 +76,7 @@ function subscribeTDMan() {
 function unSubscribeStudent() {
     let l = document.querySelectorAll("#wrapper-student-list ul li.selected-for-subscription");
     let arr = Array.from(l);
-    console.log("arr is", arr);
-    socket.emit("unSubscribeList", courseID, arr.map((e) => { return parseInt(e.id)}));
+    socket.emit("unSubscribeList", courseID, arr.map((e) => { return parseInt(e.id);}));
     // Prevenir l'utilisateur de l'inscription
 }
 
