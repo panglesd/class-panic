@@ -5,7 +5,10 @@
 function afficheQuestion(question) {
 
     console.log("newQuestion", question);
-
+    let enonce = document.querySelector("#question");
+    if(enonce && enonce.getAttribute("questionID") == question.id) {
+	return;
+    }
     // On s'occupe du carré blanc
     let temp;
     if((temp = document.querySelector("li.currentQuestion"))) {
@@ -15,7 +18,6 @@ function afficheQuestion(question) {
 	temp.classList.add("currentQuestion");
 
     // On écrit l'énoncé là où il faut. MathJax rendered.
-    let enonce = document.querySelector("#question");
     enonce.setAttribute("questionID", question.id);
     enonce.textContent=question.enonce;
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,enonce]);
@@ -156,6 +158,10 @@ function createResponse(question, rep, index) {
 
     if(rep.validity)
 	addCorrection(question, elem, rep, index);
+
+    let buttonWrapper = document.createElement("div");
+    buttonWrapper.classList.add("buttonWrapper");
+    elem.appendChild(buttonWrapper);
     
     let customComment = document.createElement("textarea");
     customComment.id="customComment-"+index;
@@ -208,7 +214,8 @@ function addCorrection(question, elem, rep, index) {
 function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect, gradeCriteria, setGlobalComment){
     let wrapper = document.querySelector("#wrapperAnswer");
     question.reponses.forEach((rep, index) => {
-	let elemRep = document.querySelector("#r"+index);
+	let elemRep = document.querySelector("#r"+index+ " .buttonWrapper");
+	elemRep.innerHTML = "";
 	let button = document.createElement("button");
 	button.addEventListener("click",(ev) => {
 	    setValidity(index,1);
@@ -245,7 +252,7 @@ function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect
 	    setValidity(index, parseFloat(vraiFauxInput.value));
 	});
 	elemRep.appendChild(vraiFauxInput);
-	elemRep.querySelector(".customComment").style.display = "";
+	document.querySelector("#r"+index+ " .customComment").style.display = "";
 	let note = document.createElement("div");
 	note.classList.add("note");
 	elemRep.appendChild(note);
@@ -270,10 +277,10 @@ function addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect
     }
     summary.appendChild(customMarkWrapper);
     summary.querySelectorAll(".critere").forEach((critereElem, index) => {
-	critereElem.querySelector(".critereNote").innerHTML = "<input type='number' class='critereInput' id='critereInput-"+index+"'>";
+	critereElem.querySelector(".critereNote").innerHTML = "<input type='number' step='0.1' class='critereInput' id='critereInput-"+index+"'>";
 	let critInput = critereElem.querySelector(".critereInput");
 	critInput.addEventListener("change", (ev) => {
-	    gradeCriteria(index, parseInt(critInput.value));
+	    gradeCriteria(index, parseFloat(critInput.value));
 	});
     });
 }

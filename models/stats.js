@@ -10,7 +10,7 @@ var async = require('async');
 
 exports. getStats = function (filter, callback) {
 
-    let query = 'SELECT `stats`.id ' +
+    let query = 'SELECT `stats`.id AS statsID' +
 	', blocID' +
 	', `users`.id as userID' +
 	', correct' +
@@ -35,10 +35,12 @@ exports. getStats = function (filter, callback) {
 	' FROM `stats` INNER JOIN `statsBloc` ON `stats`.`blocID` = `statsBloc`.`id` INNER JOIN  `users` ON `users`.id = `stats`.userID WHERE `roomID` IN (SELECT id FROM `rooms` WHERE 1=1) ';
     
     let param = [];
-    //    if(filter.courseID) {
-    query += " AND `roomID` IN (SELECT id FROM `rooms` WHERE courseID = ?) ";
-    param.push(filter.courseID);
-    //    }
+    //  Ceci était commenté : pourquoi ????
+    if(filter.courseID) {
+	query += " AND `roomID` IN (SELECT id FROM `rooms` WHERE courseID = ?) ";
+	param.push(filter.courseID);
+    }
+    //  Fin : ceci était commenté
     if(filter.studentID) {
 	query += " AND `userID` = ? ";
 	param.push(filter.studentID);
@@ -59,7 +61,7 @@ exports. getStats = function (filter, callback) {
 	query += " AND `setID` = ? ";
 	param.push(filter.setID);
     }
-
+    console.log(query, param);
     bdd.query(query, param, function(err, rows) {
 	if(err) console.log(err);
 	callback(err, rows);
@@ -164,6 +166,7 @@ function tryGetSubmission(userID, roomID, questionID, callback) {
 };
 
 exports.getSubmission = function(userID, roomID, questionID, callback) {
+    
     tryGetSubmission(userID, roomID, questionID, (err, subm) => {
 	if(subm) {
 	    subm.customQuestion = JSON.parse(subm.customQuestion);
@@ -286,7 +289,13 @@ exports.gradeCriteria = function(roomID, userID, questionID, i, grade, callback)
 	let query = "UPDATE stats SET globalInfo = ? WHERE id = ?";
 	let params = [JSON.stringify(subm.globalInfo), subm.statsID];
 	bdd.query(query, params, (err, res) => {
-	    callback(err, res);
+	     Question.getByID(questionID, (err, question)=> {
+		 exports.getSubmission(userID, roomID, questionID, (err, subm2) => {
+		     Question.correctAndLogSubmission(question, subm2, callback);
+		     // callback(err, res);
+		     
+		 });
+	     });
 	});
     });
     //    callback("setStrategy est deprecié", null);

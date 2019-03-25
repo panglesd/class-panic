@@ -133,9 +133,10 @@ socketCC.on('newQuestion', function (question) {
     console.log("question = ", question);
     currentQuestion = question;
     let notTheSame = typeof currentQuestion == "undefined";
-    notTheSame = notTheSame || !document.querySelector("#question");
-    notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != question.id;
-    if(notTheSame || !notTheSame) {
+    // notTheSame = notTheSame || !document.querySelector("#question");
+    // notTheSame = notTheSame || document.querySelector("#question").getAttribute("questionID") != question.id;
+    let enonce = document.querySelector("#question");
+    if(!(enonce && enonce.getAttribute("questionID") == question.id)) {
 	afficheQuestion(question);
 	addAdminInterface(question, setValidity, setGlobalGrade, setAutoCorrect, gradeCriteria, setGlobalComment);
     }

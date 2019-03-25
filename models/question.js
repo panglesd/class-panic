@@ -253,7 +253,7 @@ exports.getFileCorrect = function (question, n_ans, fileName, callback) {
 exports.questionCreate = function (user, question, /*filesData,*/ setID, callback) {
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
-	if(er) console.log(er); // Il faudrait regrouper reponses, description, type, coef, correcType et criteres dans un seul objet... 
+	if(er) console.log(er); // Il faudrait regrouper reponses, description, type, coef, correcType et criteres dans un seul champs de la BDD... 
 	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`, `coef`, `correcType`, `criteres`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
 	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.coef, question.correcType, JSON.stringify(question.criteres)
 	], function (err, r) {
@@ -352,8 +352,10 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 		});
 		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ?, `correcType` = ?, `criteres` = ? WHERE `id` = ?",
 			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, newQuestion.correcType, JSON.stringify(newQuestion.criteres), questionID], (err, res) => {
-			      exports.updateGradesOfQuestion(question, (err, res) => {
-				  callback(err, questionID);
+			      exports.getByID(question.id, (err, newQuestion) => {
+				  exports.updateGradesOfQuestion(newQuestion, (err, res) => {
+				      callback(err, questionID);
+				  });
 			      });
 			  });
 //		bdd.query("UPDATE `questions` SET reponses = ? WHERE id = ?", [JSON.stringify(question.reponses), questionID], (err) => {callback(err, questionID);});
@@ -387,9 +389,11 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 /***********************************************************************/
 
 exports.updateGradesOfQuestion = function(question, callback) {
-    Stats.getStats({questionID: question.id}, (err, statsL) => {
+    Stats.getStats({questionID: question.id }, (err, statsL) => {
 	async.forEach(statsL,(submission, callbackForEach) => {
-	    exports.correctAndLogSubmission(question, submission, callbackForEach);  
+	    Stats.getSubmission(submission.statsID, (err, trueSubm) => {
+		exports.correctAndLogSubmission(question, trueSubm, callbackForEach);
+	    });
 	}, (err) => {
 	    callback(err);
 	});
@@ -426,26 +430,40 @@ exports.maxPointsOfQuestion = function(question, callback) {
     }
     else {
 	question.criteres.forEach((critere) => {
-	    maxPointsTotal += critere.coef; 
+	    maxPointsTotal += parseInt(critere.coef); 
 	});
     }
     callback(null, maxPointsTotal);
 };
 
 exports.correctSubmission = function(question, submission, callback) {
-    let submPoints = 0;
-    let totPoints = 0;
     if(submission.strategy=="manual") {
 	callback(null, submission.correct);
     }
-    else {
+    else if(submission.strategy=="computed" && question.correcType == "globally") {
+	let sumCoef = 0;
+	let sumNote = 0;
+	submission.globalInfo.criteria.forEach((critere, index) => {
+	    sumCoef += question.criteres[index].coef;
+	    sumNote += question.criteres[index].coef*critere;
+	});
+	// if(sumCoef!=0)		
+	if(isNaN(sumNote) || typeof(sumNote)!= "number")
+	    callback(null, "?");
+	else
+	    callback(null, sumNote);
+
+    }
+    else if(submission.strategy=="computed" && question.correcType == "answerByAnswer") {
+	let submPoints = 0;
+	let totPoints = 0;
 	submission.response.forEach((repSubm, index) => {
 	    let rep = question.reponses[index];
 	    // Is the following really necessary ? No !
 	    // if(typeof(repSubm.points) == "number")
 	    // 	submPoints += repSubm.points;
 	    // else 
-		if(typeof(repSubm.validity) == "number") {
+	    if(typeof(repSubm.validity) == "number") {
 		if(repSubm.selected) 
 		    submPoints += repSubm.validity*rep.strategy.selected.vrai + (1-repSubm.validity)*rep.strategy.selected.faux;
 		if(!repSubm.selected) 
@@ -462,9 +480,11 @@ exports.correctSubmission = function(question, submission, callback) {
 		    else
 			submPoints += rep.strategy.selected.vrai;
 		}
-		if(!repSubm.selected)
+		else if(!repSubm.selected)
 		    if(rep.strategy.unselected.vrai != rep.strategy.unselected.faux)
-		    submPoints += (repValidity)*rep.strategy.unselected.vrai + (1-repValidity)*rep.strategy.unselected.faux;
+			submPoints += (repValidity)*rep.strategy.unselected.vrai + (1-repValidity)*rep.strategy.unselected.faux;
+		    else
+			submPoints += rep.strategy.unselected.faux;
 	    }
 	    totPoints += rep.maxPoints;
 	});
