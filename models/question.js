@@ -2,6 +2,7 @@ var async = require("async");
 let bdd = require("./bdd");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
+var config = require("./../configuration");
 
 /***********************************************************************/
 /*       Getters pour les question : listes                            */
@@ -131,7 +132,7 @@ exports.getFirstOfSet = function (setID, callback) {
 exports.getFileCorrect = function (question, n_ans, callback) {
     console.log("thequestio is ", question);
     question.correcFileInfo = JSON.parse(question.correcFileInfo);
-    let path = "storage/question"+question.id+"/anwer"+n_ans+"/"+question.correcFileInfo[n_ans];
+    let path = config.STORAGEPATH+"/question"+question.id+"/anwer"+n_ans+"/"+question.correcFileInfo[n_ans];
     fs.readFile(path, callback);    
 };
 
@@ -156,7 +157,7 @@ exports.questionCreate = function (user, question, fileInfo, setID, callback) {
 	    let questionID = r[1][0].id;
 	    async.eachOf(fileInfo, (file, index, callback) => {
 		if(file) {
- 		    let path = "storage/question"+questionID+"/anwer"+index+"/";
+ 		    let path = config.STORAGEPATH+"/question"+questionID+"/anwer"+index+"/";
 		    console.log("path =", path+file.name);
 		    mkdirp(path, (err) => {
 			file.mv(path+file.name, callback);

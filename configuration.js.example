@@ -5,3 +5,4 @@ exports.PATH = "/classPanic" ;
 exports.ADMINPASSWD = "classPanic";
 exports.TITLE = "Big Sister";
 exports.SUBTITLE = "Ta grande soeur t'aide à faire tes devoirs";
+exports.STORAGEPATH = "storage";

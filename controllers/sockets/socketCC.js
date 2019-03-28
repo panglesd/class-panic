@@ -7,6 +7,7 @@ var Question = require('../../models/question');
 var Set = require('../../models/set');
 var game = require('../../models/game');
 var async = require('async');
+var config = require("./../configuration");
 
 var fs = require("fs");
 var mkdirp = require("mkdirp");
@@ -152,7 +153,7 @@ module.exports = function(io) {
 	    if(socket.room.status == "pending"){
 		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    if(question.allResponses[n_ans].hasFile != "none") {
-			let path = "storage/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
+			let path = config.STORAGEPATH+"/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
 			console.log("path = ", path);
 			mkdirp(path, (err) => {
 			    fileName = sanit_fn(fileName);
