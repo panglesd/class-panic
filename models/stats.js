@@ -8,7 +8,7 @@ var Room = require("./room");
 var async = require('async');
 
 
-exports. getStats = function (filter, callback) {
+exports.getStats = function (filter, callback) {
 
     let query = 'SELECT `stats`.id AS statsID' +
 	', blocID' +
@@ -137,23 +137,27 @@ exports.grade = function(student, roomID, callback) {
     bdd.query(query, params, (err, submList) => {
 	let tot = 0;
 	let totCoef = 0;
-	submList.forEach((subm) => {
-	    let cQ = JSON.parse(subm.customQuestion);
-	    totCoef += parseInt(cQ.coef);
-	    
+	async.forEachSeries(submList, (subm, endCallback) => {
+	    Question.getByID(subm.questionID, (err, question) => {
+		
+	    totCoef += parseInt(question.coef);
+
 	    if (tot != "unknown" && subm.correct != "unknown") {
-		tot += parseFloat(subm.correct)*parseInt(cQ.coef);
+		tot += (parseFloat(subm.correct)/question.maxPoints)*parseInt(question.coef);
 //		tot += parseFloat(subm.correct)*parseInt(subm.customQuestion.coef);
 //		tot += parseFloat(subm.correct);
 	    }
 	    else
 		tot = "unknown";
+		endCallback();
+	    });			 
+	}, (err) => {
+	    if(tot != "unknown")
+		//	    callback(err, (tot)/(submList.length));	
+		callback(err, parseFloat(((tot)/(totCoef == 0 ? 1 : totCoef)).toFixed(5)));	
+	    else
+		callback(err, tot);	
 	});
-	if(tot != "unknown")
-//	    callback(err, (tot)/(submList.length));	
-	    callback(err, (tot)/(totCoef == 0 ? 1 : totCoef));	
-	else
-	    callback(err, tot);	
     });
 };
 
@@ -165,8 +169,24 @@ function tryGetSubmission(userID, roomID, questionID, callback) {
     });
 };
 
+exports.getSubmissionByID = function(statsID, callback) {
+    let query = "SELECT * FROM flatStats WHERE statsID = ?";
+    let params = [statsID];
+    bdd.query(query, params, (err, res) => {
+	if(err) console.log(err);
+	if(!res[0]) {console.log("no such submission with id" + statsID);callback("no such submission with id" + statsID, null);}
+	else {
+	    let subm = res[0];
+	    subm.customQuestion = JSON.parse(subm.customQuestion);
+	    subm.response = JSON.parse(subm.response);
+	    subm.globalInfo = JSON.parse(subm.globalInfo);
+	    subm.customQuestion.allResponses = subm.customQuestion.reponses;
+	    callback(err, subm);
+	}
+    });
+};
+
 exports.getSubmission = function(userID, roomID, questionID, callback) {
-    
     tryGetSubmission(userID, roomID, questionID, (err, subm) => {
 	if(subm) {
 	    subm.customQuestion = JSON.parse(subm.customQuestion);
@@ -215,22 +235,23 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 	Question.getByID(questionID, (err, question) => {
 	    //	    subm.customQuestion.reponses[i].validity = validity;
 	    //	    subm.response[i].points = points;
+	    console.log("validity = ", validity);
 	    if(typeof(validity)=="number" )
-		subm.response[i].validity = validity;
+		subm.response[i].validity = parseFloat(validity.toFixed(2));
 	    else
 		subm.response[i].validity = NaN;
-//		delete(subm.response[i].validity);
+	    console.log("validity = ", validity);
+	    //		delete(subm.response[i].validity);
 	    // let query2 = "SELECT `statsBloc`.id FROM statsBloc INNER JOIN stats on `stats`.blocID = `statsBloc`.id WHERE roomID = ? AND userID = ? AND questionID = ?";
 	    // let params2 = [roomID, userID, questionID];
-	    Question.correctSubmission(question, subm, (err, value) => {
-	    	let query = "UPDATE stats SET response = ?, correct = ? WHERE id = ?";
-	    	let params = [JSON.stringify(subm.response), value, subm.statsID];
-	    	let q = bdd.query(query, params, (err, res) => {
-	    	    if (err) {
-	    		console.log("err = ", err);
-	    	    }
-	    	    callback(err, res);
-	    	});
+	    let query = "UPDATE stats SET response = ? WHERE id = ?";
+	    let params = [JSON.stringify(subm.response), subm.statsID];
+	    let q = bdd.query(query, params, (err, res) => {
+		Question.correctAndLogSubmission(question, subm, (err, value) => {
+		    // Question.correctSubmission(question, subm, (err, value) => {
+	    	    if (err) console.log("err = ", err);
+	    	    callback(err);
+		});
 		
 	    });
 	    //	let validity2 = Question.correctSubmission(subm.customQuestion, subm.response, subm.customQuestion.strategy);
@@ -247,6 +268,7 @@ exports.setValidity = function(roomID, userID, questionID, i, validity, callback
 	});
     });
 };
+
 exports.setCustomComment = function(roomID, userID, questionID, i, customComment, callback) {
     exports.getSubmission(userID, roomID, questionID, (err, subm) => {
 //	subm.customQuestion.reponses[i].customComment = customComment;

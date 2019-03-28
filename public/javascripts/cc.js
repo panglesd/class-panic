@@ -106,7 +106,7 @@ socketCC.on("fileReceived", (n_ans, fileName, hash) => {
     console.log("fileReceived with : ", n_ans, fileName, hash);
     let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[n_ans];
     affFileInfo(elemReponse, {fileName: fileName, hash: hash, timestamp: Date.now()}, n_ans);
-    sendAnswer();    
+    chooseAnswer(n_ans);    
 });
 
 /*********************************************************************/
@@ -122,11 +122,12 @@ socketCC.on('newList', function (questionList) {
 /*********************************************************************/
 
 function chooseAnswer(i) {
+    console.log("we chose "+i);
     let chosenAnswer = currentQuestion.reponses[i];
     // Dans le cas où seul le clic détermine si question est selectionnée, (pas de fichier/textarea)
     if(!chosenAnswer.texted && !(chosenAnswer.hasFile == true || ["single","multi","true"].includes(chosenAnswer.hasFile))) {
 	if(currentQuestion.type!="multi") {
-	    var reponse=document.querySelector(".reponse.selected");
+	    let reponse=document.querySelector(".reponse.selected");
 	    if(reponse)
 		reponse.classList.replace('selected', 'notSelected');
 	    if(i>-1) {
@@ -141,6 +142,9 @@ function chooseAnswer(i) {
 	}
     }
     else { // Cas ou il y a un fichier/un textarea
+	let reponse=document.querySelector(".reponse.selected");
+	if(reponse)
+	    reponse.classList.replace('selected', 'notSelected');
 	let elem = document.querySelector("#r"+i);
 	let flag = false;
 	let textarea = elem.querySelector("textarea");

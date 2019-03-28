@@ -92,6 +92,8 @@ exports.registerAnswer = function (user, room, newAnswer, callback) {
     });
 };
 
+// A couper en fonction (createStatsBloc, createStats, fillSubmissions)
+// Pour le moment, si un étudiant change sa réponse, les info de correction globale sont remise à zéro
 exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) {
     async.parallel({
 	set : function (callback) { Set.getByID(room.questionSet, callback); },
@@ -115,7 +117,7 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 		    newAnswer[index].filesInfo = rep.filesInfo;
 		});
 		let query2 = "UPDATE `stats` SET `response` = ?,  `correct` = ?, `globalInfo` = ? WHERE userID = ? AND blocID = ?";
-		let params2 = [JSON.stringify(newAnswer), "?", "{}", user.id, answ[1][0].blocID];
+		let params2 = [JSON.stringify(newAnswer), "?", "{\"comment\": null, \"criteria\":[]}", user.id, answ[1][0].blocID];
 		bdd.query(query2, params2, (err, res) => {
 		    Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
 			Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, false);});
@@ -135,7 +137,7 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 	    // Mais pas d'entrée stats qui correspond
 	    else if (answ[1][0]) {
 		let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`, `globalInfo`) VALUES (?,?,?,?,?,'computed', ?)";     // Puis on insère un stats
-		let params2 = [user.id, "?", answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question), "{}"];
+		let params2 = [user.id, "?", answ[1][0].blocID, JSON.stringify(newAnswer), JSON.stringify(question), "{\"comment\": null, \"criteria\":[]}"];
 		bdd.query(query2, params2, (err, res) => {
 		    Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
 			Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, true);});
@@ -160,7 +162,7 @@ exports.logAnswerCC = function (user, room, questionIndex, newAnswer, callback) 
 		bdd.query(query, params, (err, tabID) => {
 		    let blocID = tabID[1][0].blocID;
 		    let query2 = "INSERT INTO `stats`(`userID`, `correct`, `blocID`, `response`, `customQuestion`,`strategy`, `globalInfo`) VALUES (?,?,?,?,?,'computed', ?)";     // Puis on insère un stats
-		    let params2 = [user.id, "?", blocID, JSON.stringify(newAnswer), JSON.stringify(question), "{}"];
+		    let params2 = [user.id, "?", blocID, JSON.stringify(newAnswer), JSON.stringify(question), "{\"comment\": null, \"criteria\":[]}"];
 		    bdd.query(query2, params2, (err, res) => {
 			Stats.getSubmission(user.id,room.id, question.id, (err, subm) => {
 			    Question.correctAndLogSubmission(question, subm, (err, res) => {callback(err, true);});
@@ -322,20 +324,24 @@ exports.backToSet = function (roomID, callback) {
 
 
 exports.logFile = function(userID, roomID, questionID, n_ans, path, fileName, hash, timestamp, callback) {
-    Stats.getSubmission(userID, roomID, questionID, (err, submission) => {
-	let index = submission.response[n_ans].filesInfo.findIndex((fileInfo)=>{return (fileInfo.fileName == fileName);});
-	if(index>=0)
-	    submission.response[n_ans].filesInfo[index]={fileName:fileName, hash:hash, timestamp:timestamp};
-	else
-	    submission.response[n_ans].filesInfo.push({fileName:fileName, hash:hash, timestamp:timestamp});
-	if(submission.response[n_ans].filesInfo.length > 0)
-	    submission.response[n_ans].selected=true;
-	let query = "UPDATE `stats` SET `response` = ? WHERE id = ?";
-	bdd.query(query, [JSON.stringify(submission.response), submission.statsID], (err, res) => {
-	    if(err) console.log("errfromLogFile", err);
-	    callback();
+    Question.getByID(questionID, (err, question) => {
+	Stats.getSubmission(userID, roomID, questionID, (err, submission) => {
+	    let index = submission.response[n_ans].filesInfo.findIndex((fileInfo)=>{return (fileInfo.fileName == fileName);});
+	    if(index>=0)
+		submission.response[n_ans].filesInfo[index]={fileName:fileName, hash:hash, timestamp:timestamp};
+	    else
+		submission.response[n_ans].filesInfo.push({fileName:fileName, hash:hash, timestamp:timestamp});
+	    if(submission.response[n_ans].filesInfo.length > 0) {
+		if(question.type=="mono")
+		    submission.response.forEach((rep, i) => { if(index != i) rep.selected = false; }) ;
+		submission.response[n_ans].selected=true;
+	    }
+	    let query = "UPDATE `stats` SET `response` = ? WHERE id = ?";
+	    bdd.query(query, [JSON.stringify(submission.response), submission.statsID], (err, res) => {
+		if(err) console.log("errfromLogFile", err);
+		callback();
+	    });
 	});
-	
     });
 };
 

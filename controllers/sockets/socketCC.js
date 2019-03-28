@@ -56,37 +56,40 @@ module.exports = function(io) {
 	//     callback();
 	// });
 	Question.getByIndex(index, socket.room.id, (err, question) => {
-	    if(!socket.room.status.showTruth) {
-		delete(question.maxPoints);
-		delete(question.coef);
-		delete(question.strategy);
-		question.reponses.forEach((rep) => {
-		    delete(rep.validity);
-		    delete(rep.coef);
-		    delete(rep.correcFilesInfo);
-		    delete(rep.maxPoints);
-		    delete(rep.correction);
-		    delete(rep.strategy);
-		    delete(rep.correcFileInfo);
-		});
-	    }
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
-		delete(submission.customQuestion);
-		delete(submission.questionText);delete(submission.setText);delete(submission.roomText);
+		if(!socket.room.status.showTruth) {
+		    question.reponses.forEach((rep) => {
+			delete(rep.validity);
+			delete(rep.correcFilesInfo);
+			delete(rep.correction);
+		    });
+		}
 		if(!socket.room.status.showNotes) {
+		    delete(submission.globalInfo.criteria);
+		    delete(question.maxPoints);
+		    delete(question.coef);
+		    delete(question.strategy);
+		    delete(question.criteres);
+		    delete(question.correcType);
 		    delete(submission.correct);
+		    question.reponses.forEach((rep) => {
+			delete(rep.coef);
+			delete(rep.maxPoints);
+			delete(rep.strategy);
+		    });
 		    submission.response.forEach((rep) => {
 			delete(rep.validity);
 		    });
 		}
 		if(!socket.room.status.showCorrecPerso) {
-		    // delete commentaire perso etc...
-		    // delete(submission.customComment)
+		    delete(submission.globalInfo.comment);
 		    submission.response.forEach((rep) => {
 			delete(rep.customComment);			
 		    });
 		}
+		delete(submission.customQuestion);
+		delete(submission.questionText);delete(submission.setText);delete(submission.roomText);
 		socket.emit("newQuestion", question);
 		callback();
 	    });

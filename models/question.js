@@ -392,7 +392,7 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 exports.updateGradesOfQuestion = function(question, callback) {
     Stats.getStats({questionID: question.id }, (err, statsL) => {
 	async.forEach(statsL,(submission, callbackForEach) => {
-	    Stats.getSubmission(submission.statsID, (err, trueSubm) => {
+	    Stats.getSubmissionByID(submission.statsID, (err, trueSubm) => {
 		exports.correctAndLogSubmission(question, trueSubm, callbackForEach);
 	    });
 	}, (err) => {
@@ -404,6 +404,8 @@ exports.updateGradesOfQuestion = function(question, callback) {
 exports.correctAndLogSubmission = function(question, submission, callback) {
     exports.correctSubmission(question, submission, (err, grade) => {
 	let query = "UPDATE `stats` SET correct = ? WHERE id = ?";
+	if(typeof(grade)=="number")
+	    grade = parseFloat(grade.toFixed(2));
 	let params = [grade, submission.statsID];
 	bdd.query(query, params, (err,res) => { callback(err,res);});
     });
