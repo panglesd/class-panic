@@ -7,7 +7,7 @@ var Question = require('../../models/question');
 var Set = require('../../models/set');
 var game = require('../../models/game');
 var async = require('async');
-var config = require("./../configuration");
+var config = require("./../../configuration");
 
 var fs = require("fs");
 var mkdirp = require("mkdirp");
