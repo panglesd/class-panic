@@ -1,5 +1,6 @@
 var fs = require("fs");
 var mkdirp = require("mkdirp");
+var config = require("./../configuration");
 var sanit_fn = require("sanitize-filename");
 var md5File = require("md5-file");
 var async = require("async");
@@ -20,7 +21,7 @@ exports.create = function(mainFile, files, courseID, ownerID, callback) {
 	let docID = resID[1][0].id;
 	console.log("docID = ", docID);
 	
-	let path = "storage/course"+courseID+"/doc"+docID+"/";
+	let path = config.STORAGEPATH+"/course"+courseID+"/doc"+docID+"/";
 	mkdirp(path, (err) => {
 	    mainFile.mv(path+sanit_fn(mainFile.name), (err) => {
 		async.forEach(files, (file, callback) => {
@@ -58,7 +59,7 @@ exports.getByID = function(docID, callback) {
 exports.getFileFromDoc = function(doc, fileName, callback) {
 //    console.log(doc.filesInfo);
     if(doc.filesInfo.main == fileName || doc.filesInfo.aux.includes(fileName)) {
-	let path = "storage/course"+doc.courseID+"/doc"+doc.id+"/"+fileName;
+	let path = config.STORAGEPATH+"/course"+doc.courseID+"/doc"+doc.id+"/"+fileName;
 	fs.readFile(path, callback);
     }
 };
@@ -95,7 +96,7 @@ exports.addFile = function(doc, files, callback) {
 	doc.filesInfo.aux.push(file.name);
     });
 //    files;
-    let path = "storage/course"+doc.courseID+"/doc"+doc.id+"/";
+    let path = config.STORAGEPATH+"/course"+doc.courseID+"/doc"+doc.id+"/";
     async.forEach(files, (file, callback) => {
 	file.mv(path+sanit_fn(file.name), callback);//(err) => {
     }, (err) => {
