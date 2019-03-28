@@ -55,7 +55,7 @@ exports.logout = function(req, res) {
 exports.user_create_post = function(req, res) {
     Users.create(req.body, function (err, rows) {
 	if(err) {
-	    //	    console.log(err);
+	    console.log(err);
 	    req.msgs.push("Impossible de créer votre compte : sans doute le pseudo est-il déjà utilisé.");
 	    res.render('signin', {config: config, msgs: req.msgs});
 	}

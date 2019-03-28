@@ -13,11 +13,11 @@ var async = require('async');
 
 // render pour manage_sets.ejs
 
-renderManageSets = function(user, course, msgs, req, res) {
+let renderManageSets = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Gérer vos sets de questions")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Gérer vos sets de questions");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -25,50 +25,49 @@ renderManageSets = function(user, course, msgs, req, res) {
 		callback(null, req.subscription);
 	    },
 	    course : function(callback) {
-		callback(null, course)
+		callback(null, course);
 	    },
 	    msgs: function(callback) {
-		callback(null, msgs)
+		callback(null, msgs);
 	    },
 	    setOwnedList :  function (callback) {
 		Set.setOwnedList(user, course.id, callback);
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
-	    res.render('manage_sets', results)
+	    res.render('manage_sets', results);
 	});
 };
 
 // render pour managet_set.ejs
 
-renderManageSet = function(req, user, course, set, msgs, req, res) {
+let renderManageSet = function(req, user, course, set, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Gérer vos sets de questions")},
+	    title : function(callback) { callback(null, "Big Sister: Gérer vos sets de questions");},
 	    server : function(callback) {
 		callback(null, req.protocol + '://' + req.get('host') );
 	    },
-	    config : function(callback) { callback(null, config) },	
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
 	    course : function(callback) {
-		callback(null, course)
+		callback(null, course);
 	    },
 	    subscription: function(callback) {
 		callback(null, req.subscription);
 	    },
 	    questionList : function (callback) {
-		Question.listBySetID(set.id, function(a,b) {callback(a,b)});
+		Question.listBySetID(set.id, function(a,b) {callback(a,b);});
 	    },
-	    msgs: function(callback) { callback(null, msgs) },
+	    msgs: function(callback) { callback(null, msgs); },
 	    set : function (callback) {
 		callback(null, set);
 	    }
 	},
 	function (err, results) {
-	    res.render('manage_set', results)
+	    res.render('manage_set', results);
 	});
 };
 

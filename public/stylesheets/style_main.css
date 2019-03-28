@@ -76,7 +76,7 @@ li.room:hover {
     border: 3px solid grey
 }
 li.question, li.reponse {
-    font-size: 0.55em;
+    /* font-size: 1em; */
     display: block;
     padding: 20px;
     margin: 10px;
@@ -97,8 +97,8 @@ a.room:hover {
 //    font-size:  3em;
 }
 li.room div, li.question div, li.reponse div {
-    text-align: right;
-    font-size: 2em;
+    /* text-align: right; */
+    /* font-size: 2em; */
     font-family: Impact, "Arial Black", Arial, Verdana, sans-serif;  
 }
 
@@ -359,4 +359,21 @@ input[type=checkbox] {
 }
 .select.set-to_correct {
     color:white
+}
+.hidden {
+    display:none;
+}
+
+legend span {
+    margin-right:10px;
+}
+legend .legend {
+    font-size:1.2em;
+}
+
+.notaAnswer .notaGlobalWrapper {
+    display: none;
+}
+.notaGlobal .fieldNotation {
+    display: none;
 }

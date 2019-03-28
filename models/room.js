@@ -11,26 +11,49 @@ var Question = require("./question");
 
 exports.getByID = function(roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ?", [roomID], function (err, resu) {
-//	console.log(this.sql);
-	resu[0].question = JSON.parse(resu[0].question);
-	resu[0].status = JSON.parse(resu[0].status);
-	callback(err, resu[0]);});
+	if(err) {
+	    console.log(err);
+	    callback(err, null);
+	}
+	else if(resu[0]) {
+	    resu[0].question = JSON.parse(resu[0].question);
+	    resu[0].status = JSON.parse(resu[0].status);
+	    callback(err, resu[0]);
+	}
+	else
+	    callback("Aucune room d'id "+roomID);
+    });
 };
 
 exports.getOwnedByID = function(user, roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `id` = ? AND `ownerID` = ?", [roomID, user.id], function (err, resu) {
-	resu[0].question = JSON.parse(resu[0].question);
-	resu[0].status = JSON.parse(resu[0].status);
-	callback(err, resu[0]);
+	if(err) {
+	    console.log(err);
+	    callback(err, null);
+	}
+	else if(resu[0]) {
+	    resu[0].question = JSON.parse(resu[0].question);
+	    resu[0].status = JSON.parse(resu[0].status);
+	    callback(err, resu[0]);
+	}
+	else
+	    callback("Aucune room d'id "+roomID);
     });
 };
 
 exports.getControllableByID = function(user, roomID, callback) {
     bdd.query("SELECT * FROM `rooms` WHERE `rooms`.courseID IN (SELECT courseID FROM subscription WHERE userID= ? AND isTDMan=1) AND id = ?", [user.id, roomID], function (err, resu) {
-	console.log(err);
-	resu[0].question = JSON.parse(resu[0].question);
-	resu[0].status = JSON.parse(resu[0].status);
-	callback(err, resu[0]);
+	if(err) {
+	    console.log(err);
+	    callback(err, null);
+	}
+	else if(resu[0]) {
+	    resu[0].question = JSON.parse(resu[0].question);
+	    resu[0].status = JSON.parse(resu[0].status);
+	    callback(err, resu[0]);
+	}
+	else
+	    callback("Aucune room d'id "+roomID);
     });
 };
 
@@ -41,7 +64,6 @@ exports.getControllableByID = function(user, roomID, callback) {
 exports.listOfCourse = function (courseID, callback) {
     bdd.query('SELECT * FROM rooms WHERE courseID = ?', [courseID], function(err, rows) {
 	if(err) throw err;
-//	console.log(this.sql);
 	async.parallel(
 	    rows.map(
 		function (room) {
@@ -80,9 +102,11 @@ exports.getFromOwnedCourse = function (user, courseID, callback) {
 
 // By Name
 
-exports.getByName= function (room, callback) {
-    bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) { callback(rows[0]); });
-};
+// exports.getByName= function (room, callback) {
+//     bdd.query("SELECT * FROM `rooms` WHERE `name` = ?", [room], function (err, rows) {
+// 	callback(rows[0]);
+//     });
+// };
 
 /***********************************************************************/
 /*       Gestion CRUD des rooms                                        */
@@ -99,8 +123,10 @@ exports.create = function (user, newRoom, courseID, callback) {
 	else {
 	    if(question) 
 		bdd.query('INSERT INTO `rooms`(`name`, `id_currentQuestion`, `questionSet`, `ownerID`, `status`, `question`, `courseID`,`type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [newRoom.name, question.id, newRoom.questionSet, user.id, JSON.stringify(newRoom.status),JSON.stringify(question), courseID, newRoom.type], function(err, rows) {
-		    if(err) console.log(err);
-		    callback(err, rows);
+		    if(err) {console.log(err);callback(err, null);}
+		    else
+			exports.getByID(rows.insertId, callback);
+//			callback(err, rows);
 		});
 	    else 
 		callback(err);
@@ -117,12 +143,11 @@ exports.delete = function (user, room, callback) {
 //Update
 
 exports.update = function (user, room, newRoom, callback) {
-//    console.log([newRoom.name, newRoom.questionSet, room.id, user.id]);
     Question.getFirstOfSet(newRoom.questionSet, (err, question) => {
 	bdd.query('UPDATE `rooms` SET `name`= ?, `questionSet` = ?, id_currentQuestion = ?, status = ?, type = ? WHERE `id` = ? AND `ownerID` = ?',
 		  [newRoom.name, newRoom.questionSet,  question.id, JSON.stringify(newRoom.status), newRoom.type, room.id, user.id],
 		  (err, res) => {
-//		      console.log(err, this.sql);
+		      if(err) console.log(err);
 		      callback(err, res);
 		  });
     });

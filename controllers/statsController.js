@@ -12,8 +12,8 @@ var courseController = require("./courseController");
 exports.stats = (req, res) => {
         async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, req.session.user);
 	    },
@@ -43,7 +43,6 @@ exports.stats = (req, res) => {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
-	    res.render('stats', results)
+	    res.render('stats', results);
 	});
-}
+};

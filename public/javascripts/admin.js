@@ -66,7 +66,6 @@ socketAdmin.on('newStats', function (newStats) {
 	JSON.parse(stat.response).forEach((ans) => {
 	    let li = document.createElement("li");
 	    let color="white";
-	    console.log("ans is", ans);
 	    if(ans.n>=0) {
 		if(currentQuestionOfAdmin.reponses[ans.n].validity == "true") 
 		    color="green";
@@ -79,9 +78,7 @@ socketAdmin.on('newStats', function (newStats) {
 	    li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*//*stat.fullName+*/' <span>'+ans.response2+' '+ans.text+'</span></div>';
 	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
 	    ul.appendChild(li);
-	    console.log(ul);
 	});
-	console.log(li);
     });
     document.querySelector("#stats ul").innerHTML = ula.innerHTML;
     document.querySelector(".window").innerHTML = document.querySelector("#stats").outerHTML;
@@ -100,7 +97,6 @@ socketAdmin.on('newQuestion', function (reponse) {
     }
     if((temp=document.querySelector("li.currentQuestion"))) {
 	temp.classList.remove("currentQuestion");
-//	console.log("reponse is", reponse);
 	if(!reponse.id)
 	    temp.classList.add("inactiveQuestion");
     }
@@ -145,17 +141,12 @@ function sendReponse() {
     newQuestion.reponses = [];
     document.querySelectorAll("#wrapperAnswer > .reponse:not(#plus)").forEach(function(questionElem) {
 	let text = questionElem.querySelector(".text");
-	console.log("text is", text);
 	let rep = {
 	    reponse:text.innerText,
 	    texted: questionElem.querySelector(".isTexted").value == "true" ? true : false
 	};
-	console.log("questionElem",questionElem);
-	console.log("rep now", rep);
 	if(rep.texted)
 	    rep.correction = questionElem.querySelector(".textCorrect").value;
-	console.log("querySelec", questionElem.querySelector(".textCorrect"));
-	console.log("rep maintenant", rep);
 	// Pour la validité
 	if(questionElem.classList.contains("true"))
 	    rep.validity = "true";
@@ -223,7 +214,6 @@ function modifyQuestion() {
 	descr.innerHTML = "<textarea id=\"newDescr\" style='width:100%;height:200px;'></textarea>";
 	descr.firstChild.textContent = currentQuestionOfAdmin.description;
 	// Pour les réponses possibles
-	console.log("query",	document.querySelectorAll("#wrapperAnswer .reponse"));
 	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse,index) => {
 	    // Pour la couleur suivant la validité
 	    reponse.classList.add(currentQuestionOfAdmin.reponses[index].validity);
@@ -245,14 +235,11 @@ function modifyQuestion() {
 		"<button class='setStatus false'>Faux</button><br>"+
 		"<button class='remove'>Retirer</button>";
 	    // Et les events listeners
-	    reponse.querySelector(".isTexted").addEventListener("click", (event) => { console.log(event); toggleTextarea(reponse); });
+	    reponse.querySelector(".isTexted").addEventListener("click", (event) => { toggleTextarea(reponse); });
 	    reponse.querySelector(".setStatus.true").addEventListener("click", (event) => { chooseAs("true", reponse); });
 	    reponse.querySelector(".setStatus.to_correct").addEventListener("click", (event) => { chooseAs("to_correct", reponse); });
 	    reponse.querySelector(".setStatus.false").addEventListener("click", (event) => { chooseAs("false", reponse); });
 	    reponse.querySelector(".remove").addEventListener("click", (event) => { removeResponse(reponse); });
-	});
-	document.querySelectorAll("#wrapperAnswer .reponse").forEach((reponse) => {
-	    console.log(reponse);
 	});
 	// Pour le panel de droite
 	document.querySelector("#customQuestion").innerHTML = "Revenir à la question en cours";
@@ -303,7 +290,6 @@ function removeResponse (response) {
 
 // On choisit le statut de la réponse
 function chooseAs (status, elem) {
-    //    console.log(elem);
     if(status =="true" && !document.querySelector("#isMulti").checked && document.querySelector(".reponse.true"))
 	document.querySelector(".reponse.true").classList.replace("true", "false");
     elem.classList.remove("true", "false", "to_correct");

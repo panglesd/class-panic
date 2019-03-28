@@ -1,66 +1,181 @@
+String.prototype.trunc = String.prototype.trunc ||
+      function(n){
+          return (this.length > n) ? this.substr(0, n-1) + '...' : this;
+      };
+// ICI ajouter les events listener
+function addReponseListener(div) {
+    div.querySelector(".remove").addEventListener("click", (ev) => {
+	removeElement(div);
+    });
+    div.querySelectorAll("fieldset").forEach((f) => { addHideAndShow(f); });
+}
+
+function addHideAndShow(fieldset) {
+    let i = 1;
+    let f = (ev) => {
+	i=1-i;
+	let legend = fieldset.querySelector("legend");
+	if(i==0) {
+	    fieldset.querySelector(".wrapperFieldset").style.display = i == 0 ? "none" : "";
+	    // let oldLegend = legend.querySelector(".legend").innerText;
+	    // legend.innerHTML = " <span class='textLegend'>Possède une champs texte</span>  <span class='fileLegend'>Possède un upload de fichiers</span> <span class='validity'></span> <span class='correction'></span> <span class='correcFichiers'></span> <span class='coefLegend'></span><span class='notaDetails'></span>";
+	    let temp;
+	    if((temp = fieldset.querySelector(".texted"))) {
+		legend.querySelector(".textLegend").innerText = temp.checked ? "Avec champs texte" : "Sans champs texte";
+		legend.querySelector(".textLegend").classList.remove("hidden");
+	    }
+	    if((temp = fieldset.querySelector(".filed"))) {
+		legend.querySelector(".fileLegend").innerText = temp.checked ? "Avec upload de fichiers" : "Sans upload de fichiers";
+		legend.querySelector(".fileLegend").classList.remove("hidden");
+	    }
+	    if((temp = fieldset.querySelector("input[type=radio]:checked"))) {
+		legend.querySelector(".validity").innerText = "Par défaut : "+ (temp.value == "true" ? "Juste" : (temp.value=="false" ? "Fausse":"À corriger"));
+		legend.querySelector(".validity").classList.remove("hidden");
+	    }
+	    if((temp = fieldset.querySelector("textarea.correction-textarea"))) {
+		if(temp.value)
+		    legend.querySelector(".correction").innerText = "Correction : "+temp.value.trunc(50);
+		else
+		    legend.querySelector(".correction").innerText = "Pas de correction texte";
+		legend.querySelector(".correction").classList.remove("hidden");
+	    }
+	    if((temp = fieldset.querySelector(".coef[type=number]"))) {
+		legend.querySelector(".coefLegend").innerText = "Coef : "+temp.value;
+		legend.querySelector(".coefLegend").classList.remove("hidden");
+	    }
+	    if((temp = fieldset.querySelector("table"))) {
+		legend.querySelector(".notaDetails").innerText = "Selectionné : ✔ "+temp.querySelectorAll("input[type=number]")[1].value+", ✘ "+temp.querySelectorAll("input[type=number]")[0].value+", non selectionné : ✔ "+temp.querySelectorAll("input[type=number]")[3].value+", ✘ "+temp.querySelectorAll("input[type=number]")[2].value;
+		legend.querySelector(".notaDetails").classList.remove("hidden");
+	    }
+
+	}
+	else {
+	    legend.querySelectorAll("span").forEach((elem)=>{elem.classList.add("hidden");});
+	    legend.querySelector(".legend").classList.remove("hidden");
+	    fieldset.querySelector(".wrapperFieldset").style.display = i == 0 ? "none" : "";
+	}
+    };
+    f();
+    fieldset.querySelector("legend").addEventListener("click", f);
+}
+
+document.querySelectorAll(".reponse").forEach(addReponseListener);
+
 // Le HTML d'une question
 
+function points(sel, val) {
+    let s = document.querySelector("#strategy");
+    switch(s.value) {
+    case "normal":
+	if(val=="true" && sel == "selected") return "1";
+	return "0";
+    case "QCM":
+	if(val=="true" && sel == "selected") return "1";
+	if(val=="false" && sel == "selected") return "-1";
+	return "0";
+    case "hardQCM":
+	if(val=="true" && sel == "selected") return "1";
+	if(val=="false" && sel == "selected") return "-1";
+	if(val=="true" && sel == "unselected") return "-1";
+	return "0";
+    default:
+	return "";
+    }
+}
+
 function returnHTMLQuestion (i) {
-    return '	<!--    Regroupement des champs hidden   -->'+
-'		<input type="hidden" class="texted-hidden" name="texted-'+i+'" value="false">'+
-'		<input type="hidden" class="correctness-hidden" name="correctness-'+i+'" value="to_correct">'+
-'	<!--    Numéro de réponse                -->'+
+
+//    return    '<li class="reponse to_correct">'+
+    return    '		<!--    Numéro de réponse                -->'+
 '		<span class="froom nreponse"> Réponse '+i+' :</span>'+
-'	<!--    Texte de la réponse              -->'+
+'		<!--    Texte de la réponse              -->'+
 '		<textarea'+
+'		    rows="2"'+
 '		    placeholder="Ne sera pas interprété par markdown. Pour les maths, utiliser \(...\) ou \[...\]"'+
-'		    class="value-reponse-textarea" name="value-reponse-'+i+'"'+
+'		    class="value-reponse-textarea"'+
+'		    name="value-reponse-'+i+'"'+
 '		    style="width:100%"></textarea>'+
-'	<!--    Réponse custom ou non            -->'+
-'		<div'+
-'		    class="text"'+
-'		    style="text-align:left;margin:3px;">'+
-'		    <span>Ajouter un champs texte</span>'+
-'		</div>'+
-'		<textarea'+
-'		    class="correction-textarea"'+
-'		    name="correction-'+i+'"'+
-'		    style="display:none; width:100%"'+
-'		    placeholder="Vous pouvez rentrer la correction/justification/explication" ></textarea>'+
-'	<!--    Peut-on rendre un fichier ?      -->'+
-'		<div'+
-'		    class="text"'+
-'		    style="text-align:left;margin:3px;">'+
-'		<input name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
-'<!--		<input name="multipleFile-'+i+'" type="checkbox">Multiple -->'+
-'		    <div>'+
-'			<span style="font-size: 0.65em;">Ajouter des fichiers pour la correction : </span><input multiple name="correcFile-'+i+'" type="file">'+
-'			<span style="font-size: 0.65em;">Enlever des fichiers :</span>'+
-'			<select multiple name="delete-'+i+'">'+
-'			    <!-- <option value="prout1">Tout garder</option> -->'+
-'			</select>'+
+'		<!--    Réponse custom ou non            -->'+
+'		<fieldset class="fieldTypeDeQuestion">'+
+'		    <legend><span class="legend"> Type de question</span>  <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>'+
+'		    <div class="wrapperFieldset">'+
+'			<input class="texted" type="checkbox" class="texted-hidden" name="texted-'+i+'"> <label for="texted-'+i+'">Possède un champs texte.</label>'+
+'			<input class="filed" name="hasFile-'+i+'" type="checkbox"><span class="fileToggle">Ajouter un upload de fichier</span>'+
 '		    </div>'+
-// '		<input name="correcFile-'+i+'" type="file">Fichier pour la correction'+
-// '		</div>'+
-'	<!--    Coefficient                      -->'+
-'		<div'+
-'		    class="text"'+
-'		    style="text-align:left;margin:3px;">'+
-'		    <input name="coeff-<%= i %>" type="number" value="1"><label for="coef-<%= i %>"> : Coefficient</label>'+
-'		</div>		'+		
-'	<!--    Boutons pour le management       -->'+
+'		</fieldset>'+
+'		<!--    Peut-on rendre un fichier ?      -->'+
+'		<fieldset class="fieldCorrection">'+
+'		    <legend><span class="legend"> Correction</span> <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>'+
+'		    <div class="wrapperFieldset">'+
+'			Cette réponse est'+
+'			<input type="radio" value="true" name="correctness-'+i+'" id="true-'+i+'"/>'+
+'			<label for="true-'+i+'"> Juste </label>'+
+'			<input checked type="radio" id="tocorrect-'+i+'" value="to_correct" name="correctness-'+i+'"/>'+
+'			<label for="tocorrect-'+i+'"> À corriger </label>'+
+'			<input type="radio" id="false-'+i+'"  value="false" name="correctness-'+i+'"/>'+
+'			<label for="false-'+i+'"> Fausse </label>'+
+'			<textarea'+
+'			    rows="2"'+
+'			    class="correction-textarea"'+
+'			    name="correction-'+i+'"'+
+'			    style="width:100%"'+
+'			    placeholder="Commentaire ou correction" ></textarea>'+
+'			<div'+
+'			    class="text"'+
+'			    style="text-align:left;margin:3px;">'+
+'			    '+
+'			    <!--		    <input name="multipleFile-'+i+'" type="checkbox">Multiple </span> -->'+
+'			    <div>'+
+'				<span style="font-size: 1em;">Ajouter des fichiers pour la correction : </span><input name="correcFile-'+i+'" multiple type="file">'+
+'			    </div>'+
+'			</div></div>		'+
+'		</fieldset>		<!--    Coefficient                      -->'+
+'		'+
+'		<fieldset class="fieldNotation">'+
+'		    <legend><span class="legend">Notation</span> <span class="hidden textLegend">Champs texte</span>  <span class="hidden fileLegend">Upload de fichiers</span> <span class="hidden validity"></span> <span class="hidden correction"></span> <span class="hidden correcFichiers"></span> <span class="hidden coefLegend"></span><span class="hidden notaDetails"></span></legend>'+
+'		    <div class="wrapperFieldset">'+
+'			<div'+
+'			    class="text"'+
+'				   style="text-align:left;margin:3px;">'+
+'			    Cette réponse est sur  <input style="width:30px;" name="max-points-'+i+'" type="number" value="1"> points, et a pour coef  <input class="coef" style="width:30px;" name="coef-rep-'+i+'" type="number" value="1">.<br>'+
+'			    <input type="button" value="Normal">'+
+'			    <input type="button" value="QCM">'+
+'			    <input type="button" value="QCM Hardcore">'+
+'			    <input type="button" value="QCM Ultra Hardcore">'+
+'			    <table>'+
+'				<tr>'+
+'				    <td></td>'+
+'				    <td>Faux</td>'+
+'				    <td>Juste</td></tr>'+
+'				<tr>'+
+'				    <td>Selectionnée</td>'+
+'				    <td>'+ // Dépend de la stratégie en cours !
+	'					<input style="width:30px;" name="selected-false-'+i+'" type="number" value="'+points("selected", "false")+'"> points par défaut'+
+'				    </td>'+
+'				    <td>'+
+'					<input style="width:30px;" name="selected-true-'+i+'" type="number" value="'+points("selected", "true")+'"> points par défaut'+
+'				    </td>'+
+'				</tr>'+
+'				<tr>'+
+'				    <td>Non selectionnée</td>'+
+'				    <td>'+
+'					<input style="width:30px;" name="unselected-false-'+i+'" type="number" value="'+points("unselected", "false")+'"> points par défaut'+
+'				    </td>'+
+'				    <td>'+
+'					<input style="width:30px;" name="unselected-true-'+i+'" type="number" value="'+points("unselected", "true")+'"> points par défaut'+
+'				    </td>'+
+'				</tr>'+
+'			    </table>'+
+'			</div>		'+
+'		    </div>		</fieldset>	<!--    Boutons pour le management       -->'+
 '		    <div>'+
 '			<ul>'+
 '			    <li style="display:inline-block; margin-right:20px;">'+
 '				<a class="room remove">Enlever cette réponse</a>'+
 '			    </li>'+
-'			    <li class="set-true select" >'+
-'				Réponse juste'+
-'			    </li>'+
-'			    <li class="set-to_correct select selected" >'+
-'				Réponse à corriger'+
-'			    </li>'+
-'			    <li class="set-false select" >'+
-'				Réponse fausse'+
-'			    </li>'+
 '			</ul>'+
-'		    </div>'+
-'';
+	'		    </div>';//+
+//	'	    </li>';
 }
 
 function addAnswer () {
@@ -77,30 +192,31 @@ function addAnswer () {
 
 // Avoir ou non un champs texte dans la réponse
 
-function toggleText(elem) {
-    let text = elem.querySelector(".text");
-    text.classList.toggle("texted");
-    let value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
-    elem.querySelector(".correction-textarea").style.display = elem.querySelector(".correction-textarea").style.display=="block" ? "none" : "block";
-    let text_string = text.querySelector("span");
-    if(text_string.textContent == "Enlever le champs texte")
-	text_string.textContent = "Ajouter un champs texte";
-    else
-	text_string.textContent = "Enlever le champs texte";
-}
+// function toggleText(elem) {
+//     let text = elem.querySelector(".text");
+//     text.classList.toggle("texted");
+//     let value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
+//     elem.querySelector(".correction-textarea").style.display = elem.querySelector(".correction-textarea").style.display=="block" ? "none" : "block";
+//     let text_string = text.querySelector("span");
+//     if(text_string.textContent == "Enlever le champs texte")
+// 	text_string.textContent = "Ajouter un champs texte";
+//     else
+// 	text_string.textContent = "Enlever le champs texte";
+// }
+
 // Avoir ou non un fichier
 
-function toggleFile(elem) {
-    let text = elem.querySelector(".text");
-    text.classList.toggle("texted");
-    let value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
-    elem.querySelector(".correction-textarea").style.visibility = elem.querySelector(".correction-textarea").style.visibility=="hidden" ? "visible" : "hidden";
-    let text_string = text.querySelector("span");
-    if(text_string.textContent == "Enlever le champs texte")
-	text_string.textContent = "Ajouter un champs texte";
-    else
-	text_string.textContent = "Enlever le champs texte";
-}
+// function toggleFile(elem) {
+//     let text = elem.querySelector(".text");
+//     text.classList.toggle("texted");
+//     let value = elem.querySelector(".texted-hidden").value = elem.querySelector(".texted-hidden").value=="true" ? "false" : "true";
+//     elem.querySelector(".correction-textarea").style.visibility = elem.querySelector(".correction-textarea").style.visibility=="hidden" ? "visible" : "hidden";
+//     let text_string = text.querySelector("span");
+//     if(text_string.textContent == "Enlever le champs texte")
+// 	text_string.textContent = "Ajouter un champs texte";
+//     else
+// 	text_string.textContent = "Enlever le champs texte";
+// }
 
 // Régler si une réponse est correcte, fausse ou à corriger
 
@@ -128,4 +244,39 @@ function renumber() {
 function removeElement(elem) {
     elem.remove();
     renumber();
+}
+
+
+function updateGlobalNota(elem) {
+    console.log(elem);
+    if(elem.value == "answerByAnswer") {
+	document.querySelector("#newQuestion").classList.remove("notaGlobal");
+	document.querySelector("#newQuestion").classList.add("notaAnswer");
+    }
+    else if(elem.value == "globally") {
+	document.querySelector("#newQuestion").classList.remove("notaAnswer");	
+	document.querySelector("#newQuestion").classList.add("notaGlobal");
+    }
+}
+updateGlobalNota(document.querySelector('input[name="corrType"]:checked'));
+
+function addCriteria(criteria) {
+    let criteriaBase = document.createElement("div");
+    let i = document.querySelectorAll(".notaGlobalList .criteria").length;
+    criteriaBase.classList.add("criteria");
+    criteriaBase.innerHTML = 'Critère : <input class="criteriaName" name="criteria-name-'+i+'" type="text" placeholder="Critère"/> Coefficient : <input class="criteriaCoef" name="criteria-coef-'+i+'" type="number"/> <span class="remove">Enlever</span>';
+    criteriaBase.querySelector(".remove").addEventListener("click", (ev) => { removeElement(criteriaBase); refreshCriteriaNumbers();});
+    if(criteria) {
+	criteriaBase.querySelector(".criteriaName").value = criteria.name;
+	criteriaBase.querySelector(".criteriaCoef").value = criteria.coef;
+    }
+    document.querySelector(".notaGlobalList").appendChild(criteriaBase);
+}
+function refreshCriteriaNumbers() {
+    document.querySelectorAll(".notaGlobalList .criteria").forEach((crit, i) => {
+	crit.querySelector(".criteriaName").name = "criteria-name-"+i;
+	crit.querySelector(".criteriaCoef").name = "criteria-coef-"+i;
+    });
+    
+    
 }

@@ -103,7 +103,6 @@ socket.on('newQuestion', function (reponse, stats) {
 	let span = document.createElement("span");
 	elem.innerHTML = "";
 	span.innerHTML = md.render(rep.reponse);
-	console.log(span, rep.reponse);
 	span.classList.add("markdown");
 	elem.appendChild(span);
 	// Si besoin, ajout d'un textarea
@@ -116,7 +115,6 @@ socket.on('newQuestion', function (reponse, stats) {
 	    // Ajout d'un event listener pour le textarea
 	    if(typeof isAdmin == "undefined") {
 		textarea.addEventListener("input", (ev) => {
-		    console.log("updateed");
 		    chooseAnswer(index, elem, true);		    //updateAnswer(index, elem, true);
 //		    sendAnswer();
 		});
@@ -127,7 +125,6 @@ socket.on('newQuestion', function (reponse, stats) {
 	wrapper.appendChild(elem);
     });
     // Si l'on nous a aussi envoyé les stats, on les affiche.
-    console.log("stats", stats);
     if(stats) 
 	showStats(stats);
 });
@@ -145,24 +142,20 @@ function showStats(stats) {
     //total=Math.max(total,1);
     let count=[];
     stats.forEach(function (v) {
-	console.log("yoo", JSON.parse(v.answer));
 	let tab_rep_one_student = JSON.parse(v.answer);
 	tab_rep_one_student.forEach((rep) => {
 	    let n_answer = rep.n;
-	    console.log("n_answer", n_answer);
 	    if(count[n_answer])
 		count[n_answer]++;
 	    else
 		count[n_answer]=1;
 	});
     });
-    console.log(count, total);
     count.forEach((c,i) => {
 	document.querySelector("#r"+i).style.background =
 	    "linear-gradient(to right, rgba(0,0,0,0.5) "+((0.+c)/total*100./*-5*/)+"%,#F5F5DC "+((0.+c)/total*100.)+"%)";	
     });
 //	if(n_answer != -1) {
-//	    console.log("#rep"+v.answer);
 //	}
 //    });
 }//);

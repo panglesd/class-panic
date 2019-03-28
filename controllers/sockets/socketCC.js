@@ -29,6 +29,7 @@ module.exports = function(io) {
     function sendListQuestion(socket, callback) {
 	game.questionListForCC(socket.request.session.user, socket.room.id, function (err, questionList) {
 	    questionList.forEach((question) => {
+		delete(question.maxPoints);
 		delete(question.correct);
 //		if(question.texted)   // Pas besoin car on n'envoie pas les réponses possibles...
 //		    delete(question.correction);
@@ -55,30 +56,46 @@ module.exports = function(io) {
 	//     callback();
 	// });
 	Question.getByIndex(index, socket.room.id, (err, question) => {
-	    question.reponses.forEach((rep) => {
-		if(!socket.room.status.showTruth) {
-		    delete(rep.validity);
-		    if(rep.texted) {
-			delete(rep.correction);
-		    }
-		    delete(rep.correcFileInfo);
-		}
-	    });
 	    Stats.getSubmission(socket.request.session.user.id, socket.room.id, question.id, (err, submission) => {
 		question.submission = submission;
-		submission.response.forEach((rep) => {
-		    if(!socket.room.status.showCorrecPerso) {
+		if(!socket.room.status.showTruth) {
+		    question.reponses.forEach((rep) => {
 			delete(rep.validity);
-			delete(rep.customComment);
-			// delete commentaire perso etc...
-		    }
-		});
+			delete(rep.correcFilesInfo);
+			delete(rep.correction);
+		    });
+		}
+		if(!socket.room.status.showNotes) {
+		    delete(submission.globalInfo.criteria);
+		    delete(question.maxPoints);
+		    delete(question.coef);
+		    delete(question.strategy);
+		    delete(question.criteres);
+		    delete(question.correcType);
+		    delete(submission.correct);
+		    question.reponses.forEach((rep) => {
+			delete(rep.coef);
+			delete(rep.maxPoints);
+			delete(rep.strategy);
+		    });
+		    submission.response.forEach((rep) => {
+			delete(rep.validity);
+		    });
+		}
+		if(!socket.room.status.showCorrecPerso) {
+		    delete(submission.globalInfo.comment);
+		    submission.response.forEach((rep) => {
+			delete(rep.customComment);			
+		    });
+		}
+		delete(submission.customQuestion);
+		delete(submission.questionText);delete(submission.setText);delete(submission.roomText);
 		socket.emit("newQuestion", question);
 		callback();
 	    });
 	});
     };
-
+    
     
     io.of('/cc').on('connection', function(socket) {
 
@@ -106,7 +123,6 @@ module.exports = function(io) {
 	/******************************************/
 
 	socket.on('chooseRoom', function (newRoom) {
-	    console.log("chooseRoom");
 	    if (socket.room) {
 		socket.leave(socket.room.id);
 		delete(socket.room);
@@ -158,9 +174,8 @@ module.exports = function(io) {
 	/******************************************/
 		
 	socket.on('chosenAnswer', function (answer, questionIndex) {
-	    	    console.log("answer = ", answer);
 	    if(socket.room.status.acceptSubm) {
-		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
+//		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
 		    // A gérer autrement à cause de la réorganisation
 		    // if(answer.length != 0 && question.type != "multi")
 		    // 	answer = [answer[0]];
@@ -168,7 +183,7 @@ module.exports = function(io) {
 			sendListQuestion(socket, function() {});
 			//			tools.sendListQuestion(socket.request.session.user, socket, socket.room, function() {});
 		    });
-		});
+//		});
 	    }
 	});
 	/******************************************/
@@ -177,17 +192,16 @@ module.exports = function(io) {
 		
 	socket.on('chosenFile', function (fileName, n_ans, questionIndex, data) {
 	    if(socket.room.status.acceptSubm){
-		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		    if(question.allResponses[n_ans].hasFile != "none") {
+//		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, questiona) => {
+		Question.getByIndex(questionIndex, socket.room.id,(err, question) => {
+		    if(question.reponses[n_ans].hasFile != "none") {
 			let path = config.STORAGEPATH+"/course"+socket.room.courseID+"/room"+socket.room.id+"/question"+question.id+"/user"+socket.request.session.user.id+"/answer"+n_ans+"/";
-			console.log("path = ", path);
 			mkdirp(path, (err) => {
 			    fileName = sanit_fn(fileName);
 			    if(fileName)
 				fs.writeFile(path+fileName, data, (err) => {
 				    if(err) throw err;
 				    md5File(path+fileName, (err, hash) => {
-					console.log("calling logFile");
 					game.logFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, path, fileName, hash, Date.now(),(err) => {
 					    sendQuestionFromIndex(socket, questionIndex,() => {});
 //					socket.emit("fileReceived", n_ans, fileName, hash);
@@ -210,8 +224,7 @@ module.exports = function(io) {
 		 
 	socket.on('removeFile', function (n_ans, fileName, questionIndex) {
 	    if(socket.room.status.acceptSubm){
-		Question.getByIndexCC(questionIndex, socket.request.session.user,socket.room.id,(err, question) => {
-		    console.log("calling logFile");
+		Question.getByIndex(questionIndex, socket.room.id,(err, question) => {
 		    game.removeFile(socket.request.session.user.id, socket.room.id, question.id, n_ans, fileName,(err) => {
 			sendQuestionFromIndex(socket, questionIndex,() => {});
 		    });
@@ -224,7 +237,6 @@ module.exports = function(io) {
 	/******************************************/
 	
 	// socket.on('sendStatsPlease', function () {
-	//     //		    console.log(socket.room);
 	//     tools.sendOwnedStats(socket.room);
 	// });
 	

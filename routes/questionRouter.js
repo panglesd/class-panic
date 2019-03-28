@@ -41,7 +41,6 @@ router.use('/:questionID/', function (req, res, next) {
 		req.question = question;
 		if(question.class != req.set.id) {
 		    res.redirect(config.PATH);
-		    console.log("this redirection");
 		}
 		else
 		    next();

@@ -31,24 +31,28 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 		callback(null, typeof question == "undefined");
 	    },
 	    question: function (callback) {
-		console.log(question);
 		if(typeof question != "undefined")
 		    callback(null, question);
 		else
 		    callback(null,
 			     {
-				 reponses : [{
-				     reponse: "",
-				     validity: "to_correct",
-				     coef: 1,
-				     texted: false,
-				     correcFilesInfo: []
-				     // correcFilesInfo: [{fileName:"test.pdf"},{fileName:"test2.pdf"}]
-				 }],
+				 reponses : [// {
+				 //     reponse: "",
+				 //     validity: "to_correct",
+				 //     coef: 1,
+				 //     texted: false,
+				 //     correcFilesInfo: [],
+				 //     strategy: { selected: { vrai: 1, faux: 0}, unselected: { vrai: 0, faux: 0}},
+				 //     maxPoints:1
+				 //     // correcFilesInfo: [{fileName:"test.pdf"},{fileName:"test2.pdf"}]
+				 // }
+					    ],
 				 coef:1,
 				 enonce: "",
 				 description:"",
-				 type:"mono"
+				 type:"multi",
+				 correcType: "1",
+				 criteres:[]
 			     });
 	    },
 	    course : function(callback) {
@@ -65,8 +69,6 @@ var renderManageQuestion = function(user, course, question, set, msgs, req, res)
 	    }
 	},
 	function (err, results) {
-	    //	    console.log(results);
-//	    console.log("question iiiiiiiiiiiiiiiiiis", question);
 	    res.render('manage_question', results);
 	});
 };
@@ -92,7 +94,6 @@ exports.question_update_get = function(req, res) {
 /*         Controlleurs POST pour modifier les questions     */
 /*************************************************************/
 function formatQuestionFromBody(body, files) {
-    console.log("body = ", body);
     let filesData = [];
     let question = {
 	enonce : body.enonce,
@@ -108,38 +109,66 @@ function formatQuestionFromBody(body, files) {
 	let correcFilesInfo = [];
 	if(Array.isArray(files["correcFile-"+i])) correcFilesInfo = files["correcFile-"+i];
 	else if (files["correcFile-"+i]) correcFilesInfo = [files["correcFile-"+i]];
+	// let strategy;
+	//     strategy = {
+	// 	selected: {
+	// 	    vrai: parseInt(body["selected-true-"+i]),
+	// 	    faux: parseInt(body["selected-false-"+i])
+	// 	},
+	// 	unselected: {
+	// 	    vrai: parseInt(body["unselected-true-"+i]),
+	// 	    faux: parseInt(body["unselected-false-"+i])
+	// 	}
+	//     };
 	reponse[i]= {
 	    reponse: body["value-reponse-"+i] ,
 	    validity: body["correctness-"+i],
-	    texted: body["texted-"+i]=="true" ? true : false,
+	    // selectedPoints: parseInt(body["selected-points-"+i]),
+	    // unSelectedPoints: parseInt(body["unselected-points-"+i]),
+	    // strategy: strategy,
+	    coef: parseInt(body["coef-rep-"+i]),
+	    maxPoints: parseInt(body["max-points-"+i]),
+	    texted: body["texted-"+i] ? true : false,
 	    hasFile: body["hasFile-"+i] ? (body["hasMultiple-"+i] ? "multiple" : "single") : "none",
-	    coef: body["coeff-"+i],
-	    correcFilesInfo: correcFilesInfo
+	    correcFilesInfo: correcFilesInfo,
+	    correction: body["correction-"+i]
 	};
-	// console.log(files);
-	// if(body["hasFile-"+i]) {
-	//     if(files["correcFile-"+i]) {
-	// 	files["correcFile-"+i].name = sanit_fn(files["correcFile-"+i].name);
-	// 	filesData[i] = files["correcFile-"+i];
-	// 	reponse[i].correcFileInfo=[files["correcFile-"+i].name];
-	//     }
-	// }
-	if(reponse[i].texted) 
-	    reponse[i].correction = body["correction-"+i];
+//	if(body["corrType"]=="answerByAnswer")
+	reponse[i].strategy = {
+	    selected: {
+		vrai: parseInt(body["selected-true-"+i]),
+		faux: parseInt(body["selected-false-"+i])
+	    },
+	    unselected: {
+		vrai: parseInt(body["unselected-true-"+i]),
+		faux: parseInt(body["unselected-false-"+i])
+	    }
+	};
+	// if(reponse[i].texted) 
+	//     reponse[i].
 	i++;
     }
-//    question.reponse = JSON.stringify(reponse);
     question.reponses = reponse;
-//    return [question, filesData];
+    question.correcType = body["corrType"];
+    let criteres = [];
+    //    if(body["corrType"]=="globally") {
+    let j=0;
+    while(typeof body["criteria-name-"+j] != "undefined") {
+	criteres[j] = {
+	    name:body["criteria-name-"+j],
+	    coef:body["criteria-coef-"+j]
+	};
+	j++;
+    }
+    //}
+    question.criteres = criteres;
     return question;
 }
 // Create
 
 exports.question_create_post = function(req, res) {
     if(req.subscription.canOwnSet) {
-	console.log("req.files is", req.files);
 	let question = formatQuestionFromBody(req.body, req.files);
-	console.log("question = ", question);
 	
 //	let [question, filesData] = formatQuestionFromBody(req.body, req.files);
 	Question.questionCreate(req.session.user, question, /* filesData,*/ req.set.id, function(err, info) {
@@ -198,7 +227,7 @@ exports.question_update_post = function(req, res) {
 exports.question_delete_post = function(req, res) {
     if(req.subscription.canAllSet || (req.subscription.canOwnRoom && (req.user.id == req.set.ownerID))) {
 	Question.questionDelete(req.session.user, req.question.id,  function(err, id) {
-	    //	console.log(err);
+	    if(err)	console.log(err);
 //	    req.params.id = req.params.idSet; // HORRIBLE HACK
 	    if(err) {
 		req.msgs.push("Impossible de supprimer la question (peut-être est-elle la question courante d'une room) !");

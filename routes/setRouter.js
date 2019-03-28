@@ -57,7 +57,7 @@ router.use('/:setID', function (req, res, next) {
 	next();
 });
 
-router.get('/:setID/log', (req, res) => {console.log(req.set)})
+router.get('/:setID/log', (req, res) => {console.log(req.set);});
 
    /**********************************************************/
    /*              Managing sets of questions                */

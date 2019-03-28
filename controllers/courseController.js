@@ -13,11 +13,11 @@ var async = require('async');
 
 // Render courses.ejs
 
-renderCourses = function(user, msgs, req, res) {
+let renderCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -29,18 +29,17 @@ renderCourses = function(user, msgs, req, res) {
 	    }          
 	},
 	function (err, results) {
-//	    console.log(results);
-	    res.render('courses', results)
+	    res.render('courses', results);
 	});
-}
+};
 
 // Render course.ejs
 
-renderCourse = function(user, course, msgs, req, res) {
+let renderCourse = function(user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Rejoindre une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -58,19 +57,18 @@ renderCourse = function(user, course, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-//	    console.log(results);
-	    res.render('course', results)
+	    res.render('course', results);
 	});
-}
+};
 
 // Render manage_room.ejs
 
 // renderRoomManage = function (req, res, msgs) {
-renderCourseManage = function (user, course, msgs, req, res) {
+let renderCourseManage = function (user, course, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: Administrer "+course.name)},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: Administrer "+course.name);},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -94,18 +92,17 @@ renderCourseManage = function (user, course, msgs, req, res) {
 	    }
 	},
 	function (err, results) {
-	    //		console.log(results);
 	    res.render('manage_course', results);
 	});
 };
 
 // Render manage_courses.ejs
 
-renderManageCourses = function(user, msgs, req, res) {
+let renderManageCourses = function(user, msgs, req, res) {
     async.parallel(
 	{
-	    title : function(callback) { callback(null, "Big Sister: ... une salle")},
-	    config : function(callback) { callback(null, config) },	
+	    title : function(callback) { callback(null, "Big Sister: ... une salle");},
+	    config : function(callback) { callback(null, config); },	
 	    user : function (callback) {
 		callback(null, user);
 	    },
@@ -123,7 +120,7 @@ renderManageCourses = function(user, msgs, req, res) {
 	    }*/
 	},
 	function (err, results) {
-	    res.render('manage_courses', results)
+	    res.render('manage_courses', results);
 	});
 };
 
@@ -181,7 +178,7 @@ exports.subscribe_list = function(req, res) {
 		callback(null, req.course);
 	    },
 	    students :  function (callback) {
-		Course.students(req.course.id, (err, res) => {/*if(err) console.log(err);*/ callback(err, res)});
+		Course.students(req.course.id, (err, res) => {if(err) console.log(err); callback(err, res)});
 	    },
 	    msgs : function(callback) {
 		callback(null, "");
@@ -202,9 +199,7 @@ exports.course_create_post = function(req, res) {
     if(req.body.name) {
 	Course.create(req.session.user, req.body, function (err,r) {
 	    //	    res.redirect(config.PATH+'/manage/room');
-	    //	    console.log(req.body);
 	    if(err) {
-//		console.log(err);
 		renderManageCourses(req.session.user, ["Impossible de créer le cours !"], req, res);
 	    }
 	    else
@@ -239,7 +234,7 @@ exports.course_delete_post = function(req, res) {
 exports.course_update_post = function(req, res) {
     Course.update(req.session.user, req.course.id, req.body, function (err, id) {
 	if(err) {
-//	    console.log(err);
+	    console.log(err);
 	    req.msgs.push("Impossible de modifier le cours");
 	    exports.course_manage(req, res);
 //	    renderRoomManage(req.session.user, req.params.id, req.msgs, res);

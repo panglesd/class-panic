@@ -87,6 +87,7 @@
 */
 var async = require("async");
 let bdd = require("./bdd");
+let Stats = require("./stats");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
 var config = require("./../configuration");
@@ -95,37 +96,51 @@ var config = require("./../configuration");
 /*       Getters pour les question : listes                            */
 /***********************************************************************/
 
+let formatQuestion = function (question) {
+    question.reponses = JSON.parse(question.reponses);
+    question.criteres = JSON.parse(question.criteres);
+    exports.maxPointsOfQuestion(question, (err, maxP)=> {
+	question.maxPoints = maxP;
+    });
+};
+
 // List of all questions
 
 exports.questionList = function (callback) {
-    bdd.query("SELECT * FROM `questions`", callback);
+    bdd.query("SELECT * FROM `questions`", (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
+    });
 };
 
 // List of all owned questions
 
 exports.ownedList = function (user, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE owner = ?", [user.id], (err, res) => {callback(err,res);});
+    bdd.query("SELECT * FROM `questions` WHERE owner = ?", [user.id],  (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
+    });;
 };
 
 // List by set ID
 
 exports.listBySetID = function (setID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ? ORDER BY indexSet", [setID], (err, qList) => {
-	qList.forEach((qu) => {
-	    qu.reponses = JSON.parse(qu.reponses);
-	});
+    bdd.query("SELECT * FROM `questions` WHERE `class` = ? ORDER BY indexSet", [setID],  (err, qList) => {
+	qList.forEach(formatQuestion);
 	callback(err, qList);	
     });
 };
 
 exports.listOwnedBySetID = function (user, setID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` = ? AND `owner` = ? ORDER BY indexSet", [setID, user.id], callback);
+    bdd.query("SELECT * FROM `questions` WHERE `class` = ? AND `owner` = ? ORDER BY indexSet", [setID, user.id],  (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
+    });
 };
 
 // List by room ID
 
 exports.listByRoomID = function (id, callback) {
-//    console.log("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id]);
     bdd.query("SELECT * FROM `setDeQuestion` WHERE `id` = (SELECT questionSet FROM `rooms` WHERE `id` = ?)", [id], function(err, qList) {
 	exports.listBySetID(qList[0].id, callback);
     });
@@ -138,8 +153,9 @@ exports.listOwnedByRoomID = function (user, id, callback) {
 };
 
 exports.listByCourseID = function (courseID, callback) {
-    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ORDER BY indexSet", [courseID], function(err, qList) {
-	callback(err, qList);
+    bdd.query("SELECT * FROM `questions` WHERE `class` IN (SELECT id FROM setDeQuestion WHERE courseID = ?) ORDER BY indexSet", [courseID],  (err, qList) => {
+	qList.forEach(formatQuestion);
+	callback(err, qList);	
     });
 };
 
@@ -152,37 +168,34 @@ exports.listByCourseID = function (courseID, callback) {
 exports.getByID = function (questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ?", [questionId], function (err, rows) {
 	let q = rows[0];
-	q.reponses = JSON.parse(q.reponses);
+	formatQuestion(q);
 	callback(err, q);
     });
 };
 
 exports.getByIndex = function (questionIndex, roomID, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `indexSet` = ? AND class = (SELECT questionSet FROM rooms WHERE id = ?)", [questionIndex, roomID], function (err, rows) {
-	console.log(err);
+	if(err) console.log(err);
 	let q = rows[0];
-	q.reponses = JSON.parse(q.reponses);
+	formatQuestion(q);
 	callback(err, q);
     });
 };
 
-exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
-    let query = 
-	"SELECT enonce, questionID, questions.id as id, description, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
-	  "questions LEFT OUTER JOIN "+
-	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
-	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
-     glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
-	 console.log(err);
-	 console.log("gler", glere.sql);
-	let q = row[0];
-//	console.log(q);
-	q.allResponses = JSON.parse(q.allResponses);
-	if(q.userResponse)
-	    q.userResponse = JSON.parse(q.userResponse);
-	callback(err, q);
-    });
-};
+// exports.getByIndexCC = function (questionIndex, user, roomID, callback) {
+//     let query = 
+// 	"SELECT enonce, questionID, questions.id as id, description, indexSet, questions.reponses as allResponses, statsOfUser.response as userResponse, type  FROM "+
+// 	  "questions LEFT OUTER JOIN "+
+// 	  "(SELECT questionID, response FROM stats INNER JOIN statsBloc ON statsBloc.id = blocID WHERE userID = ? AND roomID = ?) statsOfUser" +
+// 	  " ON statsOfUser.questionID = questions.id WHERE indexSet <= ? AND questions.class = (SELECT questionSet FROM rooms WHERE id = ?) ORDER BY indexSet DESC";
+//      let glere = bdd.query(query, [user.id, roomID, questionIndex, roomID], function(err, row) {
+// 	let q = row[0];
+// 	q.allResponses = JSON.parse(q.allResponses);
+// 	if(q.userResponse)
+// 	    q.userResponse = JSON.parse(q.userResponse);
+// 	callback(err, q);
+//     });
+// };
 
 exports.getOwnedByID = function (user, questionId, callback) {
     bdd.query("SELECT * FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionId, user.id], function (err, rows) {
@@ -223,7 +236,6 @@ exports.getFirstOfSet = function (setID, callback) {
 };
 
 exports.getFileCorrect = function (question, n_ans, fileName, callback) {
-    console.log("thequestio is ", question);
     //    question.correcFileInfo = JSON.parse(question.correcFileInfo);
     if(question.reponses[n_ans].correcFilesInfo.includes(fileName)) {
 	let path = config.STORAGEPATH+"/question"+question.id+"/answer"+n_ans+"/"+fileName;
@@ -240,13 +252,11 @@ exports.getFileCorrect = function (question, n_ans, fileName, callback) {
 // Création
 
 exports.questionCreate = function (user, question, /*filesData,*/ setID, callback) {
-    console.log("question = ", question);
-    
     let i=0;
     bdd.query("SELECT MAX(indexSet+1) as indexx FROM `questions` WHERE `class` = ? GROUP BY `class`", [setID], function (er, ind) {
-	if(er) console.log(er);
-	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`,`strategy`, `coef`) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)", [
-	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.strategy, question.coef
+	if(er) console.log(er); // Il faudrait regrouper reponses, description, type, coef, correcType et criteres dans un seul champs de la BDD... 
+	bdd.query("INSERT INTO `questions`(`enonce`, `indexSet`, `class`, `owner`, `reponses`, `description`,`type`, `coef`, `correcType`, `criteres`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+	    question.enonce, ind[0] ? ind[0].indexx : 0, setID, user.id, /* will be modified later */ "", question.description, question.type, question.coef, question.correcType, JSON.stringify(question.criteres)
 	], function (err, r) {
 	    if(err) console.log(err);
 	    let questionID = r.insertId;
@@ -255,16 +265,14 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
 		newReponses[n_ans] = {correcFilesInfo:[]};
 		async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
  		    let path = config.STORAGEPATH+"/question"+questionID+"/answer"+n_ans+"/";
-		    console.log("path =", path+file.name);
 		    mkdirp(path, (err) => {
-			console.log(err);
+			if(err) console.log(err);
 			file.mv(path+file.name, (err, res) => {
-			    console.log("adding "+file.name+" a la liste de la reponse numero "+n_ans);
 			    newReponses[n_ans].correcFilesInfo.push(file.name);
 			    callbackFileInfo(err, res);});
 		    });
 		}, (err) => {
-		    console.log(err);
+		    if(err) console.log(err);
 		    callbackRep(err);
 		});
 	    }, (err) => {
@@ -287,7 +295,6 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
 // Suppression
 
 exports.questionDelete = function (user, questionID, callback) {
-    //    console.log("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [question.id, user.id]);
     exports.getOwnedByID(user, questionID, function(err, question) {
 	bdd.query("DELETE FROM `questions` WHERE `id` = ? AND `owner` = ?", [questionID, user.id], function(err, res) {
 	    if(err)
@@ -302,7 +309,6 @@ exports.questionDelete = function (user, questionID, callback) {
 // Update
 
 exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove, callback) {
-    console.log("filesToRemove = ", filesToRemove);
     function removeElem(array, elem) {
 	let index = array.indexOf(elem);
 	if (index > -1) {
@@ -323,31 +329,36 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	    newReponses[n_ans] = {correcFilesInfo:[]};
 	    async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
  		let path = "storage/question"+questionID+"/answer"+n_ans+"/";
-		console.log("path =", path+file.name);
 		mkdirp(path, (err) => {
-		    console.log(err);
+		    if(err) console.log(err);
 		    file.mv(path+file.name, (err, res) => {
-			console.log("adding "+file.name+" a la liste de la reponse numero "+n_ans);
 			removeElem(question.reponses[n_ans].correcFilesInfo, file.name);
 			question.reponses[n_ans].correcFilesInfo.push(file.name);
 			callbackFileInfo(err, res);});
 		});
 	    }, (err) => {
-		console.log(err);
+		if(err) console.log(err);
 		callbackRep(err);
 	    });
 	}, (err) => {
 	    if(err) // Il y a eu une erreur lors de l'enregistrement des fichiers : on préfère tout supprimer (il faudrait aussi supprimer les fichiers enregistrés...)
-		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
+		// VRAIMENT ?????????????????? c'etait un reste de "create"
+// 		bdd.query("DELETE FROM `questions` WHERE id = ?", [questionID], err2 => {
 		    // fs.rm(path);
 		    callback(err);
-		});
+//		});
 	    else {
 		question.reponses.forEach((rep, n_ans) => {
 		    newQuestion.reponses[n_ans].correcFilesInfo = rep.correcFilesInfo;
 		});
-		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `strategy` = ?, `coef` = ? WHERE `id` = ?",
-			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.strategy, newQuestion.coef, questionID], (err, res) => {callback(err, questionID);});
+		bdd.query("UPDATE `questions` SET `enonce` = ?, `reponses` = ?, `description` = ?, `type` = ?, `coef` = ?, `correcType` = ?, `criteres` = ? WHERE `id` = ?",
+			  [newQuestion.enonce, JSON.stringify(newQuestion.reponses), newQuestion.description, newQuestion.type, newQuestion.coef, newQuestion.correcType, JSON.stringify(newQuestion.criteres), questionID], (err, res) => {
+			      exports.getByID(question.id, (err, newQuestion) => {
+				  exports.updateGradesOfQuestion(newQuestion, (err, res) => {
+				      callback(err, questionID);
+				  });
+			      });
+			  });
 //		bdd.query("UPDATE `questions` SET reponses = ? WHERE id = ?", [JSON.stringify(question.reponses), questionID], (err) => {callback(err, questionID);});
 	    }
 	});
@@ -359,7 +370,6 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 	      async.eachOf(filesData, (file, index, callback) => {
 		  if(file) {
  		      let path = "storage/question"+questionID+"/answer"+index+"/";
-		      console.log("path =", path+file.name);
 		      mkdirp(path, (err) => {
 			  file.mv(path+file.name, callback);
 		      });
@@ -367,7 +377,6 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 		  else
 		      callback();
 	      }, (err) => {
-		  console.log(err);
 		  callback(err, questionID);
 	      })
 	     );
@@ -380,54 +389,111 @@ exports.questionUpdate = function (user, questionID, newQuestion, filesToRemove,
 /*       Correction des questions                                      */
 /***********************************************************************/
 
-exports.correctSubmission = function(question, submission, strategy) {
-//    console.log("queztion = ", question);
-//    console.log("strategy = ", strategy);
-//   console.log("queztion", question.type);
-//    console.log("submission = ", submission);
-    switch(/*[*/strategy/*, question.strategy]*/) {
-    case "manual":
-	if(question.mark)
-	    return question.mark;
-	return "unknown";
-    case "QCM":
-	let tot = 0;
-	let visited = [];
-	submission.forEach((rep) => {
-//	    console.log("Myvalidity = ",question.reponses[rep.n].validity);
-	//     if(!visited[rep.n] && tot != "unkown") {
-	// 	console.log("we are here");
-	// 	if(question.reponses[rep.n].validity=="true")
-	// 	    tot++;
-	// 	if(question.reponses[rep.n].validity=="false")
-	// 	    tot--;
-	// 	if(question.reponses[rep.n].validity=="to_correct"){
-	// 	    console.log("we are there");
-	// 	    tot = "unknown";
-	// 	}
-	//     }
-	//     visited[rep.n]=true;
+exports.updateGradesOfQuestion = function(question, callback) {
+    Stats.getStats({questionID: question.id }, (err, statsL) => {
+	async.forEach(statsL,(submission, callbackForEach) => {
+	    Stats.getSubmissionByID(submission.statsID, (err, trueSubm) => {
+		exports.correctAndLogSubmission(question, trueSubm, callbackForEach);
+	    });
+	}, (err) => {
+	    callback(err);
 	});
-	let max = 0;
-	question.reponses.forEach((rep)=> {
-	    if (rep.validity == "true" && max != "unknown")
-		max++;
-	    if (rep.validity == "to_correct")
-		max = "unknown";
+    });
+};
+
+exports.correctAndLogSubmission = function(question, submission, callback) {
+    exports.correctSubmission(question, submission, (err, grade) => {
+	let query = "UPDATE `stats` SET correct = ? WHERE id = ?";
+	if(typeof(grade)=="number")
+	    grade = parseFloat(grade.toFixed(2));
+	let params = [grade, submission.statsID];
+	bdd.query(query, params, (err,res) => { callback(err,res);});
+    });
+};
+
+exports.maxPointsOfQuestion = function(question, callback) {
+    let maxPointsTotal = 0;
+    if(question.correcType=="answerByAnswer") {
+	question.reponses.forEach((questReponse) => {
+	    let maxPoints;
+	    if(questReponse.validity == "true")
+		maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				     questReponse.strategy.unselected.vrai);
+	    else if (questReponse.validity == "false")
+		maxPoints = Math.max(questReponse.strategy.selected.faux,
+				     questReponse.strategy.unselected.faux);
+	    else 
+		maxPoints = Math.max(questReponse.strategy.selected.vrai,
+				     questReponse.strategy.selected.faux,
+				     questReponse.strategy.unselected.vrai,
+				     questReponse.strategy.unselected.faux);
+	    questReponse.maxPoints = maxPoints;
+	    maxPointsTotal += maxPoints;
 	});
-	if(max == "unknown" || tot == "unknown")
-	    return "unknown";
-	else
-	    return ""+(tot*1./(max ? max : 1));
-    case "all_or_0":
-	if(!submission[0])
-	    return "0";
-//	if(question.reponses[submission[0].n].validity == "true")
-//	    return "1";
-//	if(question.reponses[submission[0].n].validity == "false")
-//	    return "0";
-	return "unknown";
     }
-    
-    
+    else {
+	question.criteres.forEach((critere) => {
+	    maxPointsTotal += parseInt(critere.coef); 
+	});
+    }
+    callback(null, maxPointsTotal);
+};
+
+exports.correctSubmission = function(question, submission, callback) {
+    if(submission.strategy=="manual") {
+	callback(null, submission.correct);
+    }
+    else if(submission.strategy=="computed" && question.correcType == "globally") {
+	let sumCoef = 0;
+	let sumNote = 0;
+	submission.globalInfo.criteria.forEach((critere, index) => {
+	    sumCoef += question.criteres[index].coef;
+	    sumNote += question.criteres[index].coef*critere;
+	});
+	// if(sumCoef!=0)		
+	if(isNaN(sumNote) || typeof(sumNote)!= "number")
+	    callback(null, "?");
+	else
+	    callback(null, sumNote);
+
+    }
+    else if(submission.strategy=="computed" && question.correcType == "answerByAnswer") {
+	let submPoints = 0;
+	let totPoints = 0;
+	submission.response.forEach((repSubm, index) => {
+	    let rep = question.reponses[index];
+	    // Is the following really necessary ? No !
+	    // if(typeof(repSubm.points) == "number")
+	    // 	submPoints += repSubm.points;
+	    // else 
+	    if(typeof(repSubm.validity) == "number") {
+		if(repSubm.selected) 
+		    submPoints += repSubm.validity*rep.strategy.selected.vrai + (1-repSubm.validity)*rep.strategy.selected.faux;
+		if(!repSubm.selected) 
+		    submPoints += repSubm.validity*rep.strategy.unselected.vrai + (1-repSubm.validity)*rep.strategy.unselected.faux;
+	    }
+	    else {
+		let repValidity;
+		if(rep.validity == "true") repValidity = 1;
+		else if(rep.validity == "false") repValidity = 0;
+		else repValidity = NaN;
+		if(repSubm.selected){
+		    if(rep.strategy.selected.vrai != rep.strategy.selected.faux)
+			submPoints += (repValidity)*rep.strategy.selected.vrai + (1-repValidity)*rep.strategy.selected.faux;
+		    else
+			submPoints += rep.strategy.selected.vrai;
+		}
+		else if(!repSubm.selected)
+		    if(rep.strategy.unselected.vrai != rep.strategy.unselected.faux)
+			submPoints += (repValidity)*rep.strategy.unselected.vrai + (1-repValidity)*rep.strategy.unselected.faux;
+		    else
+			submPoints += rep.strategy.unselected.faux;
+	    }
+	    totPoints += rep.maxPoints;
+	});
+	if(isNaN(submPoints))
+	    callback(null, "?");
+	else
+	    callback(null, submPoints);
+    }
 };

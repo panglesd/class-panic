@@ -28,7 +28,6 @@ module.exports = function(io) {
 	// !!!!!!!!! A voir si ça n'est pas mieux de faire ça côté client !
 	
 	socket.on("stats", function(filter) {
-	    console.log(filter);
 	    if(filter.courseID) {
 		Course.getByID(filter.courseID, (err, course) => {
 		    User.getSubscription(socket.request.session.user, course, (err, subs) => {

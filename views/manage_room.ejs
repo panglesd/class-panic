@@ -26,7 +26,8 @@ Actuellement <select name="type">
 <input type="checkbox" id="open" name="open"" <%= room.status.open ? "checked" : "" %>><label for="open">Ouverture de la salle</label> <br>
 <input type="checkbox" id="acceptSubm" name="acceptSubm"" <%= room.status.acceptSubm ? "checked" : "" %>><label for="acceptSubm">La salle accepte les nouvelles soumissions</label> <br>
 <input type="checkbox" id="showTruth" name="showTruth"" <%= room.status.showTruth ? "checked" : "" %>><label for="showTruth">La salle montre la correction des réponses</label> <br>
-<input type="checkbox" id="showCorrecPerso" name="showCorrecPerso"" <%= room.status.showCorrecPerso ? "checked" : "" %>><label for="showCorrecPerso">La salle montre les corrections personnelles et la note des étudiants corrigés</label> <br>
+<input type="checkbox" id="showCorrecPerso" name="showCorrecPerso"" <%= room.status.showCorrecPerso ? "checked" : "" %>><label for="showCorrecPerso">La salle montre les commentaires personnels des étudiants corrigés</label> <br>
+<input type="checkbox" id="showNotes" name="showNotes"" <%= room.status.showNotes ? "checked" : "" %>><label for="showNotes">La salle montre la note des étudiants corrigés</label> <br>
 <% if((subscription.canOwnRoom && user.id == room.ownerID ) || subscription.canAllRoom) {%>
     <input type="submit" value="Modifier">
     </form>

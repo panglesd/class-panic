@@ -46,13 +46,11 @@ router.get('/', course_controller.course_manage_all);
 
 router.use('/:courseID/', function (req, res, next) {
     Course.getByID(parseInt(req.params.courseID), (err, course) => {
-//	console.log(parseInt(req.params.courseID));
 	if(!err) {
 	    User.getSubscription(req.session.user, course, (err, subscription) => {
 		if(subscription) {
 		    req.subscription = subscription;
 		    req.course = course;
-//		    console.log(subscription);
 //		    if(req.subscription.isTDMan)
 			next();
 //		    else
@@ -140,7 +138,6 @@ router.use('/:courseID/:command/:roomID', (req, res, next) => {
     });
 });
 router.use('/:courseID/:command/:roomID/:fileType/:questionID', (req, res, next) => {
-    console.log(req.params);
     Question.getByID(req.params.questionID, (err, question) => {
 	req.question = question;
 	next();
@@ -158,7 +155,7 @@ router.get('/:courseID/control/:roomID', game_controller.room_admin);
 // GET request for admining a room.
 router.get('/:courseID/correct/:roomID', game_controller.room_cc_admin);
 router.get('/:courseID/correct/:roomID/filePerso/:questionID/:answerNumber/:userID/:fileName', game_controller.fileForAdmin);
-router.get('/:courseID/correct/:roomID/fileCorrect/:questionID/:answerNumber/:userID/:fileName', game_controller.fileCorrectForAdmin);
+router.get('/:courseID/correct/:roomID/fileCorrect/:questionID/:answerNumber/:fileName', game_controller.fileCorrectForAdmin);
 
 
 

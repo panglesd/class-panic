@@ -83,60 +83,18 @@ function gotoQuestion(i) {
 }
 
 /*********************************************************************/
-/*                 lorsque l'on reçoit les nouvelles statistiques    */
-/*********************************************************************/
-
-// socketCC.on('newStats', function (newStats) {
-//     console.log(newStats);
-//     let ula = document.createElement("ul");
-//     ula.innerHTML = '<li style="font-family: Impact, \'Arial Black\', Arial, Verdana, sans-serif;"> Ce qu\'en disent les élèves : </li>';
-//     newStats.forEach(function (stat) {
-// 	let li = document.createElement("li");
-// 	//li.id = stat.id;
-// 	li.innerHTML = '<div style="display:flex; justify-content: space-between;"></div>';
-// 	li.firstChild.innerText = stat.fullName;
-// 	ula.appendChild(li);
-// 	let ul = document.createElement("ul");
-// 	li.appendChild(ul);
-// 	JSON.parse(stat.response).forEach((ans) => {
-// 	    let li = document.createElement("li");
-// 	    let color="white";
-// 	    console.log("ans is", ans);
-// 	    if(ans.n>=0) {
-// 		if(currentQuestionOfAdmin.reponses[ans.n].validity == "true") 
-// 		    color="green";
-// 		else if(currentQuestionOfAdmin.reponses[ans.n].validity == "false") 
-// 		    color="red";
-// 		ans.response2 = currentQuestionOfAdmin.reponses[ans.n].reponse;
-// 	    }
-// 	    else 
-// 		ans.response2 = "?";
-// 	    li.innerHTML = '<div style="display:flex; justify-content: space-between;color:'+color+';"> '+/*stat.pseudo*//*stat.fullName+*/' <span>'+ans.response2+' '+ans.text+'</span></div>';
-// 	    MathJax.Hub.Queue(["Typeset",MathJax.Hub,li]);
-// 	    li.onclick = ((ev) => {console.log(ans);gotoQuestion(ans.indexSet);});
-// 	    ul.appendChild(li);
-// 	    console.log(ul);
-// 	});
-// 	console.log(li);
-//     });
-//     document.querySelector("#stats ul").innerHTML = ula.innerHTML;
-//     document.querySelector(".window").innerHTML = document.querySelector("#stats").outerHTML;
-// });
-
-/*********************************************************************/
 /*                 lorsque l'on reçoit une nouvelle question         */
 /*********************************************************************/
 
 socketCC.on('newQuestion', function (reponse) {
-//    console.log('newQuestion');
     console.log("newQuestion", reponse);
 //    currentQuestionOfAdmin=reponse;
     currentQuestion=reponse;
 //    currentQuestion.fileInfo = JSON.parse(currentQuestion.fileInfo);
 
-    let temp2 = reponse.submission.response;
+    //let temp2 = reponse.submission.response;
     afficheQuestion(reponse);
-    afficheSubmission(temp2);
+    afficheSubmission(reponse.submission);
     socketCC.emit("sendCorrection", currentQuestion.id);
     socketCC.emit("sendList");
 });
@@ -149,7 +107,7 @@ socketCC.on("fileReceived", (n_ans, fileName, hash) => {
     console.log("fileReceived with : ", n_ans, fileName, hash);
     let elemReponse = document.querySelectorAll("#wrapperAnswer .reponse")[n_ans];
     affFileInfo(elemReponse, {fileName: fileName, hash: hash, timestamp: Date.now()}, n_ans);
-    sendAnswer();    
+    chooseAnswer(n_ans);    
 });
 
 /*********************************************************************/
@@ -165,13 +123,12 @@ socketCC.on('newList', function (questionList) {
 /*********************************************************************/
 
 function chooseAnswer(i) {
+    console.log("we chose "+i);
     let chosenAnswer = currentQuestion.reponses[i];
-    console.log(chosenAnswer);
     // Dans le cas où seul le clic détermine si question est selectionnée, (pas de fichier/textarea)
     if(!chosenAnswer.texted && !(chosenAnswer.hasFile == true || ["single","multi","true"].includes(chosenAnswer.hasFile))) {
-	console.log("clic-determined");
 	if(currentQuestion.type!="multi") {
-	    var reponse=document.querySelector(".reponse.selected");
+	    let reponse=document.querySelector(".reponse.selected");
 	    if(reponse)
 		reponse.classList.replace('selected', 'notSelected');
 	    if(i>-1) {
@@ -185,8 +142,10 @@ function chooseAnswer(i) {
 		a.classList.toggle("selected");	    
 	}
     }
-    else {
-	console.log("content-determined");
+    else { // Cas ou il y a un fichier/un textarea
+	let reponse=document.querySelector(".reponse.selected");
+	if(reponse)
+	    reponse.classList.replace('selected', 'notSelected');
 	let elem = document.querySelector("#r"+i);
 	let flag = false;
 	let textarea = elem.querySelector("textarea");
@@ -209,7 +168,6 @@ function chooseAnswer(i) {
 
 function sendAnswer() {
     let reponses = [];
-//    document.querySelectorAll(".reponse.selected").forEach((elem) => {
     document.querySelectorAll(".reponse").forEach((elem) => {
 	let atom = {};
 	atom.selected = elem.classList.contains("selected");
@@ -223,7 +181,6 @@ function sendAnswer() {
     });
     console.log("reponse envoyées : ", reponses);
     socketCC.emit("chosenAnswer", reponses, currentQuestion.indexSet);
-//    console.log("reponses, currentQuestion.indexSet = ", reponses, currentQuestion.indexSet);
 }
 
 /*********************************************************************/

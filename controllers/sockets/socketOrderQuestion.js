@@ -23,7 +23,6 @@ module.exports = function(io) {
 			(set, callback) => { Course.getByID(set.courseID, (err, res) => {callback(err, set, res);}); },
 			(set, course, callback) => {User.getSubscription(socket.request.session.user, course, (err, res) => {callback(err, set, course, res);}); },
 			(set, course, subs) => {
-//			    console.log(subs);
 			    if(subs.canSetUpdate)
 				Set.reOrder(course, set, newOrder);
 			}]);

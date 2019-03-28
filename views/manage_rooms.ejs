@@ -7,7 +7,7 @@
 		<span class="froom"><%= room.name %></span>
 		<ul>		
 		    <li>Type de salle : <%= room.type == 'cc' ? "Salle de TD" : (room.type == "live" ? "Salle de cours" : "Salle de type Inconnu") %></li>
-		    <li>Associé au set : <%= setOwnedList.find((set) => {return set.id==room.questionSet}).name %></li>
+		    <li>Associé au set : <%= //setOwnedList.find((set) => {return set.id==room.questionSet}).name %></li>
 		</ul>
 		<div>
 		    <!--		    <ul> -->
@@ -72,7 +72,7 @@
 		    <span class="froom"><%= room.name %></span>
 		    <ul>		
 			<li>Type de salle : <%= "Salle de cours" %></li>
-			<li>Associé au set : <%= setOwnedList.find((set) => {return set.id==room.questionSet}).name %></li>
+			<li>Associé au set : <%= //setOwnedList.find((set) => {return set.id==room.questionSet}).name %></li>
 		    </ul>
 		    <div>
 			<!--		    <ul> -->
