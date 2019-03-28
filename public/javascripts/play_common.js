@@ -182,7 +182,7 @@ function createResponse(question, rep, index) {
 	customComment.addEventListener("input", (ev) => {
 	    setCustomComment(index, customComment.value);
 	});
-    customComment.style.display = "";	
+	customComment.style.display = "";	
     }
 //    elem.appendChild(document.createTextNode("Définir un commentaire personnel :"));
     elem.appendChild(customComment);
@@ -347,7 +347,7 @@ function afficheSubmission (submission) {
 	    elemReponse.querySelector(".repCustomComment").style.display = "";
 	    elemReponse.querySelector(".repCustomComment span").innerText = submReponse.customComment;
 	    elemReponse.querySelector(".customComment").value = submReponse.customComment;
-	    elemReponse.querySelector(".customComment").style.display = "";
+	    // elemReponse.querySelector(".customComment").style.display = "";
 	}
 	let maxPoints = questReponse.maxPoints;
 	// if(questReponse.validity == "true")
