@@ -347,7 +347,7 @@ function afficheSubmission (submission) {
 	    elemReponse.querySelector(".repCustomComment").style.display = "";
 	    elemReponse.querySelector(".repCustomComment span").innerText = submReponse.customComment;
 	    elemReponse.querySelector(".customComment").value = submReponse.customComment;
-	    elemReponse.querySelector(".customComment").style.display = "";
+	    // elemReponse.querySelector(".customComment").style.display = "";
 	}
 	let maxPoints = questReponse.maxPoints;
 	// if(questReponse.validity == "true")
