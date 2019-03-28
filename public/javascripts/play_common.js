@@ -182,7 +182,7 @@ function createResponse(question, rep, index) {
 	customComment.addEventListener("input", (ev) => {
 	    setCustomComment(index, customComment.value);
 	});
-    customComment.style.display = "";	
+	customComment.style.display = "";	
     }
 //    elem.appendChild(document.createTextNode("Définir un commentaire personnel :"));
     elem.appendChild(customComment);

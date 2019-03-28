@@ -416,6 +416,8 @@ exports.maxPointsOfQuestion = function(question, callback) {
     if(question.correcType=="answerByAnswer") {
 	question.reponses.forEach((questReponse) => {
 	    let maxPoints;
+	    if(!questReponse.strategy)
+		questReponse.strategy = {"selected": {"vrai":0, "faux":0}, "unselected": {"vrai":0, "faux":0}};
 	    if(questReponse.validity == "true")
 		maxPoints = Math.max(questReponse.strategy.selected.vrai,
 				     questReponse.strategy.unselected.vrai);
