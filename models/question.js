@@ -90,6 +90,7 @@ let bdd = require("./bdd");
 let Stats = require("./stats");
 var mkdirp = require("mkdirp");
 var fs = require("fs");
+var config = require("./../configuration");
 
 /***********************************************************************/
 /*       Getters pour les question : listes                            */
@@ -237,7 +238,7 @@ exports.getFirstOfSet = function (setID, callback) {
 exports.getFileCorrect = function (question, n_ans, fileName, callback) {
     //    question.correcFileInfo = JSON.parse(question.correcFileInfo);
     if(question.reponses[n_ans].correcFilesInfo.includes(fileName)) {
-	let path = "storage/question"+question.id+"/answer"+n_ans+"/"+fileName;
+	let path = config.STORAGEPATH+"/question"+question.id+"/answer"+n_ans+"/"+fileName;
 	fs.readFile(path, callback);    
     }
     else
@@ -263,7 +264,7 @@ exports.questionCreate = function (user, question, /*filesData,*/ setID, callbac
 	    async.forEachOf(question.reponses, (reponse, n_ans, callbackRep) => {
 		newReponses[n_ans] = {correcFilesInfo:[]};
 		async.eachOf(reponse.correcFilesInfo, (file, i, callbackFileInfo) => {
- 		    let path = "storage/question"+questionID+"/answer"+n_ans+"/";
+ 		    let path = config.STORAGEPATH+"/question"+questionID+"/answer"+n_ans+"/";
 		    mkdirp(path, (err) => {
 			if(err) console.log(err);
 			file.mv(path+file.name, (err, res) => {

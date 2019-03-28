@@ -6,6 +6,7 @@ var User = require("./user");
 var Set = require("./set");
 var Course = require("./course");
 var Stats = require("./stats");
+var config = require("./../configuration");
 
 var fs = require("fs");
 var mkdirp = require("mkdirp");
@@ -357,7 +358,7 @@ exports.removeFile = function(userID, roomID, questionID, n_ans, fileName, callb
 
 exports.getFileFromSubmission= function(userID, room, question, answerNumber, fileName, callback) {
     Stats.getSubmission(userID, room.id, question.id, (err, subm) => {
-	let path = "storage/course"+room.courseID+"/room"+room.id+"/question"+question.id+"/user"+userID+"/answer"+answerNumber+"/"+fileName;
+	let path = config.STORAGEPATH+"/course"+room.courseID+"/room"+room.id+"/question"+question.id+"/user"+userID+"/answer"+answerNumber+"/"+fileName;
 	fs.readFile(path, callback);
     });
 
