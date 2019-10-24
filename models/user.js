@@ -42,7 +42,9 @@ exports.userListByFilter = function (filter, callback) {
 
 exports.userByID = function (userID, callback) {
     bdd.query('SELECT * FROM users WHERE id = ?', [userID],  function(err, rows) {
-	callback(err, rows[0]);
+	let us = rows[0];
+	us.fullName = us.fullname + " " + us.surname;
+	callback(err, us);
     });
 };
 
@@ -54,7 +56,7 @@ exports.userByID = function (userID, callback) {
 
 exports.create = function (user, callback) {
     bcrypt.hash(user.password, saltRounds, function(err, hash) {
-	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `isAdmin`) VALUES (?, ?, ?, ?, ?)', [user.pseudo, hash, user.email, user.nomComplet, false ], function(err, rows) {
+	bdd.query('INSERT INTO `users`(`pseudo`, `password`, `email`, `fullName`, `surname`, `isAdmin`) VALUES (?, ?, ?, ?, ?,?)', [user.pseudo, hash, user.email, user.nomComplet, user.prenom, false ], function(err, rows) {
 	    //	    console.log(rows);
 	    console.log(err);
 	    callback(err,rows);
